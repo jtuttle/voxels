@@ -25,7 +25,7 @@ public class World : MonoBehaviour {
 				for(int y = 0; y < worldY; y++) {
 					if(y <= stone)
 						data[x, y, z] = 1;
-					else if(y <= dirt + stone)
+					else if(y <= stone + dirt)
 						data[x, y, z] = 2;
 				}
 			}
