@@ -19,6 +19,7 @@ public class Chunk : MonoBehaviour {
 	private float tUnit = 0.25f;
 	private Vector2 tStone = new Vector2(1, 0);
 	private Vector2 tGrass = new Vector2(0, 1);
+	private Vector2 tGrassTop = new Vector2 (1, 1);
 
 	private Mesh mesh;
 	private MeshCollider col;
@@ -36,18 +37,10 @@ public class Chunk : MonoBehaviour {
 		return world.Block(x + chunkX, y + chunkY, z + chunkZ);
 	}
 
-	private void GenerateMesh() {
+	public void GenerateMesh() {
 		for(int x = 0; x < chunkSize; x++) {
 			for(int y = 0; y < chunkSize; y++) {
 				for(int z = 0; z < chunkSize; z++) {
-					CubeTop(x, y, z, Block(x, y, z));
-					CubeBot(x, y, z, Block(x, y, z));
-					CubeEast(x, y, z, Block(x, y, z));
-					CubeWest(x, y, z, Block(x, y, z));
-					CubeNorth(x, y, z, Block(x, y, z));
-					CubeSouth(x, y, z, Block(x, y, z));
-
-					/*
 					// block is solid
 					if(Block(x, y, z) != 0) {
 						// block above is air
@@ -74,7 +67,6 @@ public class Chunk : MonoBehaviour {
 						if(Block(x, y, z - 1) == 0)
 							CubeSouth(x, y, z, Block(x, y, z));
 					}
-				    */
 				}
 			}
 		}
@@ -105,7 +97,15 @@ public class Chunk : MonoBehaviour {
 		newVertices.Add(new Vector3(x + 1, y, z + 1));
 		newVertices.Add(new Vector3(x + 1, y, z));
 		newVertices.Add(new Vector3(x, y, z));
-		Cube(tStone);
+
+		Vector2 texturePos = new Vector2(0, 0);
+
+		if(Block(x, y, z) == 1)
+			texturePos = tStone;
+		else if(Block(x, y, z) == 2)
+			texturePos = tGrassTop;
+
+		Cube(texturePos);
 	}
 
 	private void CubeNorth(int x, int y, int z, byte GetBlock) {

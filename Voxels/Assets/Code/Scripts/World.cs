@@ -2,30 +2,36 @@
 using System.Collections;
 
 public class World : MonoBehaviour {
-	private int worldX = 4;
-	private int worldY = 4;
-	private int worldZ = 4;
+	private int worldX = 64;
+	private int worldY = 16;
+	private int worldZ = 64;
 	private byte[,,] data;
 
 	public GameObject chunk;
-	private int chunkSize = 2;
+	private int chunkSize = 4;
 
-	private GameObject[,,] chunks;
+	private Chunk[,,] chunks;
 
-	private void Awake() {
+	private void Start() {
 		data = new byte[worldX, worldY, worldZ];
 
 		for(int x = 0; x < worldX; x++) {
-			for(int y = 0; y < worldY; y++) {
-				for(int z = 0; z < worldZ; z++) {
-					//if(y <= 8) {
+			for(int z = 0; z < worldZ; z++) {
+				int stone = PerlinNoise(x, 0, z, 10, 3, 1.2f);
+				stone += PerlinNoise(x, 300, z, 20, 4, 0) + 10;
+
+				int dirt = PerlinNoise(x, 100, z, 50, 2, 0) + 1;
+
+				for(int y = 0; y < worldY; y++) {
+					if(y <= stone)
 						data[x, y, z] = 1;
-					//}
+					else if(y <= dirt + stone)
+						data[x, y, z] = 2;
 				}
 			}
 		}
 
-		chunks = new GameObject[
+		chunks = new Chunk[
 			Mathf.FloorToInt(worldX / chunkSize),
 			Mathf.FloorToInt(worldY / chunkSize),
 			Mathf.FloorToInt(worldZ / chunkSize)
@@ -34,24 +40,43 @@ public class World : MonoBehaviour {
 		for (int x = 0; x < chunks.GetLength(0); x++) {
 			for (int y = 0; y < chunks.GetLength(1); y++) {
 				for (int z = 0; z < chunks.GetLength(2); z++) {
-					chunks[x,y,z]= Instantiate(chunk, new Vector3(x * chunkSize, y * chunkSize, z * chunkSize), new Quaternion(0, 0, 0, 0)) as GameObject;
- 
-					Chunk newChunkScript = chunks[x,y,z].GetComponent("Chunk") as Chunk;
- 
-					newChunkScript.worldGO = gameObject;
-					newChunkScript.chunkSize = chunkSize;
-					newChunkScript.chunkX = x * chunkSize;
-					newChunkScript.chunkY = y * chunkSize;
-					newChunkScript.chunkZ = z * chunkSize;
+					GameObject newChunkGo = Instantiate(chunk,
+						new Vector3(x * chunkSize - 0.5f, y * chunkSize + 0.5f, z * chunkSize - 0.5f), 
+						new Quaternion(0, 0, 0, 0)) as GameObject;
+
+					Chunk newChunk = newChunkGo.GetComponent("Chunk") as Chunk;
+					newChunk.transform.parent = transform;
+
+					newChunk.worldGO = gameObject;
+					newChunk.chunkSize = chunkSize;
+					newChunk.chunkX = x * chunkSize;
+					newChunk.chunkY = y * chunkSize;
+					newChunk.chunkZ = z * chunkSize;
+
+					chunks[x,y,z] = newChunk;
 				}
 			}
 		}
 	}
 
 	public byte Block(int x, int y, int z) {
-		if(x >= worldX || x < 0 || y >= worldY || y < 0 || z >= worldZ || z < 0)
+		// avoid hiding tops of blocks at top of map
+		if(y >= worldY) return (byte)0;
+
+		if(x >= worldX || x < 0 || y < 0 || z >= worldZ || z < 0)
 			return (byte)1;
 
 		return data[x, y, z];
+	}
+
+	private int PerlinNoise(int x, int y, int z, float scale, float height, float power) {
+		float rValue;
+		rValue = Noise.GetNoise(((double)x) / scale, ((double)y) / scale, ((double)z) / scale);
+		rValue *= height;
+
+		if(power != 0)
+			rValue = Mathf.Pow(rValue, power);
+
+		return (int)rValue;
 	}
 }

@@ -49,6 +49,7 @@
      <Compile Include="Assets\Code\Scripts\Chunk.cs" />
      <Compile Include="Assets\Code\Scripts\ManualMesh.cs" />
      <Compile Include="Assets\Code\Scripts\World.cs" />
+     <Compile Include="Assets\Code\Utils\Noise.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
