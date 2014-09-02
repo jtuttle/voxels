@@ -2,17 +2,21 @@
 using System.Collections;
 
 public class World : MonoBehaviour {
-	private int worldX = 64;
-	private int worldY = 16;
-	private int worldZ = 64;
-	private byte[,,] data;
+	public int worldX { get; private set; }
+	public int worldY { get; private set; }
+	public int worldZ { get; private set; }
+	public byte[,,] data;
 
 	public GameObject chunk;
-	private int chunkSize = 4;
-
-	private Chunk[,,] chunks;
+	public int chunkSize { get; private set; }
+	public Chunk[,,] chunks;
 
 	private void Start() {
+		worldX = 256;
+		worldY = 128;
+		worldZ = 256;
+		chunkSize = 16;
+
 		data = new byte[worldX, worldY, worldZ];
 
 		for(int x = 0; x < worldX; x++) {
@@ -36,6 +40,8 @@ public class World : MonoBehaviour {
 			Mathf.FloorToInt(worldY / chunkSize),
 			Mathf.FloorToInt(worldZ / chunkSize)
 		];
+
+		Debug.Log(worldX + " " + chunkSize);
 
 		for (int x = 0; x < chunks.GetLength(0); x++) {
 			for (int y = 0; y < chunks.GetLength(1); y++) {

@@ -11,6 +11,8 @@ public class Chunk : MonoBehaviour {
 	public int chunkY;
 	public int chunkZ;
 
+	public bool dirty = false;
+
 	private List<Vector3> newVertices = new List<Vector3>();
 	private List<int> newTriangles = new List<int>();
 	private List<Vector2> newUV = new List<Vector2>();
@@ -25,13 +27,20 @@ public class Chunk : MonoBehaviour {
 	private Mesh mesh;
 	private MeshCollider col;
 
-	void Start() {
+	protected void Start() {
 		world = worldGO.GetComponent<World>();
 
 		mesh = GetComponent<MeshFilter>().mesh;
 		col = GetComponent<MeshCollider>();
 
 		GenerateMesh();
+	}
+
+	protected void LateUpdate() {
+		if(dirty) {
+			GenerateMesh();
+			dirty = false;
+		}
 	}
 
 	public byte Block(int x, int y, int z) {
