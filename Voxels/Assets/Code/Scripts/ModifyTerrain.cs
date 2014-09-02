@@ -18,7 +18,6 @@ public class ModifyTerrain : MonoBehaviour {
 		if(Input.GetMouseButtonDown(1)) {
 			AddBlockCursor(1);
 		}
-
 	}
 
 	public void ReplaceBlockCenter(float range, byte block) {
@@ -84,7 +83,9 @@ public class ModifyTerrain : MonoBehaviour {
 	}
 
 	public void SetBlockAt(int x, int y, int z, byte block) {
-		if(x < 0 || x >= world.worldX || y < 0 || y >= world.worldY || z < 0 || z >= world.worldZ)
+		WorldConfig config = world.Config;
+
+		if(x < 0 || x >= config.WorldX || y < 0 || y >= config.WorldY || z < 0 || z >= config.WorldZ)
 			return;
 
 		world.data[x, y, z] = block;
@@ -92,13 +93,13 @@ public class ModifyTerrain : MonoBehaviour {
 	}
 
 	public void UpdateChunkAt(int x, int y, int z) {
-		int updateX = Mathf.FloorToInt(x / world.chunkSize);
-		int updateY = Mathf.FloorToInt(y / world.chunkSize);
-		int updateZ = Mathf.FloorToInt(z / world.chunkSize);
+		int chunkSize = world.Config.ChunkSize;
+
+		int updateX = Mathf.FloorToInt(x / chunkSize);
+		int updateY = Mathf.FloorToInt(y / chunkSize);
+		int updateZ = Mathf.FloorToInt(z / chunkSize);
 
 		world.chunks[updateX, updateY, updateZ].dirty = true;
-
-		int chunkSize = world.chunkSize;
 
 		if(x - (chunkSize * updateX) == 0 && updateX != 0)
 			world.chunks[updateX - 1, updateY, updateZ].dirty = true;
