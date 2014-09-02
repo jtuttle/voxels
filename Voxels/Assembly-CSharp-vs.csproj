@@ -46,9 +46,10 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Code\GameController.cs" />
+     <Compile Include="Assets\Code\Model\WorldConfig.cs" />
      <Compile Include="Assets\Code\Scripts\Chunk.cs" />
      <Compile Include="Assets\Code\Scripts\ExtendedFlyCam.cs" />
-     <Compile Include="Assets\Code\Scripts\ManualMesh.cs" />
      <Compile Include="Assets\Code\Scripts\ModifyTerrain.cs" />
      <Compile Include="Assets\Code\Scripts\World.cs" />
      <Compile Include="Assets\Code\Utils\Noise.cs" />
