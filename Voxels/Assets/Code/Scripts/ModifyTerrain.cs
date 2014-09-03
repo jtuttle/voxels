@@ -99,24 +99,24 @@ public class ModifyTerrain : MonoBehaviour {
 		int updateY = Mathf.FloorToInt(y / chunkSize);
 		int updateZ = Mathf.FloorToInt(z / chunkSize);
 
-		world.chunks[updateX, updateY, updateZ].dirty = true;
+		world.chunks[updateX, updateY, updateZ].MarkDirty();
 
 		if(x - (chunkSize * updateX) == 0 && updateX != 0)
-			world.chunks[updateX - 1, updateY, updateZ].dirty = true;
+			world.chunks[updateX - 1, updateY, updateZ].MarkDirty();
 
 		if(x - (chunkSize * updateX) == chunkSize - 1 && updateX != world.chunks.GetLength(0) - 1)
-			world.chunks[updateX + 1, updateY, updateZ].dirty = true;
+			world.chunks[updateX + 1, updateY, updateZ].MarkDirty();
 
 		if(y - (chunkSize * updateY) == 0 && updateY != 0)
-			world.chunks[updateX, updateY - 1, updateZ].dirty = true;
+			world.chunks[updateX, updateY - 1, updateZ].MarkDirty();
 
 		if(y - (chunkSize * updateY) == chunkSize - 1 && updateY != world.chunks.GetLength(1) - 1)
-			world.chunks[updateX, updateY + 1, updateZ].dirty = true;
+			world.chunks[updateX, updateY + 1, updateZ].MarkDirty();
 
 		if(z - (chunkSize * updateZ) == 0 && updateZ != 0)
-			world.chunks[updateX, updateY, updateZ - 1].dirty = true;
+			world.chunks[updateX, updateY, updateZ - 1].MarkDirty();
 
 		if(z - (chunkSize * updateZ) == chunkSize - 1 && updateZ != world.chunks.GetLength(2) - 1)
-			world.chunks[updateX, updateY, updateZ + 1].dirty = true;
+			world.chunks[updateX, updateY, updateZ + 1].MarkDirty();
 	}
 }
