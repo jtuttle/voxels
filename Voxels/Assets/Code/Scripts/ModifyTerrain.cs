@@ -11,12 +11,27 @@ public class ModifyTerrain : MonoBehaviour {
 	}
 
 	protected void Update() {
+		/*
 		if(Input.GetMouseButtonDown(0)) {
 			ReplaceBlockCursor(0);
 		}
 
 		if(Input.GetMouseButtonDown(1)) {
 			AddBlockCursor(1);
+		}
+		*/
+	}
+
+	public void ReplaceRectangularBox(Vector3 center, Vector3 edgeDistances, byte block) {
+		Vector3 min = center - edgeDistances;
+		Vector3 max = center + edgeDistances;
+
+		for(int x = (int)min.x; x < max.x; x++) {
+			for(int y = (int)min.y; y < max.y; y++) {
+				for(int z = (int)min.z; z < max.z; z++) {
+					SetBlockAt(new Vector3(x, y, z), block);
+				}
+			}
 		}
 	}
 
@@ -45,7 +60,8 @@ public class ModifyTerrain : MonoBehaviour {
 		RaycastHit hit;
 
 		if(Physics.Raycast(ray, out hit)) {
-			ReplaceBlockAt(hit, block);
+			//ReplaceBlockAt(hit, block);
+			ReplaceRectangularBox(hit.point, new Vector3(3, 3, 3), block);
 			Debug.DrawLine(ray.origin, ray.origin + (ray.direction * hit.distance), Color.green, 2);
 		}
 	}
@@ -101,6 +117,7 @@ public class ModifyTerrain : MonoBehaviour {
 
 		world.chunks[updateX, updateY, updateZ].MarkDirty();
 
+		// Update neighboring chunks when necessary
 		if(x - (chunkSize * updateX) == 0 && updateX != 0)
 			world.chunks[updateX - 1, updateY, updateZ].MarkDirty();
 

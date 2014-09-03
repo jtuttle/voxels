@@ -2,6 +2,8 @@
 using System.Collections;
 
 public class Player : MonoBehaviour {
+	public ModifyTerrain ModifyTerrain;
+
 	private CharacterController controller;
 
 	private float speed = 20.0f;
@@ -11,12 +13,17 @@ public class Player : MonoBehaviour {
 	private Vector3 right = Vector3.zero;
 
 	// Use this for initialization
-	void Start () {
+	protected void Start() {
 		controller = gameObject.GetComponent<CharacterController>();
 	}
-	
+
+	protected void Update() {
+		if(Input.GetButtonDown("Fire1"))
+			Attack();
+	}
+
 	// Update is called once per frame
-	void FixedUpdate() {
+	protected void FixedUpdate() {
 		float h = Input.GetAxisRaw("Horizontal");
 		float v = Input.GetAxisRaw("Vertical");
 
@@ -30,5 +37,17 @@ public class Player : MonoBehaviour {
 		movement += new Vector3(0, -0.05f, 0); // gravity
 
 		controller.Move(movement * speed);
+	}
+
+	private void Attack() {
+		Ray ray = new Ray(transform.position, transform.forward);
+		int distance = 8;
+		RaycastHit hit;
+
+		Debug.DrawLine(ray.origin, ray.origin + (ray.direction * distance), Color.green, 2);
+
+		if(Physics.Raycast(ray, out hit, distance)) {
+			ModifyTerrain.ReplaceRectangularBox(hit.point, new Vector3(6, 7, 6), (byte)0);
+		}
 	}
 }

@@ -11,4 +11,12 @@ public class IntVector3 {
 		Y = y;
 		Z = z;
 	}
+
+	public static IntVector3 operator +(IntVector3 a, IntVector3 b) {
+		return new IntVector3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+	}
+
+	public static IntVector3 operator -(IntVector3 a, IntVector3 b) {
+		return new IntVector3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+	}
 }
