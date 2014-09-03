@@ -3,33 +3,28 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Chunk : MonoBehaviour {
-	public GameObject worldGO;
-	private World world;
+	public World world;
+	public IntVector3 chunkOffset;
 
-	public int chunkSize;
-	public int chunkX;
-	public int chunkY;
-	public int chunkZ;
+	private bool _dirty = false;
 
-	public bool dirty = false;
+	private Mesh mesh;
+	private MeshCollider col;
 
+	// TODO - abstract cube building
 	private List<Vector3> newVertices = new List<Vector3>();
 	private List<int> newTriangles = new List<int>();
 	private List<Vector2> newUV = new List<Vector2>();
 	private int faceCount;
 
+	// TODO - abstract texture handling
 	private float tUnit = 0.0625f;
 	private Vector2 tStone = new Vector2(1, 15);
 	private Vector2 tDirt = new Vector2(2, 15);
 	private Vector2 tGrassTop = new Vector2(1, 6);
 	private Vector2 tGrassSide = new Vector2(3, 15);
 
-	private Mesh mesh;
-	private MeshCollider col;
-
 	protected void Start() {
-		world = worldGO.GetComponent<World>();
-
 		mesh = GetComponent<MeshFilter>().mesh;
 		col = GetComponent<MeshCollider>();
 
@@ -37,17 +32,19 @@ public class Chunk : MonoBehaviour {
 	}
 
 	protected void LateUpdate() {
-		if(dirty) {
+		if(_dirty) {
 			GenerateMesh();
-			dirty = false;
+			_dirty = false;
 		}
 	}
 
 	public byte Block(int x, int y, int z) {
-		return world.Block(x + chunkX, y + chunkY, z + chunkZ);
+		return world.Block(x + chunkOffset.X, y + chunkOffset.Y, z + chunkOffset.Z);
 	}
 
 	public void GenerateMesh() {
+		int chunkSize = world.Config.ChunkSize;
+
 		for(int x = 0; x < chunkSize; x++) {
 			for(int y = 0; y < chunkSize; y++) {
 				for(int z = 0; z < chunkSize; z++) {
@@ -86,6 +83,10 @@ public class Chunk : MonoBehaviour {
 		UpdateMesh();
 	}
 
+	public void MarkDirty() {
+		_dirty = true;
+	}
+
 	private void UpdateMesh() {
 		mesh.Clear();
 		mesh.vertices = newVertices.ToArray();
@@ -112,10 +113,14 @@ public class Chunk : MonoBehaviour {
 
 		Vector2 texturePos = new Vector2(0, 0);
 
+		texturePos = tDirt;
+
+		/*
 		if(block == 1)
 			texturePos = tStone;
 		else if(block == 2)
 			texturePos = tGrassTop;
+		*/
 
 		Cube(texturePos);
 	}
@@ -160,10 +165,14 @@ public class Chunk : MonoBehaviour {
 
 		Vector2 texturePos = new Vector2(0, 0);
 
+		texturePos = tDirt;
+
+		/*
 		if(block == 1)
 			texturePos = tStone;
 		else if(block == 2)
 			texturePos = tDirt;
+		*/
 
 		Cube(texturePos);
 	}
@@ -171,6 +180,9 @@ public class Chunk : MonoBehaviour {
 	private void CubeSide(int x, int y, int z, byte block) {
 		Vector2 texturePos = new Vector2(0, 0);
 
+		texturePos = tDirt;
+
+		/*
 		if(block == 1)
 			texturePos = tStone;
 		else if(block == 2) {
@@ -179,6 +191,7 @@ public class Chunk : MonoBehaviour {
 			else
 				texturePos = tDirt;
 		}
+		*/
 
 		Cube(texturePos);
 	}

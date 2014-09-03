@@ -51,7 +51,10 @@
      <Compile Include="Assets\Code\Scripts\Chunk.cs" />
      <Compile Include="Assets\Code\Scripts\ExtendedFlyCam.cs" />
      <Compile Include="Assets\Code\Scripts\ModifyTerrain.cs" />
+     <Compile Include="Assets\Code\Scripts\Player.cs" />
+     <Compile Include="Assets\Code\Scripts\PlayerCamera.cs" />
      <Compile Include="Assets\Code\Scripts\World.cs" />
+     <Compile Include="Assets\Code\Utils\IntVector3.cs" />
      <Compile Include="Assets\Code\Utils\Noise.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
