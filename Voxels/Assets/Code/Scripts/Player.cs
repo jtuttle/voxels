@@ -18,7 +18,7 @@ public class Player : MonoBehaviour {
 	}
 
 	protected void Update() {
-		if(Input.GetButtonDown("Fire1"))
+		if(Input.GetButtonDown("Jump"))
 			Attack();
 	}
 
@@ -48,6 +48,14 @@ public class Player : MonoBehaviour {
 
 		if(Physics.Raycast(ray, out hit, distance)) {
 			ModifyTerrain.ReplaceRectangularBox(hit.point, new Vector3(6, 7, 6), (byte)0);
+
+            GameObject cubeEffectGO = (GameObject)Instantiate((GameObject)Resources.Load("Prefabs/CubeEffect"));
+            cubeEffectGO.transform.position = hit.point;
+
+            CubeEffect cubeEffect = cubeEffectGO.GetComponent<CubeEffect>();
+            
+            cubeEffect.Player = this;
+            cubeEffect.Spawn(new Color(0.66f, 0.45f, 0.26f), 1);
 		}
 	}
 }

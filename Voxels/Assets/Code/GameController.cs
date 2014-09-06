@@ -6,6 +6,8 @@ public class GameController : MonoBehaviour {
 	public CharacterController Player;
 
 	protected void Start () {
+        new PerlinNoiseTester().CreateTest();
+
 		int worldX = 128;
 		int worldY = 16;
 		int worldZ = 128;
