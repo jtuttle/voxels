@@ -200,6 +200,17 @@ public static class Noise {
 		return (float)(32.0 * (n0 + n1 + n2 + n3) + 1) * 0.5f; // change to 76.0 if you want
 	}
 
+    public static float GetNoise(int x, int y, int z, float scale, float height, float power) {
+        float rValue;
+        rValue = GetNoise(((double)x) / scale, ((double)y) / scale, ((double)z) / scale);
+        rValue *= height;
+        
+        if(power != 0)
+            rValue = (float)Math.Pow(rValue, power);
+        
+        return rValue;
+    }
+
 	// get multiple octaves of noise at once
 	public static float GetOctaveNoise(double pX, double pY, double pZ, int pOctaves) {
 		float value = 0;
