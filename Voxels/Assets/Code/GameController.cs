@@ -5,6 +5,10 @@ public class GameController : MonoBehaviour {
 	// TEMP
 	public CharacterController Player;
 
+    public float Scale;
+    public float Depth;
+    public float Power;
+
 	protected void Start () {
         new PerlinNoiseTester().CreateTest();
 
@@ -26,4 +30,16 @@ public class GameController : MonoBehaviour {
 		GameObject playerGO = GameObject.Find("Player");
 		playerGO.transform.position = new Vector3(worldX / 2, worldY / 2 + 5, worldZ / 2);
 	}
+
+    private float[] GenerateNoise(int width, int height) {
+        float[] samples = new float[width * height];
+        
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                samples[y * width + x] = Noise.GetNoise(x, y, 10, Scale, Depth, Power);
+            }
+        }
+        
+        return samples;
+    }
 }

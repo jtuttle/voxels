@@ -19,7 +19,7 @@ public class CubeEffect : MonoBehaviour {
         
         GameObject cube = (GameObject)Resources.Load("Prefabs/PhysicsCube");
         
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < 20; i++) {
             GameObject newCube = (GameObject)Instantiate(cube);
             newCube.transform.parent = transform;
             newCube.transform.localPosition = 

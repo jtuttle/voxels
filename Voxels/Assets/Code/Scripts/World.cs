@@ -35,6 +35,20 @@ public class World : MonoBehaviour {
 
 		data = new byte[worldX, worldY, worldZ];
 
+        for(int x = 0; x < Config.WorldX; x++) {
+            for(int z = 0; z < Config.WorldZ; z++) {
+                float sample = (float)Noise.GetNoise(x, 100, z, 100.0f, 1.4f, 8.0f);
+
+                for(int y = 0; y < Config.WorldY; y++) {
+                    if(sample < 0.5f)
+                        data[x, y, z] = 0;
+                    else
+                        data[x, y, z] = 1;
+                }
+            }
+        }
+
+        /*
 		for(int x = 0; x < worldX; x++) {
 			for(int z = 0; z < worldZ; z++) {
 				for(int y = 0; y < worldY; y++) {
@@ -43,23 +57,26 @@ public class World : MonoBehaviour {
 				}
 			}
 		}
+        */      
 		
 		// Nice-looking Minecraft-y map
-		//for(int x = 0; x < Config.WorldX; x++) {
-		//    for(int z = 0; z < Config.WorldZ; z++) {
-		//        int stone = PerlinNoise(x, 0, z, 10, 3, 1.2f);
-		//        stone += PerlinNoise(x, 300, z, 20, 4, 0) + 10;
+        /*
+		for(int x = 0; x < Config.WorldX; x++) {
+		    for(int z = 0; z < Config.WorldZ; z++) {
+		        int stone = (int)Noise.GetNoise(x, 0, z, 10, 3, 1.2f);
+                stone += (int)Noise.GetNoise(x, 300, z, 20, 4, 0) + 10;
 
-		//        int dirt = PerlinNoise(x, 100, z, 50, 2, 0) + 1;
+                int dirt = (int)Noise.GetNoise(x, 100, z, 50, 2, 0) + 1;
 
-		//        for(int y = 0; y < Config.WorldY; y++) {
-		//            if(y <= stone)
-		//                data[x, y, z] = 1;
-		//            else if(y <= stone + dirt)
-		//                data[x, y, z] = 2;
-		//        }
-		//    }
-		//}
+		        for(int y = 0; y < Config.WorldY; y++) {
+		            if(y <= stone)
+		                data[x, y, z] = 1;
+		            else if(y <= stone + dirt)
+		                data[x, y, z] = 2;
+		        }
+		    }
+		}
+        */      
 	}
 
 	private void CreateChunks() {
