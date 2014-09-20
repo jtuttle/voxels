@@ -55,10 +55,16 @@
      <Compile Include="Assets\Code\Scripts\ModifyTerrain.cs" />
      <Compile Include="Assets\Code\Scripts\Player.cs" />
      <Compile Include="Assets\Code\Scripts\PlayerCamera.cs" />
+     <Compile Include="Assets\Code\Scripts\PropertyChangeNotifier.cs" />
      <Compile Include="Assets\Code\Scripts\World.cs" />
      <Compile Include="Assets\Code\Utils\IntVector3.cs" />
      <Compile Include="Assets\Code\Utils\Noise.cs" />
      <Compile Include="Assets\Code\Utils\PerlinNoiseTester.cs" />
+     <Compile Include="Assets\CoherentNoise\Demo\TerrainDemo.cs" />
+     <None Include="Assets\CoherentNoise\readme.txt" />
+ <Reference Include="CoherentNoise">
+ <HintPath>/Users/jtuttle/dev/voxels/Voxels/Assets/CoherentNoise/CoherentNoise.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
@@ -72,6 +78,6 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ProjectExtensions xmlns="http://schemas.microsoft.com/developer/msbuild/2003"><MonoDevelop><Properties><Policies><TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" /><CSharpFormattingPolicy NamespaceBraceStyle="EndOfLine" ClassBraceStyle="EndOfLine" InterfaceBraceStyle="EndOfLine" StructBraceStyle="EndOfLine" EnumBraceStyle="EndOfLine" MethodBraceStyle="EndOfLine" ConstructorBraceStyle="EndOfLine" DestructorBraceStyle="EndOfLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" IfParentheses="False" WhileParentheses="False" ForParentheses="False" ForeachParentheses="False" CatchParentheses="False" SwitchParentheses="False" LockParentheses="False" UsingParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" /><TextStylePolicy FileWidth="120" TabWidth="4" EolMarker="Unix" inheritsSet="Mono" inheritsScope="text/plain" scope="text/plain" /></Policies></Properties></MonoDevelop></ProjectExtensions>
+  <ProjectExtensions xmlns="http://schemas.microsoft.com/developer/msbuild/2003"><MonoDevelop><Properties><Policies><TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" /><CSharpFormattingPolicy NamespaceBraceStyle="EndOfLine" ClassBraceStyle="EndOfLine" InterfaceBraceStyle="EndOfLine" StructBraceStyle="EndOfLine" EnumBraceStyle="EndOfLine" MethodBraceStyle="EndOfLine" ConstructorBraceStyle="EndOfLine" DestructorBraceStyle="EndOfLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" IfParentheses="False" WhileParentheses="False" ForParentheses="False" ForeachParentheses="False" CatchParentheses="False" SwitchParentheses="False" LockParentheses="False" UsingParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" /><TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain" /></Policies></Properties></MonoDevelop></ProjectExtensions>
 
 </Project>

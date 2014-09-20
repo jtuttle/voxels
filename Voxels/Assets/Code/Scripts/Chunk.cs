@@ -115,12 +115,12 @@ public class Chunk : MonoBehaviour {
 
 		texturePos = tDirt;
 
-		/*
+		
 		if(block == 1)
 			texturePos = tStone;
 		else if(block == 2)
 			texturePos = tGrassTop;
-		*/
+		
 
 		Cube(texturePos);
 	}
@@ -167,12 +167,12 @@ public class Chunk : MonoBehaviour {
 
 		texturePos = tDirt;
 
-		/*
+		
 		if(block == 1)
 			texturePos = tStone;
 		else if(block == 2)
 			texturePos = tDirt;
-		*/
+		
 
 		Cube(texturePos);
 	}
@@ -182,7 +182,7 @@ public class Chunk : MonoBehaviour {
 
 		texturePos = tDirt;
 
-		/*
+		
 		if(block == 1)
 			texturePos = tStone;
 		else if(block == 2) {
@@ -191,7 +191,7 @@ public class Chunk : MonoBehaviour {
 			else
 				texturePos = tDirt;
 		}
-		*/
+
 
 		Cube(texturePos);
 	}

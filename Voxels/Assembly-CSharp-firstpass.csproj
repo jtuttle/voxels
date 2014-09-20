@@ -47,6 +47,10 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Plugins\Perlin.cs" />
+     <None Include="Assets\CoherentNoise\readme.txt" />
+ <Reference Include="CoherentNoise">
+ <HintPath>/Users/jtuttle/dev/voxels/Voxels/Assets/CoherentNoise/CoherentNoise.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
