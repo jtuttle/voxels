@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Code\GameController.cs" />
+     <Compile Include="Assets\Code\HeightMapTestController.cs" />
      <Compile Include="Assets\Code\Model\WorldConfig.cs" />
      <Compile Include="Assets\Code\NoiseTestController.cs" />
      <Compile Include="Assets\Code\Scripts\Chunk.cs" />
@@ -58,8 +59,8 @@
      <Compile Include="Assets\Code\Scripts\PropertyChangeNotifier.cs" />
      <Compile Include="Assets\Code\Scripts\World.cs" />
      <Compile Include="Assets\Code\Utils\IntVector3.cs" />
+     <Compile Include="Assets\Code\Utils\MathUtils.cs" />
      <Compile Include="Assets\Code\Utils\Noise.cs" />
-     <Compile Include="Assets\Code\Utils\PerlinNoiseTester.cs" />
      <Compile Include="Assets\CoherentNoise\Demo\TerrainDemo.cs" />
      <None Include="Assets\CoherentNoise\readme.txt" />
  <Reference Include="CoherentNoise">

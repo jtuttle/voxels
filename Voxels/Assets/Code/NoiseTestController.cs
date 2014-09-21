@@ -3,6 +3,7 @@ using CoherentNoise.Generation;
 using CoherentNoise.Generation.Fractal;
 using CoherentNoise.Interpolation;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -11,15 +12,13 @@ public class NoiseTestController : MonoBehaviour {
 
     public int Width;
     public int Height;
-
     public float Scale;
-    public float Depth;
-    public float Power;
 
+    private float[] _currentSamples;
     private Texture2D _currentTexture;
 
     protected void Start() {
-        GenerateTexture();
+        GenerateNoiseTest();
     }
 
     protected void Update() {
@@ -29,84 +28,76 @@ public class NoiseTestController : MonoBehaviour {
     protected void OnGUI() {
         if(GUI.Button(new Rect(20, 40, 80, 20), "Refresh"))
             OnRefreshClick();
+
+        if(GUI.Button(new Rect(20, 80, 80, 20), "Discritize"))
+            OnDiscritizeClick();
+
+        if(GUI.Button(new Rect(20, 120, 80, 20), "Save"))
+            OnSaveClick();
     }
 
     private void OnRefreshClick() {
-        GenerateTexture();
+        GenerateNoiseTest();
     }
 
-    private void OnWriteClick() {
+    private void OnDiscritizeClick() {
+        Discritize(_currentSamples, 5);
 
-    }
-
-    private void GenerateTexture() {
-        _currentTexture = new Texture2D(Width, Height, TextureFormat.ARGB32, false);
-        //_currentTexture.SetPixels(GenerateNoise());
-        //_currentTexture.SetPixels(GenerateNoiseUnity());
-        _currentTexture.SetPixels(GenerateCoherentNoise());
-        _currentTexture.Apply();
-
-        //SaveTextureToFile(_currentTexture, "Resources/Textures/test.png");
-        //_currentTexture = (Texture2D)Resources.Load("Textures/test.png");
-
+        _currentTexture = GenerateTexture(Width, Height, _currentSamples);
         Canvas.renderer.material.mainTexture = _currentTexture;
     }
 
-    private Color[] GenerateCoherentNoise() {
-        Color[] colors = new Color[Width * Height];
+    private void OnSaveClick() {
+        SaveTextureToFile(_currentTexture, "Resources/Textures/test.png");
+    }
 
+    private void GenerateNoiseTest() {
+        _currentSamples = GenerateCoherentNoise(Width, Height);
 
-        //Generator generator = new ValueNoise(3465478, SCurve.Cubic);
+        _currentTexture = GenerateTexture(Width, Height, _currentSamples);
+        Canvas.renderer.material.mainTexture = _currentTexture;
+    }
 
+    private float[] GenerateCoherentNoise(int width, int height) {
+        float[] samples = new float[width * height];
+        
+        //Generator generator = new ValueNoise(Random.Range(1, 65536), SCurve.Cubic);
         Generator generator = new PinkNoise(Random.Range(1, 65536));
+        
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                float xCoord = ((float)x / width) * Scale;
+                float yCoord = ((float)y / height) * Scale;
+                
+                float sample = generator.GetValue(xCoord, yCoord, 0);
 
-        float oldRange = 1 - (-1);
-        float newRange = 1 - 0;
+                // PinkNoise usually returns value in range[-1,1] but this is not guaranteed.
+                sample = Mathf.Clamp(sample, -1, 1);
 
-        for(int y = 0; y < Height; y++) {
-            for(int x = 0; x < Width; x++) {
-                float xCoord = (float)x / Width;
-                float yCoord = (float)y / Height;
-
-                float sample = generator.GetValue(xCoord, yCoord, 0);// + 1;
-                sample = (((sample - (-1)) * newRange) / oldRange) + 0;
-
-                colors[y * Width + x] = new Color(sample, sample, sample);
+                // Convert values from range [-1,1] to range [0,1].
+                sample = MathUtils.ConvertRange(-1, 1, 0, 1, sample);
+                
+                samples[y * width + x] = sample;
             }
         }
-
-        return colors;
+        
+        return samples;
     }
 
-    private Color[] GenerateNoise() {
-        Color[] colors = new Color[Width * Height];
+    private Texture2D GenerateTexture(int width, int height, float[] samples) {
+        Texture2D texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
 
-        for(int y = 0; y < Height; y++) {
-            for(int x = 0; x < Width; x++) {
-                float sample = Noise.GetNoise(x, y, 10, Scale, Depth, Power);
-                colors[y * Width + x] = new Color(sample, sample, sample);
-            }
+        Color[] pixels = new Color[width * height];
+
+        for(int i = 0; i < samples.Length; i++) {
+            float sample = samples[i];
+            pixels[i] = new Color(sample, sample, sample);
         }
 
-        return colors;
-    }
+        texture.SetPixels(pixels);
+        texture.Apply();
 
-    private Color[] GenerateNoiseUnity() {
-        Color[] colors = new Color[Width * Height];
-
-        Perlin perlin = new Perlin();
-
-        for(int y = 0; y < Height; y++) {
-            for(int x = 0; x < Width; x++) {
-                float xCoord = (float)x / Width * Scale;
-                float yCoord = (float)y / Height * Scale;
-
-                float sample = perlin.Noise(xCoord, yCoord); //Mathf.PerlinNoise(xCoord, yCoord);
-                colors[y * Width + x] = new Color(sample, sample, sample);
-            }
-        }
-
-        return colors;
+        return texture;
     }
 
     private void SaveTextureToFile(Texture2D tex, string filepath) {
@@ -119,5 +110,20 @@ public class NoiseTestController : MonoBehaviour {
         writer.Close();
 
         file.Close();
+    }
+
+    // Split the range [0,1] into evenly-spaced intervals and then 
+    // round each sample to the closest interval boundary.
+    private void Discritize(float[] samples, int intervals) {
+        List<float> bounds = new List<float>();
+        float unit = 1.0f / intervals;
+
+        for(int i = 0; i <= intervals + 1; i++)
+            bounds.Add(i * unit);
+
+        for(int i = 0; i < samples.Length; i++) {
+            int boundIndex = bounds.FindIndex(x => x > samples[i]);
+            samples[i] = bounds[boundIndex - 1];
+        }
     }
 }

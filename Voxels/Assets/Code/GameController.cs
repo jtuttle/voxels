@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using CoherentNoise;
+using CoherentNoise.Generation;
+using CoherentNoise.Generation.Fractal;
 using System.Collections;
+using UnityEngine;
 
 public class GameController : MonoBehaviour {
 	// TEMP
@@ -10,9 +13,7 @@ public class GameController : MonoBehaviour {
     public float Power;
 
 	protected void Start () {
-        new PerlinNoiseTester().CreateTest();
-
-		int worldX = 128;
+        int worldX = 128;
 		int worldY = 16;
 		int worldZ = 128;
 
@@ -20,7 +21,7 @@ public class GameController : MonoBehaviour {
 
 		World world = GameObject.Find("World").GetComponent<World>();
 		world.Initialize(worldConfig);
-		world.Generate();
+        world.Generate();//GenerateNoise(worldX, worldZ));
 
 		// center the world
 		// TODO: this breaks...add the appropriate coordinate translations to fix it?
@@ -33,10 +34,29 @@ public class GameController : MonoBehaviour {
 
     private float[] GenerateNoise(int width, int height) {
         float[] samples = new float[width * height];
-        
+
+        //Generator generator = new ValueNoise(Random.Range(1, 65536), SCurve.Cubic);
+        Generator generator = new PinkNoise(Random.Range(1, 65536));
+
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
-                samples[y * width + x] = Noise.GetNoise(x, y, 10, Scale, Depth, Power);
+                //samples[y * width + x] = Noise.GetNoise(x, y, 10, Scale, Depth, Power);
+
+                float xCoord = (((float)x / width) + 0) * Scale;
+                float yCoord = (((float)y / height) + 0) * Scale;
+                
+                float sample = generator.GetValue(xCoord, yCoord, 0);
+                //Debug.Log("initial sample: " + sample);
+                
+                // Pink noise will mostly fall in [-1,1] but this is not guaranteed
+                sample = Mathf.Clamp(sample, -1, 1);
+                //Debug.Log("clamped: " + sample);
+                
+                // Shift sample value to the [0,1] range
+                sample = MathUtils.ConvertRange(-1, 1, 0, 1, sample);
+                //Debug.Log("normalized: " + sample);
+                
+                samples[y * width + x] = sample;
             }
         }
         
