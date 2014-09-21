@@ -2,8 +2,10 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Code/NoiseTestController.cs">
     <Files>
-      <File FileName="Assets/Code/NoiseTestController.cs" Line="61" Column="35" />
-      <File FileName="Assets/CoherentNoise/Demo/TerrainDemo.cs" Line="33" Column="10" />
+      <File FileName="Assets/Code/HeightMapTestController.cs" Line="23" Column="36" />
+      <File FileName="Assets/Code/GameController.cs" Line="26" Column="28" />
+      <File FileName="Assets/Code/Scripts/World.cs" Line="110" Column="1" />
+      <File FileName="Assets/Code/NoiseTestController.cs" Line="123" Column="9" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
