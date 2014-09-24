@@ -13,17 +13,22 @@ public class GameController : MonoBehaviour {
     public float Power;
 
 	protected void Start () {
-        int worldX = 2;
+        int worldX = 4;
 		int worldY = 7;
-		int worldZ = 2;
+		int worldZ = 4;
 
-        WorldGenerator worldGen = new WorldGenerator(worldX, worldZ, worldY, Random.Range(1, 65536));
+        WorldGenerator worldGen = new WorldGenerator(Random.Range(1, 65536));
 
 		WorldConfig worldConfig = new WorldConfig(worldX, worldY, worldZ, 8);
 
 		World world = GameObject.Find("World").GetComponent<World>();
 		world.Initialize(worldConfig);
-        world.Generate(worldGen.DiscreteSamples);
+
+        float[] rawNoise = worldGen.GenerateRawNoise(worldX, worldZ);
+        float[] shiftedNoise = worldGen.ShiftNoise(0, 1, 0, worldY, rawNoise);
+        float[] discreteNoise = worldGen.DiscretizeDenormalizedNoise(shiftedNoise);
+
+        world.Generate(discreteNoise);
 
 
 
