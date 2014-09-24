@@ -8,9 +8,11 @@ public class NoiseTestController : MonoBehaviour {
 
     public int Width;
     public int Height;
+    public int Elevations;
     public float Scale;
 
     private WorldGenerator _world;
+    private float[] _currentNoise;
     private Texture2D _currentTexture;
 
     protected void Start() {
@@ -37,7 +39,8 @@ public class NoiseTestController : MonoBehaviour {
     }
 
     private void OnDiscretizeClick() {
-        _currentTexture = GenerateTexture(Width, Height, _world.DiscreteSamples);
+        _currentNoise = _world.DiscretizeNormalizedNoise(_currentNoise, Elevations);
+        _currentTexture = GenerateTexture(Width, Height, _currentNoise);
         Canvas.renderer.material.mainTexture = _currentTexture;
     }
 
@@ -46,9 +49,10 @@ public class NoiseTestController : MonoBehaviour {
     }
 
     private void GenerateNoiseTest() {
-        _world = new WorldGenerator(Width, Height, 7, Random.Range(1, 65536));
+        _world = new WorldGenerator(Random.Range(1, 65536));
 
-        _currentTexture = GenerateTexture(Width, Height, _world.RawSamples);
+        _currentNoise = _world.GenerateRawNoise(Width, Height);
+        _currentTexture = GenerateTexture(Width, Height, _currentNoise);
         Canvas.renderer.material.mainTexture = _currentTexture;
     }
 
