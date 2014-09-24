@@ -104,7 +104,8 @@ public class ModifyTerrain : MonoBehaviour {
 		if(x < 0 || x >= config.WorldX || y < 0 || y >= config.WorldY || z < 0 || z >= config.WorldZ)
 			return;
 
-		world.data[x, y, z] = block;
+        // TODO - replace this
+//		world.data[x, y, z] = block;
 		UpdateChunkAt(x, y, z);
 	}
 
