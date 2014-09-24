@@ -13,25 +13,31 @@ public class GameController : MonoBehaviour {
     public float Power;
 
 	protected void Start () {
-        int worldX = 128;
-		int worldY = 16;
-		int worldZ = 128;
+        int worldX = 2;
+		int worldY = 7;
+		int worldZ = 2;
 
-		WorldConfig worldConfig = new WorldConfig(worldX, worldY, worldZ, 16);
+        WorldGenerator worldGen = new WorldGenerator(worldX, worldZ, worldY, Random.Range(1, 65536));
+
+		WorldConfig worldConfig = new WorldConfig(worldX, worldY, worldZ, 8);
 
 		World world = GameObject.Find("World").GetComponent<World>();
 		world.Initialize(worldConfig);
-        world.Generate();//GenerateNoise(worldX, worldZ));
+        world.Generate(worldGen.DiscreteSamples);
+
+
+
 
 		// center the world
 		// TODO: this breaks...add the appropriate coordinate translations to fix it?
 		// maybe that would be too slow...
 		//world.transform.position = new Vector3(-(worldX / 2), -(worldY / 2), -(worldZ / 2));
 
-		GameObject playerGO = GameObject.Find("Player");
-		playerGO.transform.position = new Vector3(worldX / 2, worldY / 2 + 5, worldZ / 2);
+		//GameObject playerGO = GameObject.Find("Player");
+		//playerGO.transform.position = new Vector3(worldX / 2, worldY / 2 + 5, worldZ / 2);
 	}
 
+    /*
     private float[] GenerateNoise(int width, int height) {
         float[] samples = new float[width * height];
 
@@ -62,4 +68,5 @@ public class GameController : MonoBehaviour {
         
         return samples;
     }
+    */
 }
