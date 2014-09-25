@@ -6,7 +6,7 @@ public class Chunk : MonoBehaviour {
 	public World world;
 	public IntVector3 chunkOffset;
 
-    private byte[,,] _data;
+    private byte[,,] _blocks;
 	private bool _dirty = false;
 
 	private Mesh mesh;
@@ -40,24 +40,24 @@ public class Chunk : MonoBehaviour {
 	}
 
     public void Initialize(int chunkSize, bool solid) {
-        _data = new byte[chunkSize, chunkSize, chunkSize];
+        _blocks = new byte[chunkSize, chunkSize, chunkSize];
 
         // for now this is just going to be hard-coded to be
         // completely filled or completely empty
-        byte data = (byte)(solid ? 1 : 0);
+        byte blockData = (byte)(solid ? 1 : 0);
 
         for(int x = 0; x < chunkSize; x++) {
             for(int y = 0; y < chunkSize; y++) {
                 for(int z = 0; z < chunkSize; z++) {
-                    _data[x, y, z] = data;
+                    _blocks[x, y, z] = blockData;
                 }   
             }
         }
     }
 
-	public byte Block(int x, int y, int z) {
+	public byte GetBlock(int x, int y, int z) {
 		//return world.Block(x + chunkOffset.X, y + chunkOffset.Y, z + chunkOffset.Z);
-        return _data[x, y, z];
+        return _blocks[x, y, z];
 	}
 
 	public void GenerateMesh() {
@@ -66,34 +66,42 @@ public class Chunk : MonoBehaviour {
 		for(int x = 0; x < chunkSize; x++) {
 			for(int y = 0; y < chunkSize; y++) {
 				for(int z = 0; z < chunkSize; z++) {
-					byte block = Block(x, y, z);
+					byte block = GetBlock(x, y, z);
 
-					// block is solid
+					// Skip render if block is empty.
 					if(block != 0) {
-                        // TODO - replace optimization
+                        // The below logic is an optimization to only render block faces that
+                        // are next to an empty block (and therefore potentially visible).
+                        int worldCoordX = chunkOffset.X + x;
+                        int worldCoordY = chunkOffset.Y + y;
+                        int worldCoordZ = chunkOffset.Z + z;
 
-						// block above is air
-						//if(Block(x, y + 1, z) == 0)
+                        int maxBlockX = world.Config.ChunkCountX * world.Config.ChunkSize - 1;
+                        int maxBlockY = world.Config.ChunkCountY * world.Config.ChunkSize - 1;
+                        int maxBlockZ = world.Config.ChunkCountZ * world.Config.ChunkSize - 1;
+
+						// block above is empty
+                        if(worldCoordY + 1 > maxBlockY || world.GetBlock(worldCoordX, worldCoordY + 1, worldCoordZ) == 0)
 							CubeTop(x, y, z, block);
 
-						// block below is air
-                        //if(Block(x, y - 1, z) == 0)
+                        // block below is empty
+                        if(worldCoordY - 1 < 0 || world.GetBlock(worldCoordX, worldCoordY - 1, worldCoordZ) == 0)
 							CubeBot(x, y, z, block);
 
-						// block east is air
-                        //if(Block(x + 1, y, z) == 0)
+                        // block east is empty
+                        if(worldCoordX + 1 > maxBlockX || world.GetBlock(worldCoordX + 1, worldCoordY, worldCoordZ) == 0)
 							CubeEast(x, y, z, block);
 
-						// block west is air
-                        //if(Block(x - 1, y, z) == 0)
+                        // block west is empty
+                        if(worldCoordX - 1 < 0 || world.GetBlock(worldCoordX - 1, worldCoordY, worldCoordZ) == 0)
 							CubeWest(x, y, z, block);
 
-						// block north is air
-                        //if(Block(x, y, z + 1) == 0)
+                        // block north is empty
+                        if(worldCoordZ + 1 > maxBlockZ || world.GetBlock(worldCoordX, worldCoordY, worldCoordZ + 1) == 0)
 							CubeNorth(x, y, z, block);
 
-						// block south is air
-                        //if(Block(x, y, z - 1) == 0)
+                        // block south is empty
+                        if(worldCoordZ - 1 < 0 || world.GetBlock(worldCoordX, worldCoordY, worldCoordZ - 1) == 0)
 							CubeSouth(x, y, z, block);
 					}
 				}

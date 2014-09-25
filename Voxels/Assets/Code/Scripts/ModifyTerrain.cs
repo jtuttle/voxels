@@ -101,7 +101,7 @@ public class ModifyTerrain : MonoBehaviour {
 	public void SetBlockAt(int x, int y, int z, byte block) {
 		WorldConfig config = world.Config;
 
-		if(x < 0 || x >= config.WorldX || y < 0 || y >= config.WorldY || z < 0 || z >= config.WorldZ)
+		if(x < 0 || x >= config.ChunkCountX || y < 0 || y >= config.ChunkCountY || z < 0 || z >= config.ChunkCountZ)
 			return;
 
         // TODO - replace this
@@ -116,25 +116,25 @@ public class ModifyTerrain : MonoBehaviour {
 		int updateY = Mathf.FloorToInt(y / chunkSize);
 		int updateZ = Mathf.FloorToInt(z / chunkSize);
 
-		world.chunks[updateX, updateY, updateZ].MarkDirty();
+		world.Chunks[updateX, updateY, updateZ].MarkDirty();
 
 		// Update neighboring chunks when necessary
 		if(x - (chunkSize * updateX) == 0 && updateX != 0)
-			world.chunks[updateX - 1, updateY, updateZ].MarkDirty();
+			world.Chunks[updateX - 1, updateY, updateZ].MarkDirty();
 
-		if(x - (chunkSize * updateX) == chunkSize - 1 && updateX != world.chunks.GetLength(0) - 1)
-			world.chunks[updateX + 1, updateY, updateZ].MarkDirty();
+		if(x - (chunkSize * updateX) == chunkSize - 1 && updateX != world.Chunks.GetLength(0) - 1)
+			world.Chunks[updateX + 1, updateY, updateZ].MarkDirty();
 
 		if(y - (chunkSize * updateY) == 0 && updateY != 0)
-			world.chunks[updateX, updateY - 1, updateZ].MarkDirty();
+			world.Chunks[updateX, updateY - 1, updateZ].MarkDirty();
 
-		if(y - (chunkSize * updateY) == chunkSize - 1 && updateY != world.chunks.GetLength(1) - 1)
-			world.chunks[updateX, updateY + 1, updateZ].MarkDirty();
+		if(y - (chunkSize * updateY) == chunkSize - 1 && updateY != world.Chunks.GetLength(1) - 1)
+			world.Chunks[updateX, updateY + 1, updateZ].MarkDirty();
 
 		if(z - (chunkSize * updateZ) == 0 && updateZ != 0)
-			world.chunks[updateX, updateY, updateZ - 1].MarkDirty();
+			world.Chunks[updateX, updateY, updateZ - 1].MarkDirty();
 
-		if(z - (chunkSize * updateZ) == chunkSize - 1 && updateZ != world.chunks.GetLength(2) - 1)
-			world.chunks[updateX, updateY, updateZ + 1].MarkDirty();
+		if(z - (chunkSize * updateZ) == chunkSize - 1 && updateZ != world.Chunks.GetLength(2) - 1)
+			world.Chunks[updateX, updateY, updateZ + 1].MarkDirty();
 	}
 }

@@ -2,15 +2,15 @@
 using System.Collections;
 
 public class WorldConfig {
-	public int WorldX { get; private set; }
-	public int WorldY { get; private set; }
-	public int WorldZ { get; private set; }
+	public int ChunkCountX { get; private set; }
+	public int ChunkCountY { get; private set; }
+	public int ChunkCountZ { get; private set; }
 	public int ChunkSize { get; private set; }
 
-	public WorldConfig(int worldX, int worldY, int worldZ, int chunkSize) {
-		WorldX = worldX;
-		WorldY = worldY;
-		WorldZ = worldZ;
+	public WorldConfig(int chunkCountX, int chunkCountY, int chunkCountZ, int chunkSize) {
+		ChunkCountX = chunkCountX;
+		ChunkCountY = chunkCountY;
+		ChunkCountZ = chunkCountZ;
 		ChunkSize = chunkSize;
 	}
 }
