@@ -6,8 +6,8 @@ public class World : MonoBehaviour {
 
 	//public byte[,,] data;
 
-	public GameObject chunk;
-	public Chunk[,,] chunks;
+	public GameObject ChunkPrototype;
+	public Chunk[,,] Chunks;
 
 	public void Initialize(WorldConfig config) {
 		Config = config;
@@ -18,22 +18,22 @@ public class World : MonoBehaviour {
         CreateChunks(samples);
 	}
 
-    /*
-	public byte Block(int x, int y, int z) {
-		// avoid hiding tops of blocks at top of map
-		if(y >= Config.WorldY) return (byte)0;
+	public byte GetBlock(int x, int y, int z) {
+        int chunkSize = Config.ChunkSize;
 
-		if(x >= Config.WorldX || x < 0 || y < 0 || z >= Config.WorldZ || z < 0)
-			return (byte)1;
+        IntVector3 chunkCoords = new IntVector3((int)Mathf.Floor(x / chunkSize), 
+                                                (int)Mathf.Floor(y / chunkSize), 
+                                                (int)Mathf.Floor(z / chunkSize));
 
-		return data[x, y, z];
+        Chunk chunk = Chunks[chunkCoords.X, chunkCoords.Y, chunkCoords.Z];
+
+        return  chunk.GetBlock(x % chunkSize, y % chunkSize, z % chunkSize);
 	}
-    */   
 
 	private void CreateBlocks() {
-		int worldX = Config.WorldX;
-		int worldY = Config.WorldY;
-		int worldZ = Config.WorldZ;
+		int worldX = Config.ChunkCountX;
+		int worldY = Config.ChunkCountY;
+		int worldZ = Config.ChunkCountZ;
 
 		//data = new byte[worldX, worldY, worldZ];
 
@@ -86,20 +86,20 @@ public class World : MonoBehaviour {
 	private void CreateChunks(float[] samples) {
 		int chunkSize = Config.ChunkSize;
 
-		chunks = new Chunk[
-			Mathf.FloorToInt(Config.WorldX),
-			Mathf.FloorToInt(Config.WorldY),
-			Mathf.FloorToInt(Config.WorldZ)
+		Chunks = new Chunk[
+			Mathf.FloorToInt(Config.ChunkCountX),
+			Mathf.FloorToInt(Config.ChunkCountY),
+			Mathf.FloorToInt(Config.ChunkCountZ)
 		];
 
-		for(int x = 0; x < chunks.GetLength(0); x++) {
-            for(int z = 0; z < chunks.GetLength(2); z++) {
-			    for(int y = 0; y < chunks.GetLength(1); y++) {
-					GameObject newChunkGo = Instantiate(chunk,
+		for(int x = 0; x < Chunks.GetLength(0); x++) {
+            for(int z = 0; z < Chunks.GetLength(2); z++) {
+			    for(int y = 0; y < Chunks.GetLength(1); y++) {
+                    GameObject newChunkGo = Instantiate(ChunkPrototype,
 						new Vector3(x * chunkSize - 0.5f, y * chunkSize + 0.5f, z * chunkSize - 0.5f),
 						new Quaternion(0, 0, 0, 0)) as GameObject;
 
-                    bool solid = (y <= samples[z * Config.WorldX + x]);
+                    bool solid = (y <= samples[z * Config.ChunkCountX + x]);
 
 					Chunk newChunk = newChunkGo.GetComponent("Chunk") as Chunk;
                     newChunk.Initialize(Config.ChunkSize, solid);
@@ -108,7 +108,7 @@ public class World : MonoBehaviour {
 					newChunk.world = this;
 					newChunk.chunkOffset = new IntVector3(x * chunkSize, y * chunkSize, z * chunkSize);
 
-					chunks[x, y, z] = newChunk;
+					Chunks[x, y, z] = newChunk;
 				}
 			}
 		}

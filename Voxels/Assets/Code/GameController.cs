@@ -13,19 +13,19 @@ public class GameController : MonoBehaviour {
     public float Power;
 
 	protected void Start () {
-        int worldX = 4;
-		int worldY = 7;
-		int worldZ = 4;
+        int chunkCountX = 16;
+		int chunkCountY = 7;
+		int chunkCountZ = 16;
 
         WorldGenerator worldGen = new WorldGenerator(Random.Range(1, 65536));
 
-		WorldConfig worldConfig = new WorldConfig(worldX, worldY, worldZ, 8);
+		WorldConfig worldConfig = new WorldConfig(chunkCountX, chunkCountY, chunkCountZ, 8);
 
 		World world = GameObject.Find("World").GetComponent<World>();
 		world.Initialize(worldConfig);
 
-        float[] rawNoise = worldGen.GenerateRawNoise(worldX, worldZ);
-        float[] shiftedNoise = worldGen.ShiftNoise(0, 1, 0, worldY, rawNoise);
+        float[] rawNoise = worldGen.GenerateRawNoise(chunkCountX, chunkCountZ);
+        float[] shiftedNoise = worldGen.ShiftNoise(0, 1, 0, chunkCountY, rawNoise);
         float[] discreteNoise = worldGen.DiscretizeDenormalizedNoise(shiftedNoise);
 
         world.Generate(discreteNoise);
@@ -41,37 +41,4 @@ public class GameController : MonoBehaviour {
 		//GameObject playerGO = GameObject.Find("Player");
 		//playerGO.transform.position = new Vector3(worldX / 2, worldY / 2 + 5, worldZ / 2);
 	}
-
-    /*
-    private float[] GenerateNoise(int width, int height) {
-        float[] samples = new float[width * height];
-
-        //Generator generator = new ValueNoise(Random.Range(1, 65536), SCurve.Cubic);
-        Generator generator = new PinkNoise(Random.Range(1, 65536));
-
-        for(int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
-                //samples[y * width + x] = Noise.GetNoise(x, y, 10, Scale, Depth, Power);
-
-                float xCoord = (((float)x / width) + 0) * Scale;
-                float yCoord = (((float)y / height) + 0) * Scale;
-                
-                float sample = generator.GetValue(xCoord, yCoord, 0);
-                //Debug.Log("initial sample: " + sample);
-                
-                // Pink noise will mostly fall in [-1,1] but this is not guaranteed
-                sample = Mathf.Clamp(sample, -1, 1);
-                //Debug.Log("clamped: " + sample);
-                
-                // Shift sample value to the [0,1] range
-                sample = MathUtils.ConvertRange(-1, 1, 0, 1, sample);
-                //Debug.Log("normalized: " + sample);
-                
-                samples[y * width + x] = sample;
-            }
-        }
-        
-        return samples;
-    }
-    */
 }
