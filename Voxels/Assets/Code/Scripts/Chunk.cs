@@ -19,12 +19,14 @@ public class Chunk : MonoBehaviour {
 	private int faceCount;
 
 	// TODO - abstract texture handling
-	private float tUnit = 0.0625f;
+	private float tUnit = 0.25f;
+    private Vector2 tGrass = new Vector2(0, 3);
+    /*
 	private Vector2 tStone = new Vector2(1, 15);
 	private Vector2 tDirt = new Vector2(2, 15);
 	private Vector2 tGrassTop = new Vector2(1, 6);
 	private Vector2 tGrassSide = new Vector2(3, 15);
-
+    */
 	protected void Start() {
 		mesh = GetComponent<MeshFilter>().mesh;
 		col = GetComponent<MeshCollider>();
@@ -141,7 +143,7 @@ public class Chunk : MonoBehaviour {
 
 		Vector2 texturePos = new Vector2(0, 0);
 
-		texturePos = tDirt;
+        texturePos = tGrass;
 
         /*
 		if(block == 1)
@@ -193,7 +195,7 @@ public class Chunk : MonoBehaviour {
 
 		Vector2 texturePos = new Vector2(0, 0);
 
-		texturePos = tDirt;
+        texturePos = tGrass;
 
 		/*
 		if(block == 1)
@@ -208,7 +210,7 @@ public class Chunk : MonoBehaviour {
 	private void CubeSide(int x, int y, int z, byte block) {
 		Vector2 texturePos = new Vector2(0, 0);
 
-		texturePos = tDirt;
+		texturePos = tGrass;
 
 		/*
 		if(block == 1)

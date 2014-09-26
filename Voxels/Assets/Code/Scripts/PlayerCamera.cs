@@ -10,6 +10,7 @@ public class PlayerCamera : MonoBehaviour {
 	
 	void Update () {
 		transform.position = getTarget();
+        SmoothFollowPosition();
 	}
 
 	private void SmoothFollowPosition() {
@@ -18,6 +19,6 @@ public class PlayerCamera : MonoBehaviour {
 	}
 
 	private Vector3 getTarget() {
-		return Player.transform.position + new Vector3(0, 35.0f, -30.0f);
+		return Player.transform.position + new Vector3(0, 30.0f, -20.0f);
 	}
 }
