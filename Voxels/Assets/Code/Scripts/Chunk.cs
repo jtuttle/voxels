@@ -27,6 +27,10 @@ public class Chunk : MonoBehaviour {
 	private Vector2 tGrassTop = new Vector2(1, 6);
 	private Vector2 tGrassSide = new Vector2(3, 15);
     */
+    private TextureAtlas _textureAtlas;
+    private int _textureIndex;
+
+
 	protected void Start() {
 		mesh = GetComponent<MeshFilter>().mesh;
 		col = GetComponent<MeshCollider>();
@@ -41,7 +45,7 @@ public class Chunk : MonoBehaviour {
 		}
 	}
 
-    public void Initialize(int chunkSize, bool solid) {
+    public void Initialize(int chunkSize, bool solid, TextureAtlas textureAtlas, int textureIndex) {
         _blocks = new byte[chunkSize, chunkSize, chunkSize];
 
         // for now this is just going to be hard-coded to be
@@ -55,6 +59,9 @@ public class Chunk : MonoBehaviour {
                 }   
             }
         }
+
+        _textureAtlas = textureAtlas;
+        _textureIndex = textureIndex;
     }
 
 	public byte GetBlock(int x, int y, int z) {
@@ -236,10 +243,14 @@ public class Chunk : MonoBehaviour {
 		newTriangles.Add(offset + 2); //3
 		newTriangles.Add(offset + 3); //4
 
+        /*
 		newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y));
 		newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y + tUnit));
 		newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y + tUnit));
 		newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y));
+        */      
+
+        newUV.AddRange(_textureAtlas.getUVCoords(_textureIndex));
 
 		faceCount++;
 	}

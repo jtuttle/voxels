@@ -9,8 +9,12 @@ public class World : MonoBehaviour {
 	public GameObject ChunkPrototype;
 	public Chunk[,,] Chunks;
 
+    private TextureAtlas _textureAtlas;
+
 	public void Initialize(WorldConfig config) {
 		Config = config;
+
+        _textureAtlas = new TextureAtlas(4, 4);
 	}
 
     public void Generate(float[] samples) {
@@ -30,10 +34,12 @@ public class World : MonoBehaviour {
         return  chunk.GetBlock(x % chunkSize, y % chunkSize, z % chunkSize);
 	}
 
-	private void CreateBlocks() {
+	//private void CreateBlocks() {
+        /*
 		int worldX = Config.ChunkCountX;
 		int worldY = Config.ChunkCountY;
 		int worldZ = Config.ChunkCountZ;
+        */
 
 		//data = new byte[worldX, worldY, worldZ];
 
@@ -81,7 +87,7 @@ public class World : MonoBehaviour {
 		    }
 		}
         */      
-	}
+	//}
 
 	private void CreateChunks(float[] samples) {
 		int chunkSize = Config.ChunkSize;
@@ -101,8 +107,21 @@ public class World : MonoBehaviour {
 
                     bool solid = (y <= samples[z * Config.ChunkCountX + x]);
 
+                    Debug.Log(y);
+
+                    int textureIndex = 12;
+
+                    if(y < 1)
+                        textureIndex = 14;
+                    else if(y < 2)
+                        textureIndex = 13;
+                    else if(y > 4)
+                        textureIndex = 15;
+                    else if(y > 5)
+                        textureIndex = 8;
+
 					Chunk newChunk = newChunkGo.GetComponent("Chunk") as Chunk;
-                    newChunk.Initialize(Config.ChunkSize, solid);
+                    newChunk.Initialize(Config.ChunkSize, solid, _textureAtlas, textureIndex);
 					newChunk.transform.parent = transform;
 
 					newChunk.world = this;
