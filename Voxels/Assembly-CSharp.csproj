@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Code\GameController.cs" />
      <Compile Include="Assets\Code\HeightMapTestController.cs" />
+     <Compile Include="Assets\Code\Model\TextureAtlas.cs" />
      <Compile Include="Assets\Code\Model\WorldConfig.cs" />
      <Compile Include="Assets\Code\Model\WorldGenerator.cs" />
      <Compile Include="Assets\Code\NoiseTestController.cs" />
