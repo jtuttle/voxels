@@ -13,32 +13,36 @@ public class GameController : MonoBehaviour {
     public float Power;
 
 	protected void Start () {
-        int chunkCountX = 16;
+        // each loaded screen could be 16 x 12 chunks
+        // world can be 16 x 16 screens
+
+        int chunkCountX = 256;
 		int chunkCountY = 7;
-		int chunkCountZ = 16;
+		int chunkCountZ = 192;
+
+        WorldConfig worldConfig = new WorldConfig(chunkCountX, chunkCountY, chunkCountZ, 8);
 
         WorldGenerator worldGen = new WorldGenerator(Random.Range(1, 65536));
-
-		WorldConfig worldConfig = new WorldConfig(chunkCountX, chunkCountY, chunkCountZ, 8);
-
-		World world = GameObject.Find("World").GetComponent<World>();
-		world.Initialize(worldConfig);
 
         float[] rawNoise = worldGen.GenerateRawNoise(chunkCountX, chunkCountZ);
         float[] shiftedNoise = worldGen.ShiftNoise(0, 1, 0, chunkCountY, rawNoise);
         float[] discreteNoise = worldGen.DiscretizeDenormalizedNoise(shiftedNoise);
 
-        world.Generate(discreteNoise);
+        World world = GameObject.Find("World").GetComponent<World>();
+        world.Initialize(worldConfig);
 
 
+        // quick test of chunk groups
+        float[,] samples = new float[16, 12];
+        Vector2 offset = new Vector2(4, 4);
 
+        for(int x = 0; x < samples.GetLength(0); x++) {
+            for(int y = 0; y < samples.GetLength(1); y++) {
+                samples[x, y] = discreteNoise[y * world.Config.ChunkCountX + x];
+            }
+        }
 
-		// center the world
-		// TODO: this breaks...add the appropriate coordinate translations to fix it?
-		// maybe that would be too slow...
-		//world.transform.position = new Vector3(-(worldX / 2), -(worldY / 2), -(worldZ / 2));
-
-		//GameObject playerGO = GameObject.Find("Player");
-		//playerGO.transform.position = new Vector3(worldX / 2, worldY / 2 + 5, worldZ / 2);
+        world.CreateChunkGroup(samples, new Vector2(0, 0));
+        world.CreateChunkGroup(samples, new Vector2(200, 0));
 	}
 }

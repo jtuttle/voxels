@@ -18,7 +18,7 @@ public class WorldGenerator {
         
         //Generator generator = new ValueNoise(Random.Range(1, 65536), SCurve.Cubic);
         Generator generator = new PinkNoise(Seed);
-        
+
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
                 float xCoord = (float)x / width;

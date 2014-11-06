@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class Chunk : MonoBehaviour {
 	public World world;
+    public ChunkGroup chunkGroup;
+
 	public IntVector3 chunkOffset;
 
     private byte[,,] _blocks;
@@ -65,7 +67,6 @@ public class Chunk : MonoBehaviour {
     }
 
 	public byte GetBlock(int x, int y, int z) {
-		//return world.Block(x + chunkOffset.X, y + chunkOffset.Y, z + chunkOffset.Z);
         return _blocks[x, y, z];
 	}
 
@@ -85,32 +86,32 @@ public class Chunk : MonoBehaviour {
                         int worldCoordY = chunkOffset.Y + y;
                         int worldCoordZ = chunkOffset.Z + z;
 
-                        int maxBlockX = world.Config.ChunkCountX * world.Config.ChunkSize - 1;
-                        int maxBlockY = world.Config.ChunkCountY * world.Config.ChunkSize - 1;
-                        int maxBlockZ = world.Config.ChunkCountZ * world.Config.ChunkSize - 1;
+                        int maxBlockX = chunkGroup.Chunks.GetLength(0) * world.Config.ChunkSize - 1;
+                        int maxBlockY = chunkGroup.Chunks.GetLength(1) * world.Config.ChunkSize - 1;
+                        int maxBlockZ = chunkGroup.Chunks.GetLength(2) * world.Config.ChunkSize - 1;
 
 						// block above is empty
-                        if(worldCoordY + 1 > maxBlockY || world.GetBlock(worldCoordX, worldCoordY + 1, worldCoordZ) == 0)
+                        if(worldCoordY + 1 > maxBlockY || chunkGroup.GetBlock(worldCoordX, worldCoordY + 1, worldCoordZ) == 0)
 							CubeTop(x, y, z, block);
 
                         // block below is empty
-                        if(worldCoordY - 1 < 0 || world.GetBlock(worldCoordX, worldCoordY - 1, worldCoordZ) == 0)
+                        if(worldCoordY - 1 < 0 || chunkGroup.GetBlock(worldCoordX, worldCoordY - 1, worldCoordZ) == 0)
 							CubeBot(x, y, z, block);
 
                         // block east is empty
-                        if(worldCoordX + 1 > maxBlockX || world.GetBlock(worldCoordX + 1, worldCoordY, worldCoordZ) == 0)
+                        if(worldCoordX + 1 > maxBlockX || chunkGroup.GetBlock(worldCoordX + 1, worldCoordY, worldCoordZ) == 0)
 							CubeEast(x, y, z, block);
 
                         // block west is empty
-                        if(worldCoordX - 1 < 0 || world.GetBlock(worldCoordX - 1, worldCoordY, worldCoordZ) == 0)
+                        if(worldCoordX - 1 < 0 || chunkGroup.GetBlock(worldCoordX - 1, worldCoordY, worldCoordZ) == 0)
 							CubeWest(x, y, z, block);
 
                         // block north is empty
-                        if(worldCoordZ + 1 > maxBlockZ || world.GetBlock(worldCoordX, worldCoordY, worldCoordZ + 1) == 0)
+                        if(worldCoordZ + 1 > maxBlockZ || chunkGroup.GetBlock(worldCoordX, worldCoordY, worldCoordZ + 1) == 0)
 							CubeNorth(x, y, z, block);
 
                         // block south is empty
-                        if(worldCoordZ - 1 < 0 || world.GetBlock(worldCoordX, worldCoordY, worldCoordZ - 1) == 0)
+                        if(worldCoordZ - 1 < 0 || chunkGroup.GetBlock(worldCoordX, worldCoordY, worldCoordZ - 1) == 0)
 							CubeSouth(x, y, z, block);
 					}
 				}
