@@ -104,11 +104,13 @@ public class ModifyTerrain : MonoBehaviour {
 		if(x < 0 || x >= config.ChunkCountX || y < 0 || y >= config.ChunkCountY || z < 0 || z >= config.ChunkCountZ)
 			return;
 
-        // TODO - replace this
+        // TODO - replace this (might have been done?)
 //		world.data[x, y, z] = block;
-		UpdateChunkAt(x, y, z);
+
+		//UpdateChunkAt(x, y, z);
 	}
 
+    /* This became broken when I started using chunkgroups. Needs fixing.
 	public void UpdateChunkAt(int x, int y, int z) {
 		int chunkSize = world.Config.ChunkSize;
 
@@ -137,4 +139,5 @@ public class ModifyTerrain : MonoBehaviour {
 		if(z - (chunkSize * updateZ) == chunkSize - 1 && updateZ != world.Chunks.GetLength(2) - 1)
 			world.Chunks[updateX, updateY, updateZ + 1].MarkDirty();
 	}
+    */   
 }
