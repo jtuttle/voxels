@@ -12,7 +12,7 @@ public class NoiseTestController : MonoBehaviour {
     public float Scale;
 
     private WorldGenerator _world;
-    private float[] _currentNoise;
+    private float[,] _currentNoise;
     private Texture2D _currentTexture;
 
     protected void Start() {
@@ -27,15 +27,24 @@ public class NoiseTestController : MonoBehaviour {
         if(GUI.Button(new Rect(20, 40, 80, 20), "Refresh"))
             OnRefreshClick();
 
-        if(GUI.Button(new Rect(20, 80, 80, 20), "Discretize"))
+        if(GUI.Button(new Rect(20, 80, 80, 20), "Weight"))
+            OnWeightClick();
+
+        if(GUI.Button(new Rect(20, 120, 80, 20), "Discretize"))
             OnDiscretizeClick();
 
-        if(GUI.Button(new Rect(20, 120, 80, 20), "Save"))
+        if(GUI.Button(new Rect(20, 160, 80, 20), "Save"))
             OnSaveClick();
     }
 
     private void OnRefreshClick() {
         GenerateNoiseTest();
+    }
+
+    private void OnWeightClick() {
+        _currentNoise = _world.WeightNoise(0, 2, _currentNoise);
+        _currentTexture = GenerateTexture(Width, Height, _currentNoise);
+        Canvas.renderer.material.mainTexture = _currentTexture;
     }
 
     private void OnDiscretizeClick() {
@@ -56,14 +65,16 @@ public class NoiseTestController : MonoBehaviour {
         Canvas.renderer.material.mainTexture = _currentTexture;
     }
 
-    private Texture2D GenerateTexture(int width, int height, float[] samples) {
+    private Texture2D GenerateTexture(int width, int height, float[,] samples) {
         Texture2D texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
 
         Color[] pixels = new Color[width * height];
 
-        for(int i = 0; i < samples.Length; i++) {
-            float sample = samples[i];
-            pixels[i] = new Color(sample, sample, sample);
+        for(int y = 0; y < samples.GetLength(1); y++) {
+            for(int x = 0; x < samples.GetLength(0); x++) {
+                float sample = samples[x, y];
+                pixels[y * width + x] = new Color(sample, sample, sample);
+            }
         }
 
         texture.SetPixels(pixels);

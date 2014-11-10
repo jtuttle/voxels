@@ -27,13 +27,12 @@ public class GameController : MonoBehaviour {
 
         WorldGenerator worldGen = new WorldGenerator(Random.Range(1, 65536));
 
-        float[] rawNoise = worldGen.GenerateRawNoise(chunkCountX, chunkCountZ);
-        float[] shiftedNoise = worldGen.ShiftNoise(0, 1, 0, chunkCountY, rawNoise);
-        float[] discreteNoise = worldGen.DiscretizeDenormalizedNoise(shiftedNoise);
+        float[,] rawNoise = worldGen.GenerateRawNoise(chunkCountX, chunkCountZ);
+        float[,] shiftedNoise = worldGen.ShiftNoise(0, 1, 0, chunkCountY, rawNoise);
+        float[,] discreteNoise = worldGen.DiscretizeDenormalizedNoise(shiftedNoise);
 
         World world = GameObject.Find("World").GetComponent<World>();
         world.Initialize(worldConfig);
-
 
         // quick test of chunk groups
         float[,] samples = new float[16, 12];
@@ -41,7 +40,7 @@ public class GameController : MonoBehaviour {
 
         for(int x = 0; x < samples.GetLength(0); x++) {
             for(int y = 0; y < samples.GetLength(1); y++) {
-                samples[x, y] = discreteNoise[y * world.Config.ChunkCountX + x];
+                samples[x, y] = discreteNoise[x, y];
             }
         }
 
