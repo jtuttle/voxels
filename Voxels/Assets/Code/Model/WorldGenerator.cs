@@ -79,6 +79,12 @@ public class WorldGenerator {
     }
 
     /*
+    public float[] WeightNoise(float vMin, float vMax, float[] samples) {
+
+    }
+    */
+
+    /*
     private float[] GenerateWorldNoise(int width, int height, int elevations) {
         float[] samples = new float[width * height];
         
