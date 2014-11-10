@@ -19,8 +19,11 @@ public class GameController : MonoBehaviour {
         int chunkCountX = 256;
 		int chunkCountY = 7;
 		int chunkCountZ = 192;
+        int chunkSize = 8;
+        IntVector2 chunkGroupSize = new IntVector2(16, 12);
 
-        WorldConfig worldConfig = new WorldConfig(chunkCountX, chunkCountY, chunkCountZ, 8);
+        WorldConfig worldConfig = new WorldConfig(chunkCountX, chunkCountY, chunkCountZ, 
+                                                  chunkSize, chunkGroupSize);
 
         WorldGenerator worldGen = new WorldGenerator(Random.Range(1, 65536));
 

@@ -4,8 +4,6 @@ using System.Collections;
 public class World : MonoBehaviour {
 	public WorldConfig Config { get; private set; }
 
-	//public byte[,,] data;
-
 	public GameObject ChunkPrototype;
 	public Chunk[,,] Chunks;
 
@@ -16,4 +14,15 @@ public class World : MonoBehaviour {
 
         TextureAtlas = new TextureAtlas(4, 4);
 	}
+
+    public void CreateChunkGroup(float[,] samples, Vector2 offset) {
+        GameObject go = new GameObject();
+        go.name = "ChunkGroup";
+
+        ChunkGroup chunkGroup = go.AddComponent<ChunkGroup>();
+        chunkGroup.Initialize(samples, offset, this);
+        chunkGroup.CreateChunks();
+
+        go.transform.position = new Vector3(offset.x, 0, offset.y);
+    }
 }
