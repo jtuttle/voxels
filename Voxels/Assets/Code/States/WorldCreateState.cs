@@ -38,21 +38,7 @@ public class WorldCreateState : FSMState {
         World world = GameObject.Find("World").GetComponent<World>();
         world.Initialize(worldConfig, worldNoise);
 
-        // quick test of chunk groups
-        /*
-        float[,] samples = new float[16, 12];
-        Vector2 offset = new Vector2(4, 4);
-        
-        for(int x = 0; x < samples.GetLength(0); x++) {
-            for(int y = 0; y < samples.GetLength(1); y++) {
-                samples[x, y] = worldNoise[x, y];
-            }
-        }
-        
-        world.CreateChunkGroup(samples, new Vector2(0, 0));
-        world.CreateChunkGroup(samples, new Vector2(200, 0));
-        */
-        
+        // TEMP - just to see full noise map
         NoiseCanvas.renderer.material.mainTexture = GenerateTexture(chunkCountX, chunkCountZ, worldNoise);
 
         IntVector2 startCoords = new IntVector2(0, 0);
@@ -60,6 +46,12 @@ public class WorldCreateState : FSMState {
 
         GameData.World = world;
         GameData.CurrentScreenCoords = startCoords;
+
+        // TEMP - place the player
+        GameObject playerGo = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Player"));
+        Player player = playerGo.GetComponent<Player>();
+        player.transform.position = new Vector3(50, 50, 50);
+        Camera.main.GetComponent<PlayerCamera>().Player = player;
 
         ExitState(new FSMTransition(GameState.WorldNavigate));
     }
