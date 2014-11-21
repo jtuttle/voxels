@@ -47,10 +47,11 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Code\GameController.cs" />
+     <Compile Include="Assets\Code\GameData.cs" />
      <Compile Include="Assets\Code\HeightMapTestController.cs" />
      <Compile Include="Assets\Code\Model\TextureAtlas.cs" />
      <Compile Include="Assets\Code\Model\WorldConfig.cs" />
-     <Compile Include="Assets\Code\Model\WorldGenerator.cs" />
+     <Compile Include="Assets\Code\Model\WorldNoiseGenerator.cs" />
      <Compile Include="Assets\Code\NoiseTestController.cs" />
      <Compile Include="Assets\Code\Scripts\Chunk.cs" />
      <Compile Include="Assets\Code\Scripts\ChunkGroup.cs" />
@@ -60,11 +61,17 @@
      <Compile Include="Assets\Code\Scripts\Player.cs" />
      <Compile Include="Assets\Code\Scripts\PlayerCamera.cs" />
      <Compile Include="Assets\Code\Scripts\PropertyChangeNotifier.cs" />
+     <Compile Include="Assets\Code\Scripts\ScreenCamera.cs" />
      <Compile Include="Assets\Code\Scripts\World.cs" />
+     <Compile Include="Assets\Code\States\WorldCreateState.cs" />
+     <Compile Include="Assets\Code\States\WorldNavigateState.cs" />
      <Compile Include="Assets\Code\Utils\IntVector2.cs" />
      <Compile Include="Assets\Code\Utils\IntVector3.cs" />
      <Compile Include="Assets\Code\Utils\MathUtils.cs" />
      <Compile Include="Assets\Code\Utils\Noise.cs" />
+     <Compile Include="Assets\Code\Utils\State\FSMState.cs" />
+     <Compile Include="Assets\Code\Utils\State\FSMTransition.cs" />
+     <Compile Include="Assets\Code\Utils\State\FiniteStateMachine.cs" />
      <Compile Include="Assets\CoherentNoise\Demo\TerrainDemo.cs" />
      <None Include="Assets\CoherentNoise\readme.txt" />
  <Reference Include="CoherentNoise">

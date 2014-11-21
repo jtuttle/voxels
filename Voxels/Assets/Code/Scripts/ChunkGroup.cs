@@ -5,7 +5,7 @@ public class ChunkGroup : MonoBehaviour {
     public Chunk[,,] Chunks { get; private set; }
 
     private float[,] _samples;
-    private Vector2 _offset;
+    private IntVector2 _offset;
     private World _world;
 
     public int Width {
@@ -16,7 +16,7 @@ public class ChunkGroup : MonoBehaviour {
         get { return Chunks.GetLength(1); }
     }
 
-    public void Initialize(float[,] samples, Vector2 offset, World world) {
+    public void Initialize(float[,] samples, IntVector2 offset, World world) {
         _samples = samples;
         _offset = offset;
         _world = world;
@@ -78,8 +78,7 @@ public class ChunkGroup : MonoBehaviour {
                     Chunk newChunk = newChunkGo.GetComponent("Chunk") as Chunk;
                     newChunk.Initialize(chunkSize, solid, _world.TextureAtlas, textureIndex);
                     newChunk.transform.parent = transform;
-                    
-                    newChunk.world = _world;
+
                     newChunk.chunkGroup = this;
                     newChunk.chunkOffset = new IntVector3(x * chunkSize, y * chunkSize, z * chunkSize);
                     

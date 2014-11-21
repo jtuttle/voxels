@@ -4,6 +4,10 @@ using System.Collections;
 public class PlayerCamera : MonoBehaviour {
 	public Player Player;
 
+    public bool Lock;
+    public float Angle = 45.0f;
+    public float Distance = 20.0f;
+
 	void Start () {
 		transform.position = getTarget();
 	}
@@ -19,6 +23,9 @@ public class PlayerCamera : MonoBehaviour {
 	}
 
 	private Vector3 getTarget() {
-		return Player.transform.position + new Vector3(0, 30.0f, -20.0f);
+        float opp = Mathf.Sin(Angle * Mathf.Deg2Rad) * Distance;
+        float adj = Mathf.Cos(Angle * Mathf.Deg2Rad) * Distance;
+
+		return Player.transform.position + new Vector3(0, adj, -opp);
 	}
 }
