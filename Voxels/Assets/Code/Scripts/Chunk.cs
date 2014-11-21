@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Chunk : MonoBehaviour {
-	public World world;
     public ChunkGroup chunkGroup;
 
 	public IntVector3 chunkOffset;
@@ -71,7 +70,7 @@ public class Chunk : MonoBehaviour {
 	}
 
 	public void GenerateMesh() {
-		int chunkSize = world.Config.ChunkSize;
+        int chunkSize = _blocks.GetLength(0);
 
 		for(int x = 0; x < chunkSize; x++) {
 			for(int y = 0; y < chunkSize; y++) {
@@ -86,9 +85,9 @@ public class Chunk : MonoBehaviour {
                         int worldCoordY = chunkOffset.Y + y;
                         int worldCoordZ = chunkOffset.Z + z;
 
-                        int maxBlockX = chunkGroup.Chunks.GetLength(0) * world.Config.ChunkSize - 1;
-                        int maxBlockY = chunkGroup.Chunks.GetLength(1) * world.Config.ChunkSize - 1;
-                        int maxBlockZ = chunkGroup.Chunks.GetLength(2) * world.Config.ChunkSize - 1;
+                        int maxBlockX = chunkGroup.Chunks.GetLength(0) * chunkSize - 1;
+                        int maxBlockY = chunkGroup.Chunks.GetLength(1) * chunkSize - 1;
+                        int maxBlockZ = chunkGroup.Chunks.GetLength(2) * chunkSize - 1;
 
 						// block above is empty
                         if(worldCoordY + 1 > maxBlockY || chunkGroup.GetBlock(worldCoordX, worldCoordY + 1, worldCoordZ) == 0)

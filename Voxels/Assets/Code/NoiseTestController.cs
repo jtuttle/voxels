@@ -11,7 +11,7 @@ public class NoiseTestController : MonoBehaviour {
     public int Elevations;
     public float Scale;
 
-    private WorldGenerator _world;
+    private WorldNoiseGenerator _world;
     private float[,] _currentNoise;
     private Texture2D _currentTexture;
 
@@ -27,13 +27,19 @@ public class NoiseTestController : MonoBehaviour {
         if(GUI.Button(new Rect(20, 40, 80, 20), "Refresh"))
             OnRefreshClick();
 
-        if(GUI.Button(new Rect(20, 80, 80, 20), "Weight"))
+        if(GUI.Button(new Rect(20, 80, 80, 20), "Average"))
+            OnAverageClick();
+
+        if(GUI.Button(new Rect(20, 120, 80, 20), "Weight"))
             OnWeightClick();
 
-        if(GUI.Button(new Rect(20, 120, 80, 20), "Discretize"))
+        if(GUI.Button(new Rect(20, 160, 80, 20), "Blockify"))
+            OnBlockifyClick();
+
+        if(GUI.Button(new Rect(20, 200, 80, 20), "Discretize"))
             OnDiscretizeClick();
 
-        if(GUI.Button(new Rect(20, 160, 80, 20), "Save"))
+        if(GUI.Button(new Rect(20, 240, 80, 20), "Save"))
             OnSaveClick();
     }
 
@@ -41,8 +47,20 @@ public class NoiseTestController : MonoBehaviour {
         GenerateNoiseTest();
     }
 
+    private void OnAverageClick() {
+        _currentNoise = _world.NormalizeAverage(_currentNoise);
+        _currentTexture = GenerateTexture(Width, Height, _currentNoise);
+        Canvas.renderer.material.mainTexture = _currentTexture;
+    }
+
     private void OnWeightClick() {
-        _currentNoise = _world.WeightNoise(0, 2, _currentNoise);
+        _currentNoise = _world.ApplyCubicWeight(_currentNoise);
+        _currentTexture = GenerateTexture(Width, Height, _currentNoise);
+        Canvas.renderer.material.mainTexture = _currentTexture;
+    }
+
+    private void OnBlockifyClick() {
+        _currentNoise = _world.Blockify(_currentNoise);
         _currentTexture = GenerateTexture(Width, Height, _currentNoise);
         Canvas.renderer.material.mainTexture = _currentTexture;
     }
@@ -58,7 +76,7 @@ public class NoiseTestController : MonoBehaviour {
     }
 
     private void GenerateNoiseTest() {
-        _world = new WorldGenerator(Random.Range(1, 65536));
+        _world = new WorldNoiseGenerator(Random.Range(1, 65536));
 
         _currentNoise = _world.GenerateRawNoise(Width, Height);
         _currentTexture = GenerateTexture(Width, Height, _currentNoise);
