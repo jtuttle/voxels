@@ -3,6 +3,7 @@ using System.Collections;
 
 public class ChunkGroup : MonoBehaviour {
     public Chunk[,,] Chunks { get; private set; }
+    public Rect Bounds { get; private set; }
 
     private float[,] _samples;
     private IntVector2 _offset;
@@ -20,6 +21,22 @@ public class ChunkGroup : MonoBehaviour {
         _samples = samples;
         _offset = offset;
         _world = world;
+
+        ComputeBounds();
+    }
+
+    private void ComputeBounds() {
+        int chunkSize = _world.Config.ChunkSize;
+        int chunkGroupWidth = _world.Config.ChunkGroupWidth;
+        int chunkGroupHeight = _world.Config.ChunkGroupHeight;
+        float screenEdge = chunkSize / 2.0f;
+
+        Bounds = new Rect(_offset.X * chunkGroupWidth * chunkSize + screenEdge,
+                          _offset.Y * chunkGroupHeight * chunkSize - screenEdge,
+                          chunkGroupWidth * chunkSize - chunkSize,
+                          chunkGroupHeight * chunkSize - chunkSize);
+
+        Debug.Log(Bounds);
     }
 
     public byte GetBlock(int x, int y, int z) {

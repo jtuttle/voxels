@@ -8,13 +8,15 @@ public class PlayerCamera : MonoBehaviour {
     public float Angle = 45.0f;
     public float Distance = 20.0f;
 
-	void Start () {
-		transform.position = getTarget();
+	void Start() {
+		
 	}
 	
-	void Update () {
-		transform.position = getTarget();
-        SmoothFollowPosition();
+	void Update() {
+        if(Player != null) {
+		    transform.position = getTarget();
+            SmoothFollowPosition();
+        }
 	}
 
 	private void SmoothFollowPosition() {
