@@ -19,8 +19,9 @@ public class WorldNoiseGenerator {
         worldNoise = ApplyCubicWeight(worldNoise);
         worldNoise = Blockify(worldNoise);
 
-        worldNoise = ShiftNoise(0, 1, 0, elevations, worldNoise);
-        worldNoise = DiscretizeDenormalizedNoise(worldNoise);
+        // This shift is just to make sure we don't have any > 1 values.
+        worldNoise = ShiftNoise(0, 1, 0, 1, worldNoise);
+        worldNoise = DiscretizeNormalizedNoise(worldNoise, elevations);
 
         return worldNoise;
     }
