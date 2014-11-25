@@ -21,7 +21,7 @@ public class WorldNoiseGenerator {
 
         // This shift is just to make sure we don't have any > 1 values.
         worldNoise = ShiftNoise(0, 1, 0, 1, worldNoise);
-        worldNoise = DiscretizeNormalizedNoise(worldNoise, elevations);
+        //worldNoise = DiscretizeNormalizedNoise(worldNoise, elevations);
 
         return worldNoise;
     }
