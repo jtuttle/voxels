@@ -34,24 +34,48 @@ public class WorldCreateState : FSMState {
         
         WorldNoiseGenerator worldNoiseGen = new WorldNoiseGenerator(Random.Range(1, 65536));
         float[,] worldNoise = worldNoiseGen.GenerateWorldNoise(chunkCountX, chunkCountZ, chunkCountY);
-        
+
+        // TEMP - just to see full noise map
+        NoiseCanvas.renderer.material.mainTexture = GenerateTexture(chunkCountX, 
+                                                                    chunkCountZ, 
+                                                                    worldNoiseGen.DiscretizeNormalizedNoise(worldNoise, chunkCountY));
+
+        // Shift noise to ints for easier processing
+        worldNoise = worldNoiseGen.ShiftNoise(0, 1, 0, chunkCountY, worldNoise);
+        worldNoise = worldNoiseGen.DiscretizeDenormalizedNoise(worldNoise);
+
         World world = GameObject.Find("World").GetComponent<World>();
         world.Initialize(worldConfig, worldNoise);
 
-        // TEMP - just to see full noise map
-        NoiseCanvas.renderer.material.mainTexture = GenerateTexture(chunkCountX, chunkCountZ, worldNoise);
-
+        // TODO: This is always coming up ocean, something's wrong!
         IntVector2 startCoords = new IntVector2(0, 0);
         world.CreateScreen(startCoords);
+
+        // Looks like it's not crazy to draw 6 screens so we could
+        // have some nice depth to our vision.
+        /*
+        world.CreateScreen(startCoords + new IntVector2(1, 0));
+        world.CreateScreen(startCoords + new IntVector2(2, 0));
+        world.CreateScreen(startCoords + new IntVector2(0, 1));
+        world.CreateScreen(startCoords + new IntVector2(1, 1));
+        world.CreateScreen(startCoords + new IntVector2(2, 1));
+        */
 
         GameData.World = world;
         GameData.CurrentScreenCoords = startCoords;
 
         // TEMP - place the player
+        Vector3 playerStartPos = new Vector3(startCoords.X * worldConfig.ChunkGroupWidth * worldConfig.ChunkSize,
+                                             50,
+                                             startCoords.Y * worldConfig.ChunkGroupHeight * worldConfig.ChunkSize);
+
         GameObject playerGo = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Player"));
         Player player = playerGo.GetComponent<Player>();
-        player.transform.position = new Vector3(50, 50, 50);
-        Camera.main.GetComponent<PlayerCamera>().Player = player;
+        player.transform.position = playerStartPos;
+
+        ScreenCamera screenCam = Camera.main.GetComponent<ScreenCamera>();
+        screenCam.Player = player;
+        screenCam.Bounds = world.GetScreenBounds(startCoords);
 
         ExitState(new FSMTransition(GameState.WorldNavigate));
     }

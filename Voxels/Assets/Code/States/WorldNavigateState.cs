@@ -21,6 +21,10 @@ public class WorldNavigateState : FSMState {
         
         base.ExitState(nextStateTransition);
     }
+
+    public override void Update() {
+
+    }
     
     public override void Dispose() {
         
