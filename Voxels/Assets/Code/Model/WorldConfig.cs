@@ -2,20 +2,22 @@
 using System.Collections;
 
 public class WorldConfig {
-	public int ChunkCountX { get; private set; }
-	public int ChunkCountY { get; private set; }
-	public int ChunkCountZ { get; private set; }
-	public int ChunkSize { get; private set; }
+    public int ChunkSize { get; private set; }
 
-    public int ChunkGroupWidth { get; private set; }
-    public int ChunkGroupHeight { get; private set; }
+	public int WorldChunksX { get; private set; }
+	public int WorldChunksY { get; private set; }
+	public int WorldChunksZ { get; private set; }
 
-	public WorldConfig(int chunkCountX, int chunkCountY, int chunkCountZ, int chunkSize, int chunkGroupWidth, int chunkGroupHeight) {
-		ChunkCountX = chunkCountX;
-		ChunkCountY = chunkCountY;
-		ChunkCountZ = chunkCountZ;
-		ChunkSize = chunkSize;
-        ChunkGroupWidth = chunkGroupWidth;
-        ChunkGroupHeight = chunkGroupHeight;
+    public int ScreenChunksX { get; private set; }
+    public int ScreenChunksZ { get; private set; }
+
+    // TODO: figure out consistent naming scheme and dimensions.
+    public WorldConfig(int chunkSize, int worldChunksX, int worldChunksY, int worldChunksZ, int screenChunksX, int screenChunksZ) {
+        ChunkSize = chunkSize;
+		WorldChunksX = worldChunksX;
+		WorldChunksY = worldChunksY;
+		WorldChunksZ = worldChunksZ;
+        ScreenChunksX = screenChunksX;
+        ScreenChunksZ = screenChunksZ;
 	}
 }

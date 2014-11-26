@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class ModifyTerrain : MonoBehaviour {
@@ -101,7 +101,7 @@ public class ModifyTerrain : MonoBehaviour {
 	public void SetBlockAt(int x, int y, int z, byte block) {
 		WorldConfig config = world.Config;
 
-		if(x < 0 || x >= config.ChunkCountX || y < 0 || y >= config.ChunkCountY || z < 0 || z >= config.ChunkCountZ)
+		if(x < 0 || x >= config.WorldChunksX || y < 0 || y >= config.WorldChunksY || z < 0 || z >= config.WorldChunksZ)
 			return;
 
         // TODO - replace this (might have been done?)
