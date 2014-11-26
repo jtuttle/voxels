@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
 public class Chunk : MonoBehaviour {
-    public ChunkGroup chunkGroup;
+    public WorldScreen chunkGroup;
 
 	public IntVector3 chunkOffset;
 

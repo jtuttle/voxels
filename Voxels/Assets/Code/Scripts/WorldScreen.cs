@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChunkGroup : MonoBehaviour {
+// The world is split up into chunk groupings that I will call screens, though
+// they will often extend over an area that's larger than the player's screen.
+public class WorldScreen : MonoBehaviour {
     public Chunk[,,] Chunks { get; private set; }
 
     private float[,] _samples;
@@ -37,7 +39,7 @@ public class ChunkGroup : MonoBehaviour {
     public void CreateChunks() {
         int chunkSize = _world.Config.ChunkSize;
         
-        Chunks = new Chunk[_samples.GetLength(0), _world.Config.ChunkCountY, _samples.GetLength(1)];
+        Chunks = new Chunk[_samples.GetLength(0), _world.Config.WorldChunksY, _samples.GetLength(1)];
         
         // coastline test
         /*
@@ -51,7 +53,7 @@ public class ChunkGroup : MonoBehaviour {
         
         for(int x = 0; x < _samples.GetLength(0); x++) {
             for(int z = 0; z < _samples.GetLength(1); z++) {
-                for(int y = 0; y < _world.Config.ChunkCountY; y++) {
+                for(int y = 0; y < _world.Config.WorldChunksY; y++) {
                     GameObject newChunkGo = Instantiate(_world.ChunkPrototype,
                                                         new Vector3(x * chunkSize - 0.5f, y * chunkSize + 0.5f, z * chunkSize - 0.5f),
                                                         new Quaternion(0, 0, 0, 0)) as GameObject;

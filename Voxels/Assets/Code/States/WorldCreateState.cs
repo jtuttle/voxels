@@ -21,27 +21,28 @@ public class WorldCreateState : FSMState {
 
         // each loaded screen could be 16 x 12 chunks
         // world can be 16 x 16 screens
-        
-        int chunkCountX = 256;
-        int chunkCountY = 7;
-        int chunkCountZ = 192;
+
         int chunkSize = 8;
-        int chunkGroupWidth = 16;
-        int chunkGroupHeight = 12;
+        int worldChunksX = 256;
+        int worldChunksY = 7;
+        int worldChunksZ = 192;
+        int screenChunksX = 16;
+        int screenChunksZ = 12;
         
-        WorldConfig worldConfig = new WorldConfig(chunkCountX, chunkCountY, chunkCountZ, 
-                                                  chunkSize, chunkGroupWidth, chunkGroupHeight);
+        WorldConfig worldConfig = new WorldConfig(chunkSize,
+                                                  worldChunksX, worldChunksY, worldChunksZ,
+                                                  screenChunksX, screenChunksZ);
         
         WorldNoiseGenerator worldNoiseGen = new WorldNoiseGenerator(Random.Range(1, 65536));
-        float[,] worldNoise = worldNoiseGen.GenerateWorldNoise(chunkCountX, chunkCountZ, chunkCountY);
+        float[,] worldNoise = worldNoiseGen.GenerateWorldNoise(worldChunksX, worldChunksZ, worldChunksY);
 
         // TEMP - just to see full noise map
-        NoiseCanvas.renderer.material.mainTexture = GenerateTexture(chunkCountX, 
-                                                                    chunkCountZ, 
-                                                                    worldNoiseGen.DiscretizeNormalizedNoise(worldNoise, chunkCountY));
+        NoiseCanvas.renderer.material.mainTexture = GenerateTexture(worldChunksX, 
+                                                                    worldChunksZ, 
+                                                                    worldNoiseGen.DiscretizeNormalizedNoise(worldNoise, worldChunksY));
 
         // Shift noise to ints for easier processing
-        worldNoise = worldNoiseGen.ShiftNoise(0, 1, 0, chunkCountY, worldNoise);
+        worldNoise = worldNoiseGen.ShiftNoise(0, 1, 0, worldChunksY, worldNoise);
         worldNoise = worldNoiseGen.DiscretizeDenormalizedNoise(worldNoise);
 
         World world = GameObject.Find("World").GetComponent<World>();
@@ -49,25 +50,14 @@ public class WorldCreateState : FSMState {
 
         // TODO: This is always coming up ocean, something's wrong!
         IntVector2 startCoords = new IntVector2(0, 0);
-        world.CreateScreen(startCoords);
-
-        // Looks like it's not crazy to draw 6 screens so we could
-        // have some nice depth to our vision.
-        /*
-        world.CreateScreen(startCoords + new IntVector2(1, 0));
-        world.CreateScreen(startCoords + new IntVector2(2, 0));
-        world.CreateScreen(startCoords + new IntVector2(0, 1));
-        world.CreateScreen(startCoords + new IntVector2(1, 1));
-        world.CreateScreen(startCoords + new IntVector2(2, 1));
-        */
+        CreateInitialChunkGroups(world, startCoords);
 
         GameData.World = world;
         GameData.CurrentScreenCoords = startCoords;
 
         // TEMP - place the player
-        Vector3 playerStartPos = new Vector3(startCoords.X * worldConfig.ChunkGroupWidth * worldConfig.ChunkSize,
-                                             50,
-                                             startCoords.Y * worldConfig.ChunkGroupHeight * worldConfig.ChunkSize);
+        Vector2 screenCenter = world.GetScreenCenter(startCoords);
+        Vector3 playerStartPos = new Vector3(screenCenter.x, 50, screenCenter.y);
 
         GameObject playerGo = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Player"));
         Player player = playerGo.GetComponent<Player>();
@@ -75,7 +65,7 @@ public class WorldCreateState : FSMState {
 
         ScreenCamera screenCam = Camera.main.GetComponent<ScreenCamera>();
         screenCam.Player = player;
-        screenCam.Bounds = world.GetScreenBounds(startCoords);
+        screenCam.Bounds = world.GetScreenBounds(startCoords, 13.0f);
 
         ExitState(new FSMTransition(GameState.WorldNavigate));
     }
@@ -106,5 +96,20 @@ public class WorldCreateState : FSMState {
         texture.Apply();
         
         return texture;
+    }
+
+    // Creates the initial set of six chunk groups around the player's starting point.
+    // TODO: make this draw from a pool of reusable chunk groups
+    private void CreateInitialChunkGroups(World world, IntVector2 startCoords) {
+        WorldConfig config = world.Config;
+        int hGroupCount = config.WorldChunksX / config.ScreenChunksX;
+        int vGroupCount = config.WorldChunksZ / config.ScreenChunksZ;
+
+        for(int x = startCoords.X - 1; x <= startCoords.X + 1; x++) {
+            for(int y = startCoords.Y; y <= startCoords.Y + 1; y++) {
+                if(x >= 0 && x < hGroupCount && y >= 0 && y < vGroupCount)
+                    world.CreateScreen(new IntVector2(x, y));
+            }
+        }
     }
 }
