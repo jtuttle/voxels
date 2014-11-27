@@ -37,22 +37,32 @@ public class World : MonoBehaviour {
             }
         }
 
-        WorldScreen chunkGroup = CreateChunkGroup(screenNoise, screenCoords);
+        WorldScreen screen = CreateScreenChunks(screenNoise, screenCoords);
 
-        _screens[screenCoords] = chunkGroup;
+        _screens[screenCoords] = screen;
     }
 
-    // The screen edge size is pretty arbitrary and depends on camera angle/distance.
+    // The edge size is pretty arbitrary and depends on camera angle/distance.
     // 13 works well for an angle/distance of 40/40.
     public Rect GetScreenBounds(IntVector2 screenCoords, float edgeSize) {
+        Vector2 corner = GetScreenCorner(screenCoords);
+        Vector2 dimensions = GetScreenDimensions();
         int chunkSize = Config.ChunkSize;
-        int chunkGroupWidth = Config.ScreenChunksX;
-        int chunkGroupHeight = Config.ScreenChunksZ;
 
-        return new Rect(screenCoords.X * chunkGroupWidth * chunkSize + edgeSize,
-                        screenCoords.Y * chunkGroupHeight * chunkSize + edgeSize,
-                        chunkGroupWidth * chunkSize - chunkSize - edgeSize * 2,
-                        chunkGroupHeight * chunkSize - chunkSize - edgeSize * 2);
+        return new Rect(corner.x + edgeSize,
+                        corner.y + edgeSize,
+                        dimensions.x - chunkSize - edgeSize * 2,
+                        dimensions.y - chunkSize - edgeSize * 2);
+    }
+
+    public WorldScreen GetScreen(IntVector2 screenCoords) {
+        return _screens.ContainsKey(screenCoords) ? _screens[screenCoords] : null;
+    }
+
+    public Vector2 GetScreenDimensions() {
+        int chunkSize = Config.ChunkSize;
+        return new Vector2(Config.ScreenChunksX * chunkSize,
+                           Config.ScreenChunksZ * chunkSize);
     }
 
     public Vector2 GetScreenCorner(IntVector2 screenCoords) {
@@ -69,18 +79,19 @@ public class World : MonoBehaviour {
                                     (Config.ScreenChunksZ * chunkSize) / 2);
     }
 
-    private WorldScreen CreateChunkGroup(float[,] chunkGroupNoise, IntVector2 screenCoords) {
+    // TODO: This is badly named.
+    private WorldScreen CreateScreenChunks(float[,] chunkGroupNoise, IntVector2 screenCoords) {
         GameObject go = new GameObject();
         go.name = "Screen " + screenCoords.X + "," + screenCoords.Y;
 
-        WorldScreen chunkGroup = go.AddComponent<WorldScreen>();
-        chunkGroup.Initialize(chunkGroupNoise, screenCoords, this);
-        chunkGroup.CreateChunks();
+        WorldScreen worldScreen = go.AddComponent<WorldScreen>();
+        worldScreen.Initialize(chunkGroupNoise, screenCoords, this);
+        worldScreen.CreateChunks();
 
         go.transform.position = new Vector3(screenCoords.X * Config.ScreenChunksX * Config.ChunkSize, 
                                             0, 
                                             screenCoords.Y * Config.ScreenChunksZ * Config.ChunkSize);
 
-        return chunkGroup;
+        return worldScreen;
     }
 }

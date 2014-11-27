@@ -65,6 +65,8 @@
      <Compile Include="Assets\Code\Scripts\WorldScreen.cs" />
      <Compile Include="Assets\Code\States\WorldCreateState.cs" />
      <Compile Include="Assets\Code\States\WorldNavigateState.cs" />
+     <Compile Include="Assets\Code\States\WorldScreenChangeState.cs" />
+     <Compile Include="Assets\Code\Transitions\WorldScreenChangeTransition.cs" />
      <Compile Include="Assets\Code\Utils\IntVector2.cs" />
      <Compile Include="Assets\Code\Utils\IntVector3.cs" />
      <Compile Include="Assets\Code\Utils\MathUtils.cs" />
@@ -76,6 +78,9 @@
      <None Include="Assets\CoherentNoise\readme.txt" />
  <Reference Include="CoherentNoise">
  <HintPath>/Users/jtuttle/dev/voxels/Voxels/Assets/CoherentNoise/CoherentNoise.dll</HintPath>
+ </Reference>
+ <Reference Include="HOTween">
+ <HintPath>/Users/jtuttle/dev/voxels/Voxels/Assets/Plugins/HOTween.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

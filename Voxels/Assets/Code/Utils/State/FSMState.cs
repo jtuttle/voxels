@@ -12,9 +12,9 @@ public abstract class FSMState {
         StateId = stateId;
     }
 
-    public virtual void InitState(FSMState prevState) { }
+    public virtual void InitState(FSMTransition transition) { }
 
-    public virtual void EnterState(FSMState prevState) {
+    public virtual void EnterState(FSMTransition transition) {
         NextStateTransition = null;
     }
 
