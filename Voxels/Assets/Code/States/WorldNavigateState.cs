@@ -32,11 +32,7 @@ public class WorldNavigateState : FSMState {
 
         if(!_navBounds.Contains(new Vector2(playerPos.x, playerPos.z))) {
             IntVector2 nextScreenCoords = GetTransitionCoords();
-
-            _player.GetComponent<CharacterController>().enabled = false;
-            Camera.main.GetComponent<ScreenCamera>().enabled = false;
-
-            ExitState(new WorldScreenChangeTransition(nextScreenCoords));
+            ExitState(new WorldScreenChangeTransition(nextScreenCoords, true));
         }
     }
     

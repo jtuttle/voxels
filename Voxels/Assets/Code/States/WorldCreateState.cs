@@ -69,7 +69,7 @@ public class WorldCreateState : FSMState {
 
         ScreenCamera screenCam = Camera.main.GetComponent<ScreenCamera>();
         screenCam.Player = player;
-        screenCam.Bounds = world.GetScreenBounds(startCoords, 13.0f);
+        screenCam.UpdateBounds(startCoords);
 
         ExitState(new FSMTransition(GameState.WorldNavigate ));
     }
