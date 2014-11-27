@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class IntVector2 {
     public int X { get; set; }
@@ -34,7 +35,7 @@ public class IntVector2 {
         return !(a == b);
     }
     
-    public override bool Equals(Object otherObject) {
+    public override bool Equals(System.Object otherObject) {
         if(otherObject == null) return false;
         
         IntVector2 other = otherObject as IntVector2;
@@ -50,6 +51,10 @@ public class IntVector2 {
     
     public override int GetHashCode() {
         return X ^ Y;
+    }
+
+    public Vector2 ToVector2() {
+        return new Vector2(X, Y);
     }
 
     public override string ToString() {

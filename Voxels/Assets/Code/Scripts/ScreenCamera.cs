@@ -3,11 +3,12 @@ using System.Collections;
 
 public class ScreenCamera : MonoBehaviour {
     public Player Player;
-    public Rect Bounds;
-    
+
     public bool Lock;
     public float Angle = 40.0f;
     public float Distance = 40.0f;
+
+    public Rect Bounds { get; private set; }
     
     void Start() {
         
@@ -34,6 +35,11 @@ public class ScreenCamera : MonoBehaviour {
 
             transform.position = target + new Vector3(0, adj, -opp);
         }
+    }
+
+    public void UpdateBounds(IntVector2 screenCoord) {
+        // TODO: un-hardcode this edge value, maybe.
+        Bounds = GameData.World.GetScreenBounds(screenCoord, 13.0f);
     }
 
     private void SmoothFollowPosition() {
