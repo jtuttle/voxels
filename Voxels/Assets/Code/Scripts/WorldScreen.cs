@@ -6,22 +6,22 @@ using System.Collections;
 public class WorldScreen : MonoBehaviour {
     public Chunk[,,] Chunks { get; private set; }
 
+    public IntVector2 Coords { get; private set; }
+    public Rect NavBounds { get; private set; }
+
     private float[,] _samples;
-    private IntVector2 _offset;
     private World _world;
 
-    public int Width {
-        get { return Chunks.GetLength(0); }
-    }
+    public int Width { get { return Chunks.GetLength(0); } }
+    public int Height { get { return Chunks.GetLength(1); } }
 
-    public int Height {
-        get { return Chunks.GetLength(1); }
-    }
-
-    public void Initialize(float[,] samples, IntVector2 offset, World world) {
+    public void Initialize(float[,] samples, IntVector2 coords, World world) {
         _samples = samples;
-        _offset = offset;
+        Coords = coords;
         _world = world;
+
+        // Set navigation bounds at half a chunk.
+        NavBounds = world.GetScreenBounds(Coords, world.Config.ChunkSize / 2);
     }
 
     public byte GetBlock(int x, int y, int z) {
@@ -39,7 +39,9 @@ public class WorldScreen : MonoBehaviour {
     public void CreateChunks() {
         int chunkSize = _world.Config.ChunkSize;
         
-        Chunks = new Chunk[_samples.GetLength(0), _world.Config.WorldChunksY, _samples.GetLength(1)];
+        Chunks = new Chunk[_samples.GetLength(0), 
+                           _world.Config.WorldChunksY, 
+                           _samples.GetLength(1)];
         
         // coastline test
         /*
@@ -54,8 +56,11 @@ public class WorldScreen : MonoBehaviour {
         for(int x = 0; x < _samples.GetLength(0); x++) {
             for(int z = 0; z < _samples.GetLength(1); z++) {
                 for(int y = 0; y < _world.Config.WorldChunksY; y++) {
-                    GameObject newChunkGo = Instantiate(_world.ChunkPrototype,
-                                                        new Vector3(x * chunkSize - 0.5f, y * chunkSize + 0.5f, z * chunkSize - 0.5f),
+                    Vector3 chunkPos = new Vector3(x * chunkSize - 0.5f, 
+                                                   y * chunkSize + 0.5f, 
+                                                   z * chunkSize - 0.5f);
+
+                    GameObject newChunkGo = Instantiate(_world.ChunkPrototype, chunkPos,
                                                         new Quaternion(0, 0, 0, 0)) as GameObject;
 
                     float sample = _samples[x, z];

@@ -56,12 +56,12 @@ public class FiniteStateMachine {
 
             CurrentState = nextState;
 
-            CurrentState.InitState(prevState);
+            CurrentState.InitState(stateTransition);
         }
 
         Debug.Log("Changed state to: " + CurrentState.StateId.ToString());
 
-        CurrentState.EnterState(prevState);
+        CurrentState.EnterState(stateTransition);
 
         if(prevState != null && !stateTransition.PushCurrentState)
             prevState.Dispose();
