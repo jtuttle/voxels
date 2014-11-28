@@ -5,11 +5,11 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{9B033C41-C587-7846-DE3E-16016AB8C6FD}</ProjectGuid>
+	<ProjectGuid>{6EB7E828-7834-375B-49EE-BBEB1A5EB502}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
-	<AssemblyName>Assembly-CSharp</AssemblyName>
+	<AssemblyName>Assembly-CSharp-Editor</AssemblyName>
 	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
 	<FileAlignment>512</FileAlignment>
 	<BaseDirectory>Assets</BaseDirectory>
@@ -46,47 +46,26 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Code\GameController.cs" />
-     <Compile Include="Assets\Code\GameData.cs" />
-     <Compile Include="Assets\Code\HeightMapTestController.cs" />
-     <Compile Include="Assets\Code\Model\TextureAtlas.cs" />
-     <Compile Include="Assets\Code\Model\WorldConfig.cs" />
-     <Compile Include="Assets\Code\Model\WorldNoiseGenerator.cs" />
-     <Compile Include="Assets\Code\NoiseTestController.cs" />
-     <Compile Include="Assets\Code\Scripts\Chunk.cs" />
-     <Compile Include="Assets\Code\Scripts\CubeEffect.cs" />
-     <Compile Include="Assets\Code\Scripts\ExtendedFlyCam.cs" />
-     <Compile Include="Assets\Code\Scripts\ModifyTerrain.cs" />
-     <Compile Include="Assets\Code\Scripts\Player.cs" />
-     <Compile Include="Assets\Code\Scripts\PlayerCamera.cs" />
-     <Compile Include="Assets\Code\Scripts\PropertyChangeNotifier.cs" />
-     <Compile Include="Assets\Code\Scripts\ScreenCamera.cs" />
-     <Compile Include="Assets\Code\Scripts\World.cs" />
-     <Compile Include="Assets\Code\Scripts\WorldScreen.cs" />
-     <Compile Include="Assets\Code\States\WorldCreateState.cs" />
-     <Compile Include="Assets\Code\States\WorldNavigateState.cs" />
-     <Compile Include="Assets\Code\States\WorldScreenChangeState.cs" />
-     <Compile Include="Assets\Code\Transitions\WorldScreenChangeTransition.cs" />
-     <Compile Include="Assets\Code\Utils\GameObjectPool.cs" />
-     <Compile Include="Assets\Code\Utils\IntVector2.cs" />
-     <Compile Include="Assets\Code\Utils\IntVector3.cs" />
-     <Compile Include="Assets\Code\Utils\MathUtils.cs" />
-     <Compile Include="Assets\Code\Utils\Noise.cs" />
-     <Compile Include="Assets\Code\Utils\State\FSMState.cs" />
-     <Compile Include="Assets\Code\Utils\State\FSMTransition.cs" />
-     <Compile Include="Assets\Code\Utils\State\FiniteStateMachine.cs" />
-     <Compile Include="Assets\CoherentNoise\Demo\TerrainDemo.cs" />
+     <Compile Include="Assets\Editor\GameObjectPoolEditor.cs" />
      <None Include="Assets\CoherentNoise\readme.txt" />
+ <Reference Include="AssetStoreTools">
+ <HintPath>/Users/jtuttle/dev/voxels/Voxels/Assets/AssetStoreTools/Editor/AssetStoreTools.dll</HintPath>
+ </Reference>
  <Reference Include="CoherentNoise">
  <HintPath>/Users/jtuttle/dev/voxels/Voxels/Assets/CoherentNoise/CoherentNoise.dll</HintPath>
  </Reference>
  <Reference Include="HOTween">
  <HintPath>/Users/jtuttle/dev/voxels/Voxels/Assets/Plugins/HOTween.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEditor.Graphs">
+ <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.Graphs.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass-vs.csproj">
       <Project>{4972E51B-ED02-9089-3ED1-9001852D94B8}</Project>      <Name>Assembly-CSharp-firstpass-vs</Name>    </ProjectReference>
+    <ProjectReference Include="Assembly-CSharp-vs.csproj">
+      <Project>{9B033C41-C587-7846-DE3E-16016AB8C6FD}</Project>      <Name>Assembly-CSharp-vs</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -96,6 +75,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ProjectExtensions xmlns="http://schemas.microsoft.com/developer/msbuild/2003"><MonoDevelop><Properties><Policies><TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" /><CSharpFormattingPolicy NamespaceBraceStyle="EndOfLine" ClassBraceStyle="EndOfLine" InterfaceBraceStyle="EndOfLine" StructBraceStyle="EndOfLine" EnumBraceStyle="EndOfLine" MethodBraceStyle="EndOfLine" ConstructorBraceStyle="EndOfLine" DestructorBraceStyle="EndOfLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" IfParentheses="False" WhileParentheses="False" ForParentheses="False" ForeachParentheses="False" CatchParentheses="False" SwitchParentheses="False" LockParentheses="False" UsingParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" /><TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain" /></Policies></Properties></MonoDevelop></ProjectExtensions>
-
+  
 </Project>
