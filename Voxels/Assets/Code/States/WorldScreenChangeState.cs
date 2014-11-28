@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class WorldScreenChangeState : FSMState {
     private IntVector2 _nextScreenCoords;
+    private Vector2 _coordDifference;
 
     private Camera _camera;
     private Player _player;
@@ -21,6 +22,7 @@ public class WorldScreenChangeState : FSMState {
         base.EnterState(transition);
 
         _nextScreenCoords = (transition as WorldScreenChangeTransition).NextScreenCoords;
+        _coordDifference = (_nextScreenCoords - GameData.CurrentScreen.Coords).ToVector2();
 
         _camera = Camera.main;
         _player = GameData.Player;
@@ -29,10 +31,8 @@ public class WorldScreenChangeState : FSMState {
         _camera.GetComponent<ScreenCamera>().enabled = false;
         _player.GetComponent<CharacterController>().enabled = false;
 
-
-
         // Set up tween to move player across screen edge.
-        Vector3 newPlayerPos = GetNewPlayerPosition(_player, _nextScreenCoords);
+        Vector3 newPlayerPos = GetNewPlayerPosition(_player);
         
         TweenParms playerParms = new TweenParms();
         playerParms.Prop("position", newPlayerPos);
@@ -42,12 +42,7 @@ public class WorldScreenChangeState : FSMState {
         HOTween.To(_player.transform, 1, playerParms);
 
         // Set up tween to move camera across screen edge.
-        // TODO: there's a noticable snap when transitioning because the camera
-        // isn't being tweened far enough to keep up with the player's position.
-        //Vector3 newCameraPos = GetNewCameraPosition(_camera, _nextScreenCoords);
-        Vector3 newCameraPos = GetNewCameraPosition(_camera, newPlayerPos, _nextScreenCoords);
-
-        // new camera pos = new player pos * abs value of coord diff mask?
+        Vector3 newCameraPos = GetNewCameraPosition(_camera, newPlayerPos);
 
         TweenParms cameraParms = new TweenParms();
         cameraParms.Prop("position", newCameraPos);
@@ -57,6 +52,7 @@ public class WorldScreenChangeState : FSMState {
     }
     
     public override void ExitState(FSMTransition nextStateTransition) {
+        // Update game state stuff.
         GameData.CurrentScreen = GameData.World.GetScreen(_nextScreenCoords);
         _camera.GetComponent<ScreenCamera>().UpdateBounds(_nextScreenCoords);
 
@@ -65,44 +61,35 @@ public class WorldScreenChangeState : FSMState {
         _player.GetComponent<CharacterController>().enabled = true;
 
         _nextScreenCoords = null;
+        _coordDifference = Vector2.zero;
         _camera = null;
         _player = null;
 
         base.ExitState(nextStateTransition);
     }
-    
-    public override void Update() {
 
-    }
-    
     public override void Dispose() {
 
         base.Dispose();
     }
 
     // Move player to one chunk farther than the screen edge.
-    private Vector3 GetNewPlayerPosition(Player player, IntVector2 nextScreenCoords) {
-        Vector2 distanceToEdge = GetDistanceToEdge(player.transform, nextScreenCoords);
-
-        // Coordinate difference will be used to mask vector dimensions.
-        Vector2 coordDiff = (nextScreenCoords - GameData.CurrentScreen.Coords).ToVector2();
+    private Vector3 GetNewPlayerPosition(Player player) {
+        Vector2 distanceToEdge = GetDistanceToEdge(player.transform);
 
         // For now, we'll just place the player one chunk away from the screen edge.
         WorldConfig worldConfig = GameData.World.Config;
         Vector2 chunkSize = 2 * new Vector2(worldConfig.ChunkSize, worldConfig.ChunkSize);
-        chunkSize.Scale(coordDiff);
+        chunkSize.Scale(_coordDifference);
         
         return player.transform.position + new Vector3(distanceToEdge.x + chunkSize.x, 0, distanceToEdge.y + chunkSize.y);
     }
 
     // New camera position needs to match player's.
-    private Vector3 GetNewCameraPosition(Camera camera, Vector3 newPlayerPos, IntVector2 nextScreenCoords) {
-        // Coordinate difference will be used to mask vector dimensions.
-        Vector2 coordDiff = (nextScreenCoords - GameData.CurrentScreen.Coords).ToVector2();
-
+    private Vector3 GetNewCameraPosition(Camera camera, Vector3 newPlayerPos) {
         Vector3 cameraPos = camera.transform.position;
 
-        if(coordDiff.x != 0)
+        if(_coordDifference.x != 0)
             cameraPos = new Vector3(newPlayerPos.x, cameraPos.y, cameraPos.z);
         else
             cameraPos = new Vector3(cameraPos.x, cameraPos.y, newPlayerPos.z);
@@ -110,12 +97,9 @@ public class WorldScreenChangeState : FSMState {
         return cameraPos;
     }
 
-    private Vector2 GetDistanceToEdge(Transform transform, IntVector2 nextScreenCoords) {
+    private Vector2 GetDistanceToEdge(Transform transform) {
         World world = GameData.World;
         IntVector2 currentScreenCoords = GameData.CurrentScreen.Coords;
-
-        // Coordinate difference will be used to mask vector dimensions.
-        Vector2 coordDiff = (nextScreenCoords - currentScreenCoords).ToVector2();
 
         Vector3 pos = transform.position;
 
@@ -127,8 +111,8 @@ public class WorldScreenChangeState : FSMState {
         Vector2 halfScreenDimensions = world.GetScreenDimensions() / 2;
 
         // Use coordinate different to mask the desired dimensions.
-        halfScreenDimensions.Scale(coordDiff);
-        distanceToCenter.Scale(coordDiff);
+        halfScreenDimensions.Scale(_coordDifference);
+        distanceToCenter.Scale(_coordDifference);
 
         return halfScreenDimensions - distanceToCenter;
     }
