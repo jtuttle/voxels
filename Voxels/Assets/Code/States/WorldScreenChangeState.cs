@@ -29,26 +29,33 @@ public class WorldScreenChangeState : FSMState {
         _camera.GetComponent<ScreenCamera>().enabled = false;
         _player.GetComponent<CharacterController>().enabled = false;
 
+
+
+        // Set up tween to move player across screen edge.
+        Vector3 newPlayerPos = GetNewPlayerPosition(_player, _nextScreenCoords);
+        
+        TweenParms playerParms = new TweenParms();
+        playerParms.Prop("position", newPlayerPos);
+        playerParms.Ease(EaseType.Linear);
+        playerParms.OnComplete(OnTweenComplete);
+        
+        HOTween.To(_player.transform, 1, playerParms);
+
+
+
         // Set up tween to move camera across screen edge.
         // TODO: there's a noticable snap when transitioning because the camera
         // isn't being tweened far enough to keep up with the player's position.
-        Vector3 newCameraPos = GetNewCameraPosition(_camera, _nextScreenCoords);
+        //Vector3 newCameraPos = GetNewCameraPosition(_camera, _nextScreenCoords);
+        Vector3 newCameraPos = GetNewCameraPosition(_camera, newPlayerPos, _nextScreenCoords);
+
+        // new camera pos = new player pos * abs value of coord diff mask?
 
         TweenParms cameraParms = new TweenParms();
         cameraParms.Prop("position", newCameraPos);
         cameraParms.Ease(EaseType.Linear);
 
         HOTween.To(_camera.transform, 1, cameraParms);
-
-        // Set up tween to move player across screen edge.
-        Vector3 newPlayerPos = GetNewPlayerPosition(_player, _nextScreenCoords);
-
-        TweenParms playerParms = new TweenParms();
-        playerParms.Prop("position", newPlayerPos);
-        playerParms.Ease(EaseType.Linear);
-        playerParms.OnComplete(OnTweenComplete);
-
-        HOTween.To(_player.transform, 1, playerParms);
     }
     
     public override void ExitState(FSMTransition nextStateTransition) {
@@ -90,11 +97,19 @@ public class WorldScreenChangeState : FSMState {
         return player.transform.position + new Vector3(distanceToEdge.x + chunkSize.x, 0, distanceToEdge.y + chunkSize.y);
     }
 
-    // Reflect camera position across the edge of the screen.
-    private Vector3 GetNewCameraPosition(Camera camera, IntVector2 nextScreenCoords) {
-        Vector2 distanceToEdge = GetDistanceToEdge(camera.transform, nextScreenCoords);
+    // New camera position needs to match player's.
+    private Vector3 GetNewCameraPosition(Camera camera, Vector3 newPlayerPos, IntVector2 nextScreenCoords) {
+        // Coordinate difference will be used to mask vector dimensions.
+        Vector2 coordDiff = (nextScreenCoords - GameData.CurrentScreen.Coords).ToVector2();
 
-        return camera.transform.position + new Vector3(2 * distanceToEdge.x, 0, 2 * distanceToEdge.y);
+        Vector3 cameraPos = camera.transform.position;
+
+        if(coordDiff.x != 0)
+            cameraPos = new Vector3(newPlayerPos.x, cameraPos.y, cameraPos.z);
+        else
+            cameraPos = new Vector3(cameraPos.x, cameraPos.y, newPlayerPos.z);
+
+        return cameraPos;
     }
 
     private Vector2 GetDistanceToEdge(Transform transform, IntVector2 nextScreenCoords) {
