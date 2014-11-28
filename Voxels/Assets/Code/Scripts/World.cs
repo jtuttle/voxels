@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class World : MonoBehaviour {
 	public WorldConfig Config { get; private set; }
 
-	public GameObject ChunkPrototype;
+	public GameObjectPool ChunkPool;
 	public Chunk[,,] Chunks;
 
     public TextureAtlas TextureAtlas { get; private set; }
@@ -47,12 +47,13 @@ public class World : MonoBehaviour {
     public Rect GetScreenBounds(IntVector2 screenCoords, float edgeSize) {
         Vector2 corner = GetScreenCorner(screenCoords);
         Vector2 dimensions = GetScreenDimensions();
+
         int chunkSize = Config.ChunkSize;
 
         return new Rect(corner.x + edgeSize,
                         corner.y + edgeSize,
-                        dimensions.x - chunkSize - edgeSize * 2,
-                        dimensions.y - chunkSize - edgeSize * 2);
+                        dimensions.x - edgeSize * 2,
+                        dimensions.y - edgeSize * 2);
     }
 
     public WorldScreen GetScreen(IntVector2 screenCoords) {

@@ -60,8 +60,12 @@ public class WorldScreen : MonoBehaviour {
                                                    y * chunkSize + 0.5f, 
                                                    z * chunkSize - 0.5f);
 
-                    GameObject newChunkGo = Instantiate(_world.ChunkPrototype, chunkPos,
-                                                        new Quaternion(0, 0, 0, 0)) as GameObject;
+                    //GameObject newChunkGo = Instantiate(_world.ChunkPrototype, chunkPos,
+                    //                                    new Quaternion(0, 0, 0, 0)) as GameObject;
+
+                    GameObject newChunkGo = _world.ChunkPool.GetObject();
+                    newChunkGo.transform.position = chunkPos;
+                    newChunkGo.transform.parent = transform;
 
                     float sample = _samples[x, z];
                     bool solid = (y <= sample);
@@ -84,12 +88,20 @@ public class WorldScreen : MonoBehaviour {
                     
                     Chunk newChunk = newChunkGo.GetComponent("Chunk") as Chunk;
                     newChunk.Initialize(chunkSize, solid, _world.TextureAtlas, textureIndex);
-                    newChunk.transform.parent = transform;
+                    //newChunk.transform.parent = transform;
 
                     newChunk.chunkGroup = this;
                     newChunk.chunkOffset = new IntVector3(x * chunkSize, y * chunkSize, z * chunkSize);
-                    
+
                     Chunks[x, y, z] = newChunk;
+                }
+            }
+        }
+
+        for(int x = 0; x < _samples.GetLength(0); x++) {
+            for(int z = 0; z < _samples.GetLength(1); z++) {
+                for(int y = 0; y < _world.Config.WorldChunksY; y++) {
+                    Chunks[x, y, z].GenerateMesh();
                 }
             }
         }
