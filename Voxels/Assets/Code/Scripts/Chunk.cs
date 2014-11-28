@@ -36,7 +36,7 @@ public class Chunk : MonoBehaviour {
 		mesh = GetComponent<MeshFilter>().mesh;
 		col = GetComponent<MeshCollider>();
 
-		GenerateMesh();
+		//GenerateMesh();
 	}
 
 	protected void LateUpdate() {

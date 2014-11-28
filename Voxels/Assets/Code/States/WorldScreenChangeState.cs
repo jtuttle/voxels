@@ -41,8 +41,6 @@ public class WorldScreenChangeState : FSMState {
         
         HOTween.To(_player.transform, 1, playerParms);
 
-
-
         // Set up tween to move camera across screen edge.
         // TODO: there's a noticable snap when transitioning because the camera
         // isn't being tweened far enough to keep up with the player's position.
