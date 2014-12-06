@@ -5,6 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class is responsible for generating the initial Perlin noise we use to create 
+// the world and modifying it to have discrete elevations, flatter areas, ocean in the 
+// south and mountains in the north, etc. Methods are exposed for piecemeal testing.
 public class WorldNoiseGenerator {
     public int Seed { get; private set; }
 
@@ -12,6 +15,7 @@ public class WorldNoiseGenerator {
         Seed = seed;
     }
 
+    // Run the full noise generation algorithm.
     public float[,] GenerateWorldNoise(int width, int height, int elevations) {
         float[,] worldNoise = GenerateRawNoise(width, height);
 
@@ -21,12 +25,12 @@ public class WorldNoiseGenerator {
 
         // This shift is just to make sure we don't have any > 1 values.
         worldNoise = ShiftNoise(0, 1, 0, 1, worldNoise);
-        //worldNoise = DiscretizeNormalizedNoise(worldNoise, elevations);
+        worldNoise = DiscretizeNormalizedNoise(worldNoise, elevations);
 
         return worldNoise;
     }
 
-    // Return an array of noise values in the range [0,1]
+    // Generates some nice-looking Perlin noise.
     public float[,] GenerateRawNoise(int width, int height) {
         float[,] samples = new float[width, height];
         
@@ -40,35 +44,35 @@ public class WorldNoiseGenerator {
                 
                 float sample = generator.GetValue(xCoord, yCoord, 0);
                 
-                // PinkNoise usually returns value in range[-1,1] but this is not guaranteed.
+                // PinkNoise usually returns value in [-1,1] but this is not guaranteed.
                 sample = Mathf.Clamp(sample, -1, 1);
                 
-                // Convert values from range [-1,1] to range [0,1].
+                // Convert value from [-1,1] to [0,1].
                 sample = MathUtils.ConvertRange(-1, 1, 0, 1, sample);
                 
                 samples[x, y] = sample;
-                
-                //Debug.Log(x + "," + y + " => " + sample);
             }
         }
         
         return samples;
     }
 
+    // Discretize noise in the [0,1] range into the specified number of elevations.
     public float[,] DiscretizeNormalizedNoise(float[,] samples, int elevations) {
         float[,] output = new float[samples.GetLength(0), samples.GetLength(1)];
-        
-        List<float> bounds = new List<float>();
-        
+
         float unit = 1.0f / elevations;
-        
-        for(int i = 0; i <= elevations + 1; i++)
+
+        List<float> bounds = new List<float>();
+
+        for(int i = 0; i <= elevations; i++)
             bounds.Add(i * unit);
 
         for(int y = 0; y < samples.GetLength(1); y++) {
             for(int x = 0; x < samples.GetLength(0); x++) {
-                //output[i] = Mathf.Floor(samples[i]);
-                int boundIndex = bounds.FindIndex(b => b > samples[x, y]);
+                // TODO: Shouldn't this is biasing our noise upwards by quite a bit?
+                // I don't see how there would be many zero values left afterwards...
+                int boundIndex = bounds.FindIndex(b => b >= samples[x, y]);
                 output[x, y] = bounds[boundIndex - 1];
             }
         }
@@ -76,8 +80,8 @@ public class WorldNoiseGenerator {
         return output;
     }
 
-    // This will discretize noise to the nearest whole numbers, intended for use with
-    // noise that has already been shifted to a non-unit range.
+    // Discretize noise to the nearest integer, intended for use with noise that
+    // has already been shifted from the [0,1] range.
     public float[,] DiscretizeDenormalizedNoise(float[,] samples) {
         float[,] output = new float[samples.GetLength(0), samples.GetLength(1)];
 
@@ -90,6 +94,7 @@ public class WorldNoiseGenerator {
         return output;
     }
 
+    // Shift noise from one range of values to another.
     public float[,] ShiftNoise(float oldMin, float oldMax, float newMin, float newMax, float[,] samples) {
         float[,] output = new float[samples.GetLength(0), samples.GetLength(1)];
 
@@ -102,31 +107,33 @@ public class WorldNoiseGenerator {
         return output;
     }
 
+    // In order to create a world where we are much more likely to have ocean along 
+    // the bottom and mountains along the top, we apply a cubic curve to weight the
+    // noise in such a way that lower values (on the y-axis) are scaled down, higher
+    // values are scaled up, and central values are left mostly untouched.
     public float[,] ApplyCubicWeight(float[,] samples) {
         float[,] output = new float[samples.GetLength(0), samples.GetLength(1)];
         
         for(int y = 0; y < samples.GetLength(1); y++) {
-            //float scale = MathUtils.ConvertRange(0, 1, vMin, vMax, (float)y / samples.GetLength(1)); 
-
-            // need to take a min of 1 and value here, the upper values are just getting scaled
-            // back down to where they used to be.
-
+            // Figure out our vertical position in the image.
             float heightRatio = (float)y / (samples.GetLength(1) - 1);
 
-            // (2x - 1)^3 + 1
+            // Plug position into cubic equation (2x - 1)^3 + 1
             float scale = Mathf.Pow(2 * heightRatio - 1, 3) + 1;
-
-            //Debug.Log(y + ": " + scale);
 
             for(int x = 0; x < samples.GetLength(0); x++) {
                 float weighted = samples[x, y] * scale;
-                output[x, y] = Mathf.Min(1, weighted); //MathUtils.ConvertRange(0, 2, 0, 1, weighted);
+
+                // Value can go above 1, so we must take min.
+                output[x, y] = Mathf.Min(1, weighted);
             }
         }
         
         return output;
     }
 
+    // Modify the noise values such that they produce the target average. This helps
+    // prevent the world from having too much ocean or mountainous area.
     public float[,] NormalizeAverage(float[,] samples, float targetAverage = 0.6f) {
         float[,] output = new float[samples.GetLength(0), samples.GetLength(1)];
 
@@ -151,6 +158,8 @@ public class WorldNoiseGenerator {
         return output;
     }
 
+    // Take the max of the surrounding values for each noise sample. This reduces
+    // the elevation variation of the map to produce flatter areas.
     public float[,] Blockify(float[,] samples) {
         float[,] output = new float[samples.GetLength(0), samples.GetLength(1)];
 

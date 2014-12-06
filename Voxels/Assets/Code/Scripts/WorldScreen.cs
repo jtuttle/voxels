@@ -20,8 +20,10 @@ public class WorldScreen : MonoBehaviour {
         Coords = coords;
         _world = world;
 
+        float edgeSize = world.Config.ChunkSize / 2;
+
         // Set navigation bounds at half a chunk.
-        NavBounds = world.GetScreenBounds(Coords, world.Config.ChunkSize / 2);
+        NavBounds = world.GetScreenBounds(Coords, edgeSize, edgeSize);
     }
 
     public byte GetBlock(int x, int y, int z) {

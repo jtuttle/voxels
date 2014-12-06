@@ -11,6 +11,12 @@ public class WorldConfig {
     public int ScreenChunksX { get; private set; }
     public int ScreenChunksZ { get; private set; }
 
+
+    // idea: store chunks per screen in an XY and then screenCount in an XY
+    // world stuff can be computed
+    // store chunk size
+   
+
     // TODO: figure out consistent naming scheme and dimensions.
     public WorldConfig(int chunkSize, int worldChunksX, int worldChunksY, int worldChunksZ, int screenChunksX, int screenChunksZ) {
         ChunkSize = chunkSize;
@@ -20,4 +26,11 @@ public class WorldConfig {
         ScreenChunksX = screenChunksX;
         ScreenChunksZ = screenChunksZ;
 	}
+
+    /*
+    public bool Validate() {
+
+        return true;
+    }
+    */
 }
