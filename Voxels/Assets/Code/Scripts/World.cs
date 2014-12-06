@@ -42,20 +42,6 @@ public class World : MonoBehaviour {
         _screens[screenCoords] = screen;
     }
 
-    // The edge size is pretty arbitrary and depends on camera angle/distance.
-    // 13 works well for an angle/distance of 40/40.
-    public Rect GetScreenBounds(IntVector2 screenCoords, float edgeSize) {
-        Vector2 corner = GetScreenCorner(screenCoords);
-        Vector2 dimensions = GetScreenDimensions();
-
-        int chunkSize = Config.ChunkSize;
-
-        return new Rect(corner.x + edgeSize,
-                        corner.y + edgeSize,
-                        dimensions.x - edgeSize * 2,
-                        dimensions.y - edgeSize * 2);
-    }
-
     public WorldScreen GetScreen(IntVector2 screenCoords) {
         return _screens.ContainsKey(screenCoords) ? _screens[screenCoords] : null;
     }
@@ -78,6 +64,20 @@ public class World : MonoBehaviour {
 
         return corner + new Vector2((Config.ScreenChunksX * chunkSize) / 2,
                                     (Config.ScreenChunksZ * chunkSize) / 2);
+    }
+
+    // The edge size is pretty arbitrary and depends on camera angle/distance.
+    // 13 works well for an angle/distance of 40/40.
+    public Rect GetScreenBounds(IntVector2 screenCoords, float horizontalEdge, float verticalEdge) {
+        Vector2 corner = GetScreenCorner(screenCoords);
+        Vector2 dimensions = GetScreenDimensions();
+        
+        int chunkSize = Config.ChunkSize;
+        
+        return new Rect(corner.x + horizontalEdge,
+                        corner.y + verticalEdge,
+                        dimensions.x - horizontalEdge * 2,
+                        dimensions.y - verticalEdge * 2);
     }
 
     // TODO: This is badly named.

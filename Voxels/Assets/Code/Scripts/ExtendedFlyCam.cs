@@ -30,7 +30,8 @@ public class ExtendedFlyCam : MonoBehaviour {
 	private float rotationY = 0.0f;
 
 	void Start() {
-		Screen.lockCursor = true;
+        // had to comment this out to fix error, will need it back if we use this cam probably.
+		//Screen.lockCursor = true;
 	}
 
 	void Update() {
@@ -57,7 +58,8 @@ public class ExtendedFlyCam : MonoBehaviour {
 		if(Input.GetKey(KeyCode.E)) { transform.position -= transform.up * climbSpeed * Time.deltaTime; }
 
 		if(Input.GetKeyDown(KeyCode.End)) {
-			Screen.lockCursor = (Screen.lockCursor == false) ? true : false;
+            // had to comment this out to fix error, will need it back if we use this cam probably.
+			//Screen.lockCursor = (Screen.lockCursor == false) ? true : false;
 		}
 	}
 }

@@ -38,10 +38,10 @@ public class WorldCreateState : FSMState {
 
         // TEMP - just to see full noise map
         // BUG - this seems to give a pretty different map than is generated in the world,
-        // should really make these two sync up somehow.
+        // should really make these two sync up.
         NoiseCanvas.renderer.material.mainTexture = GenerateTexture(worldChunksX, 
                                                                     worldChunksZ, 
-                                                                    worldNoiseGen.DiscretizeNormalizedNoise(worldNoise, worldChunksY));
+                                                                    worldNoise);
 
         // Shift noise to ints for easier processing
         worldNoise = worldNoiseGen.ShiftNoise(0, 1, 0, worldChunksY, worldNoise);

@@ -42,6 +42,8 @@ public class WorldScreenChangeState : FSMState {
         HOTween.To(_player.transform, 1, playerParms);
 
         // Set up tween to move camera across screen edge.
+        // TODO: made the camera navbounds bigger and now it's jumping again.
+        // should probably come up with a cleaner solution for this...
         Vector3 newCameraPos = GetNewCameraPosition(_camera, newPlayerPos);
 
         TweenParms cameraParms = new TweenParms();
