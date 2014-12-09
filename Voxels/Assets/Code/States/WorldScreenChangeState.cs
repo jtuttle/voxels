@@ -1,8 +1,8 @@
-﻿using Holoville.HOTween;
+using Holoville.HOTween;
 using UnityEngine;
 
 public class WorldScreenChangeState : FSMState {
-    private IntVector2 _nextScreenCoords;
+    private XY _nextScreenCoords;
     private Vector2 _coordDifference;
 
     private Camera _camera;
@@ -22,7 +22,9 @@ public class WorldScreenChangeState : FSMState {
         base.EnterState(transition);
 
         _nextScreenCoords = (transition as WorldScreenChangeTransition).NextScreenCoords;
-        _coordDifference = (_nextScreenCoords - GameData.CurrentScreen.Coords).ToVector2();
+
+        XY coordDiff = _nextScreenCoords - GameData.CurrentScreen.Coords;
+        _coordDifference = new Vector2(coordDiff.X, coordDiff.Y);
 
         _camera = Camera.main;
         _player = GameData.Player;
@@ -100,8 +102,8 @@ public class WorldScreenChangeState : FSMState {
     }
 
     private Vector2 GetDistanceToEdge(Transform transform) {
-        World world = GameData.World;
-        IntVector2 currentScreenCoords = GameData.CurrentScreen.Coords;
+        WorldComponent world = GameData.World;
+        XY currentScreenCoords = GameData.CurrentScreen.Coords;
 
         Vector3 pos = transform.position;
 

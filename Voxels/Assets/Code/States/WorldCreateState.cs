@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -23,35 +23,32 @@ public class WorldCreateState : FSMState {
         // world can be 16 x 16 screens
 
         int chunkSize = 8;
-        int worldChunksX = 256;
-        int worldChunksY = 7;
-        int worldChunksZ = 192;
-        int screenChunksX = 16;
-        int screenChunksZ = 12;
-        
-        WorldConfig worldConfig = new WorldConfig(chunkSize,
-                                                  worldChunksX, worldChunksY, worldChunksZ,
-                                                  screenChunksX, screenChunksZ);
-        
+        XYZ screenChunks = new XYZ(16, 8, 12);
+        XYZ screenCount = new XYZ(16, 1, 16);
+
+        WorldConfig worldConfig = new WorldConfig(chunkSize, screenChunks, screenCount);
+
+        XYZ worldChunks = worldConfig.WorldChunks;
+
         WorldNoiseGenerator worldNoiseGen = new WorldNoiseGenerator(Random.Range(1, 65536));
-        float[,] worldNoise = worldNoiseGen.GenerateWorldNoise(worldChunksX, worldChunksZ, worldChunksY);
+        float[,] worldNoise = worldNoiseGen.GenerateWorldNoise(worldChunks.X, worldChunks.Z, worldChunks.Y);
 
         // TEMP - just to see full noise map
         // BUG - this seems to give a pretty different map than is generated in the world,
         // should really make these two sync up.
-        NoiseCanvas.renderer.material.mainTexture = GenerateTexture(worldChunksX, 
-                                                                    worldChunksZ, 
+        NoiseCanvas.renderer.material.mainTexture = GenerateTexture(worldChunks.X, 
+                                                                    worldChunks.Z, 
                                                                     worldNoise);
 
         // Shift noise to ints for easier processing
-        worldNoise = worldNoiseGen.ShiftNoise(0, 1, 0, worldChunksY, worldNoise);
+        worldNoise = worldNoiseGen.ShiftNoise(0, 1, 0, worldChunks.Y, worldNoise);
         worldNoise = worldNoiseGen.DiscretizeDenormalizedNoise(worldNoise);
 
-        World world = GameObject.Find("World").GetComponent<World>();
+        WorldComponent world = GameObject.Find("World").GetComponent<WorldComponent>();
         world.Initialize(worldConfig, worldNoise);
 
         // TODO: This is always coming up ocean, something's wrong!
-        IntVector2 startCoords = new IntVector2(0, 0);
+        XY startCoords = new XY(0, 0);
         CreateInitialScreens(world, startCoords);
 
         GameData.World = world;
@@ -104,15 +101,17 @@ public class WorldCreateState : FSMState {
 
     // Creates the initial set of six chunk groups around the player's starting point.
     // TODO: make this draw from a pool of reusable chunk groups
-    private void CreateInitialScreens(World world, IntVector2 startCoords) {
+    private void CreateInitialScreens(WorldComponent world, XY startCoords) {
+        XYZ screenCount = world.Config.ScreenCount;
+
         WorldConfig config = world.Config;
-        int hGroupCount = config.WorldChunksX / config.ScreenChunksX;
-        int vGroupCount = config.WorldChunksZ / config.ScreenChunksZ;
+        int hGroupCount = screenCount.X;
+        int vGroupCount = screenCount.Z;
 
         for(int x = startCoords.X - 1; x <= startCoords.X + 1; x++) {
             for(int y = startCoords.Y; y <= startCoords.Y + 1; y++) {
                 if(x >= 0 && x < hGroupCount && y >= 0 && y < vGroupCount)
-                    world.CreateScreen(new IntVector2(x, y));
+                    world.CreateScreen(new XY(x, y));
             }
         }
     }

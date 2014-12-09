@@ -2,19 +2,23 @@
 using System.Collections;
 
 public class WorldGenerator {
-
+    private WorldConfig _worldConfig;
+    private float[,] _worldNoise;
 	
-    public World GenerateWorld(WorldConfig worldConfig) {
+    public WorldGenerator(WorldConfig worldConfig) {
+        _worldConfig = worldConfig;
+    }
+
+    public World GenerateWorld() {
         // 0. validate world config
         // Maybe store the information such that it shouldn't need to be
         // validated and the potentially invalid values are computed.
         //worldConfig.Validate();
 
         // 1. generate noise
-        WorldNoiseGenerator worldNoiseGen = new WorldNoiseGenerator(Random.Range(1, 65536));
-        float[,] worldNoise = worldNoiseGen.GenerateWorldNoise(worldConfig.WorldChunksX, 
-                                                               worldConfig.WorldChunksZ,
-                                                               worldConfig.WorldChunksY);
+        float[,] worldNoise = GenerateWorldNoise();
+
+
 
         // 2. split world into "screens"
         // - evenly dividing world samples into rectangular areas
@@ -36,12 +40,15 @@ public class WorldGenerator {
 
 
 
-        return null;
+        return new World(worldNoise);
     }
 
-    private bool ValidateWorldConfig(WorldConfig config) {
+    public float[,] GenerateWorldNoise() {
+        XYZ worldChunks = _worldConfig.WorldChunks;
 
-
-        return true;
+        WorldNoiseGenerator worldNoiseGen = new WorldNoiseGenerator(Random.Range(1, 65536));
+        return worldNoiseGen.GenerateWorldNoise(worldChunks.X, 
+                                                worldChunks.Z,
+                                                worldChunks.Y);
     }
 }

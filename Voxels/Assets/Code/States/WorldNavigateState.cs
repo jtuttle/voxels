@@ -31,7 +31,7 @@ public class WorldNavigateState : FSMState {
         Vector3 playerPos = _player.transform.position;
 
         if(!_navBounds.Contains(new Vector2(playerPos.x, playerPos.z))) {
-            IntVector2 nextScreenCoords = GetTransitionCoords();
+            XY nextScreenCoords = GetTransitionCoords();
             ExitState(new WorldScreenChangeTransition(nextScreenCoords, true));
         }
     }
@@ -42,20 +42,20 @@ public class WorldNavigateState : FSMState {
         base.Dispose();
     }
 
-    private IntVector2 GetTransitionCoords() {
+    private XY GetTransitionCoords() {
         Vector3 playerPos = _player.transform.position;
 
-        IntVector2 currentCoords = GameData.CurrentScreen.Coords;
-        IntVector2 shiftCoord = null;
+        XY currentCoords = GameData.CurrentScreen.Coords;
+        XY shiftCoord = null;
 
         if(playerPos.x <= _navBounds.xMin) {
-            shiftCoord = new IntVector2(-1, 0);
+            shiftCoord = new XY(-1, 0);
         } else if(playerPos.x >= _navBounds.xMax) {
-            shiftCoord = new IntVector2(1, 0);
+            shiftCoord = new XY(1, 0);
         } else if(playerPos.y <= _navBounds.yMin) {
-            shiftCoord = new IntVector2(0, -1);
+            shiftCoord = new XY(0, -1);
         } else if(playerPos.y >= _navBounds.yMax) {
-            shiftCoord = new IntVector2(0, 1);
+            shiftCoord = new XY(0, 1);
         }
 
         return currentCoords + shiftCoord;

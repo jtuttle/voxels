@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Chunk : MonoBehaviour {
-    public WorldScreen chunkGroup;
+    public WorldScreenComponent chunkGroup;
 
-	public IntVector3 chunkOffset;
+	public XYZ chunkOffset;
 
     private byte[,,] _blocks;
 	private bool _dirty = false;

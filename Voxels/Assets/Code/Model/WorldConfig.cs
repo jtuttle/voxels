@@ -1,36 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// This class describes the world from the same perspective that it is rendered,
+// so X and Z represent width and depth, while Y represents elevation.
 public class WorldConfig {
     public int ChunkSize { get; private set; }
 
-	public int WorldChunksX { get; private set; }
-	public int WorldChunksY { get; private set; }
-	public int WorldChunksZ { get; private set; }
+    public XYZ ScreenChunks { get; private set; }
+    public XYZ ScreenCount { get; private set; }
+    public XYZ ScreenSize { get; private set; }
 
-    public int ScreenChunksX { get; private set; }
-    public int ScreenChunksZ { get; private set; }
+    public XYZ WorldChunks { get; private set; }
 
-
-    // idea: store chunks per screen in an XY and then screenCount in an XY
-    // world stuff can be computed
-    // store chunk size
-   
-
-    // TODO: figure out consistent naming scheme and dimensions.
-    public WorldConfig(int chunkSize, int worldChunksX, int worldChunksY, int worldChunksZ, int screenChunksX, int screenChunksZ) {
+    public WorldConfig(int chunkSize, XYZ screenChunks, XYZ screenCount) {
         ChunkSize = chunkSize;
-		WorldChunksX = worldChunksX;
-		WorldChunksY = worldChunksY;
-		WorldChunksZ = worldChunksZ;
-        ScreenChunksX = screenChunksX;
-        ScreenChunksZ = screenChunksZ;
+        ScreenChunks = screenChunks;
+        ScreenCount = screenCount;
+
+        ScreenSize = ScreenChunks * chunkSize;
+
+        WorldChunks = new XYZ(screenChunks.X * screenCount.X,
+                              screenChunks.Y * screenCount.Y,
+                              screenChunks.Z * screenCount.Z);
 	}
-
-    /*
-    public bool Validate() {
-
-        return true;
-    }
-    */
 }
