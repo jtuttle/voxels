@@ -1,21 +1,21 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 // The world is split up into chunk groupings that I will call screens, though
 // they will often extend over an area that's larger than the player's screen.
-public class WorldScreen : MonoBehaviour {
+public class WorldScreenComponent : MonoBehaviour {
     public Chunk[,,] Chunks { get; private set; }
 
-    public IntVector2 Coords { get; private set; }
+    public XY Coords { get; private set; }
     public Rect NavBounds { get; private set; }
 
     private float[,] _samples;
-    private World _world;
+    private WorldComponent _world;
 
     public int Width { get { return Chunks.GetLength(0); } }
     public int Height { get { return Chunks.GetLength(1); } }
 
-    public void Initialize(float[,] samples, IntVector2 coords, World world) {
+    public void Initialize(float[,] samples, XY coords, WorldComponent world) {
         _samples = samples;
         Coords = coords;
         _world = world;
@@ -29,9 +29,9 @@ public class WorldScreen : MonoBehaviour {
     public byte GetBlock(int x, int y, int z) {
         int chunkSize = _world.Config.ChunkSize;
         
-        IntVector3 chunkCoords = new IntVector3((int)Mathf.Floor(x / chunkSize), 
-                                                (int)Mathf.Floor(y / chunkSize), 
-                                                (int)Mathf.Floor(z / chunkSize));
+        XYZ chunkCoords = new XYZ((int)Mathf.Floor(x / chunkSize), 
+                                  (int)Mathf.Floor(y / chunkSize), 
+                                  (int)Mathf.Floor(z / chunkSize));
         
         Chunk chunk = Chunks[chunkCoords.X, chunkCoords.Y, chunkCoords.Z];
         
@@ -40,9 +40,10 @@ public class WorldScreen : MonoBehaviour {
 
     public void CreateChunks() {
         int chunkSize = _world.Config.ChunkSize;
-        
+        int screenHeight = _world.Config.ScreenChunks.Y;
+
         Chunks = new Chunk[_samples.GetLength(0), 
-                           _world.Config.WorldChunksY, 
+                           screenHeight, 
                            _samples.GetLength(1)];
         
         // coastline test
@@ -57,7 +58,7 @@ public class WorldScreen : MonoBehaviour {
         
         for(int x = 0; x < _samples.GetLength(0); x++) {
             for(int z = 0; z < _samples.GetLength(1); z++) {
-                for(int y = 0; y < _world.Config.WorldChunksY; y++) {
+                for(int y = 0; y < screenHeight; y++) {
                     Vector3 chunkPos = new Vector3(x * chunkSize - 0.5f, 
                                                    y * chunkSize + 0.5f, 
                                                    z * chunkSize - 0.5f);
@@ -93,7 +94,7 @@ public class WorldScreen : MonoBehaviour {
                     //newChunk.transform.parent = transform;
 
                     newChunk.chunkGroup = this;
-                    newChunk.chunkOffset = new IntVector3(x * chunkSize, y * chunkSize, z * chunkSize);
+                    newChunk.chunkOffset = new XYZ(x * chunkSize, y * chunkSize, z * chunkSize);
 
                     Chunks[x, y, z] = newChunk;
                 }
@@ -102,7 +103,7 @@ public class WorldScreen : MonoBehaviour {
 
         for(int x = 0; x < _samples.GetLength(0); x++) {
             for(int z = 0; z < _samples.GetLength(1); z++) {
-                for(int y = 0; y < _world.Config.WorldChunksY; y++) {
+                for(int y = 0; y < screenHeight; y++) {
                     Chunks[x, y, z].GenerateMesh();
                 }
             }

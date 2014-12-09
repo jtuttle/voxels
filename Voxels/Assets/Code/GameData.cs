@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class GameData {
-    public static World World;
+    public static WorldComponent World;
     public static Player Player;
 
-    public static WorldScreen CurrentScreen;
+    public static WorldScreenComponent CurrentScreen;
 }
