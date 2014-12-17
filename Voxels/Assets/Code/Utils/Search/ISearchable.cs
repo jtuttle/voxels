@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
 public interface ISearchable {
-    List<ISearchable> Neighbors();
+    List<ISearchable> Neighbors { get; }
+    int Value { get; }
 }

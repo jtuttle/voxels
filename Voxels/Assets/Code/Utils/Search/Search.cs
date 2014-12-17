@@ -16,7 +16,7 @@ public class Search {
 
             yield return next;
 
-            foreach(ISearchable neighbor in next.Neighbors()) {
+            foreach(ISearchable neighbor in next.Neighbors) {
                 if(!set.Contains(neighbor) && inclusionCondition(next, neighbor)) {
                     queue.Enqueue(neighbor);
                     set.Add(neighbor);
