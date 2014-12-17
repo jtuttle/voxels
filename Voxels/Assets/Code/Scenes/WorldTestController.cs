@@ -6,16 +6,17 @@ using UnityEngine;
 public class WorldTestController : MonoBehaviour {
     public GameObject Canvas;
 
-    public int Width;
-    public int Height;
-    public int Elevation;
+    public Vector3 ScreenChunks;
+    public Vector3 ScreenCount;
 
-    private WorldNoiseGenerator _worldNoise;
-    private float[,] _currentNoise;
+    private WorldGenerator _worldGenerator;
+    //private float[,] _currentNoise;
+    private World _currentWorld;
+
     private Texture2D _currentTexture;
 
     protected void Start() {
-        GenerateWorldNoise();
+        RefreshWorld();
     }
 
     protected void Update() {
@@ -26,8 +27,8 @@ public class WorldTestController : MonoBehaviour {
         if(GUI.Button(new Rect(20, 40, 80, 20), "Refresh"))
             OnRefreshClick();
 
-        if(GUI.Button(new Rect(20, 80, 80, 20), "Find Rooms"))
-            OnFindRoomsClick();
+        //if(GUI.Button(new Rect(20, 80, 80, 20), "Find Rooms"))
+        //    OnFindRoomsClick();
 
         /*
         if(GUI.Button(new Rect(20, 120, 80, 20), "Weight"))
@@ -45,11 +46,10 @@ public class WorldTestController : MonoBehaviour {
     }
 
     private void OnRefreshClick() {
-        GenerateWorldNoise();
+        RefreshWorld();
     }
 
     private void OnFindRoomsClick() {
-
         /*
         _currentNoise = _worldNoise.NormalizeAverage(_currentNoise);
         _currentTexture = GenerateTexture(Width, Height, _currentNoise);
@@ -61,22 +61,34 @@ public class WorldTestController : MonoBehaviour {
         SaveTextureToFile(_currentTexture, "Resources/Textures/test.png");
     }
 
-    private void GenerateWorldNoise() {
-        _worldNoise = new WorldNoiseGenerator(Random.Range(1, 65536));
+    private void RefreshWorld() {
+        XYZ screenChunks = new XYZ((int)ScreenChunks.x, (int)ScreenChunks.y, (int)ScreenChunks.z);
+        XYZ screenCount = new XYZ((int)ScreenCount.x, (int)ScreenCount.y, (int)ScreenCount.z);
+        WorldConfig worldConfig = new WorldConfig(8, screenChunks, screenCount);
 
-        _currentNoise = _worldNoise.GenerateWorldNoise(Width, Height, Elevation);
-        _currentTexture = GenerateTexture(Width, Height, _currentNoise);
+        _worldGenerator = new WorldGenerator();
+        World world = _worldGenerator.GenerateWorld(worldConfig);
+
+        _currentWorld = world;
+        _currentTexture = GenerateTexture(_currentWorld);
         Canvas.renderer.material.mainTexture = _currentTexture;
     }
 
-    private Texture2D GenerateTexture(int width, int height, float[,] samples) {
+    private Texture2D GenerateTexture(World world) {
+        XYZ worldChunks = world.Config.WorldChunks;
+        int elevations = world.Config.ScreenChunks.Y;
+
+        int width = worldChunks.X;
+        int height = worldChunks.Z;
+        float normalizeRatio = 1.0f / elevations;
+
         Texture2D texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
 
         Color[] pixels = new Color[width * height];
 
-        for(int y = 0; y < samples.GetLength(1); y++) {
-            for(int x = 0; x < samples.GetLength(0); x++) {
-                float sample = samples[x, y];
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                float sample = world.Noise[x, y] * normalizeRatio;
                 pixels[y * width + x] = new Color(sample, sample, sample);
             }
         }

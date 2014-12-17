@@ -82,6 +82,7 @@ public class WorldNoiseGenerator {
 
     // Discretize noise to the nearest integer, intended for use with noise that
     // has already been shifted from the [0,1] range.
+    // TODO: use an array if int or byte here to save space.
     public float[,] DiscretizeDenormalizedNoise(float[,] samples) {
         float[,] output = new float[samples.GetLength(0), samples.GetLength(1)];
 

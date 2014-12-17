@@ -3,13 +3,15 @@ using System.Collections.Generic;
 
 public class WorldScreen {
     public XY Coord { get; private set; }
-    public Rect Bounds { get; private set; }
-    public List<Room> Rooms { get; private set; }
+    public List<ScreenRoom> Rooms { get; private set; }
 	
-    public WorldScreen(XY coord, Rect bounds) {
+    public WorldScreen(XY coord) {
         Coord = coord;
-        Bounds = bounds;
 
-        Rooms = new List<Room>();
+        Rooms = new List<ScreenRoom>();
+    }
+
+    public void AddRoom(ScreenRoom room) {
+        Rooms.Add(room);
     }
 }
