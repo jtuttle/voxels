@@ -63,26 +63,26 @@ public class WorldGenerator {
         XYZ screenChunks = world.Config.ScreenChunks;
 
         // Loop over world screens.
-        for(int worldZ = 0; worldZ < screenCount.Z; worldZ++) {
-            for(int worldX = 0; worldX < screenCount.X; worldX++) {
-                XY screenCoord = new XY(worldX, worldZ);
+        for(int screenZ = 0; screenZ < screenCount.Z; screenZ++) {
+            for(int screenX = 0; screenX < screenCount.X; screenX++) {
+                XY screenCoord = new XY(screenX, screenZ);
 
                 WorldScreen screen = new WorldScreen(screenCoord);
 
                 // Create queue of coords to be searched for rooms.
                 Dictionary<XY, RoomCoord> screenCoords = new Dictionary<XY, RoomCoord>();
 
-                for(int screenZ = 0; screenZ < screenChunks.Z; screenZ++) {
-                    for(int screenX = 0; screenX < screenChunks.X; screenX++) {
-                        XY roomCoord = new XY(screenX, screenZ);
+                for(int roomZ = 0; roomZ < screenChunks.Z; roomZ++) {
+                    for(int roomX = 0; roomX < screenChunks.X; roomX++) {
+                        XY roomCoord = new XY(roomX, roomZ);
 
-                        XY noiseCoord = screenCoord + roomCoord;
+                        XY noiseCoord = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z) + roomCoord;
                         float elevation = world.Noise[noiseCoord.X, noiseCoord.Y];
 
                         screenCoords[roomCoord] = new RoomCoord(roomCoord, elevation);
                     }
                 }
-
+                Debug.Log("screen " + screenCoord);
                 FindScreenRooms(screen, screenCoords);
 
                 world.AddScreen(screenCoord, screen);
@@ -105,25 +105,27 @@ public class WorldGenerator {
 
         List<XY> neighborOffsets = new List<XY> { new XY(0, 1), new XY(-1, 0), new XY(1, 0), new XY(0, -1) };
 
+        HashSet<RoomCoord> visited = new HashSet<RoomCoord>();
+
         while(coordQueue.Count > 0) {
             RoomCoord startCoord = coordQueue.Dequeue();
 
             // Skip this coord if it has already been visited.
-            if(screenCoords[startCoord.Coord] == null) continue;
-
-            ScreenRoom room = new ScreenRoom(startCoord.Elevation);
+            //if(screenCoords[startCoord.Coord] == null) continue;
+            if(visited.Contains(startCoord)) continue;
 
             // Place first coord of room in search queue.
             searchQueue.Enqueue(startCoord);
+            visited.Add(startCoord);
 
-            HashSet<RoomCoord> visited = new HashSet<RoomCoord>();
+            ScreenRoom room = new ScreenRoom(startCoord.Elevation);
 
             // Perform BFS on the start coord.
             while(searchQueue.Count > 0) {
                 RoomCoord searchCoord = searchQueue.Dequeue();
 
                 // Mark searched nodes by nulling dictionary value.
-                screenCoords[searchCoord.Coord] = null;
+                //screenCoords[searchCoord.Coord] = null;
 
                 bool isEdge = false;
 
@@ -138,20 +140,19 @@ public class WorldGenerator {
                         // Search coord is on edge of the screen.
                         if(!hasKey) isEdge = true;
                     } else {
-                        // BIG PROBLEM HERE: it's possible to queue a node a bunch of times
-                        // because I'm not marking it as visited until it gets popped from the queue.
                         if(searchCoord.Elevation == neighbor.Elevation && !visited.Contains(neighbor)) {
                             visited.Add(neighbor);
                             searchQueue.Enqueue(neighbor);
-                        } else {
-                            isEdge = true;
                         }
+
+                        if(searchCoord.Elevation != neighbor.Elevation)
+                            isEdge = true;
                     }
                 }
 
                 room.AddCoord(searchCoord.Coord, isEdge);
             }
-
+            Debug.Log("adding room");
             worldScreen.AddRoom(room);
         }
     }
