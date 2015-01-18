@@ -1,18 +1,24 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Code/Model/WorldGenerator.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Code/Scenes/WorldTestController.cs">
     <Files>
-      <File FileName="Assets/Code/Model/WorldGenerator.cs" Line="119" Column="39" />
-      <File FileName="Assets/Code/States/WorldCreateState.cs" Line="45" Column="76" />
-      <File FileName="Assets/Code/Model/WorldNoiseGenerator.cs" Line="77" Column="14" />
-      <File FileName="Assets/Code/Scenes/WorldTestController.cs" Line="31" Column="11" />
-      <File FileName="Assets/Code/Model/World.cs" Line="4" Column="19" />
-      <File FileName="Assets/Code/Utils/XY.cs" Line="93" Column="1" />
-      <File FileName="Assets/Code/Scripts/Chunk.cs" Line="128" Column="1" />
+      <File FileName="Assets/Code/Model/WorldGenerator.cs" Line="143" Column="51" />
+      <File FileName="Assets/Code/Scenes/WorldTestController.cs" Line="110" Column="11" />
+      <File FileName="Assets/Code/Model/WorldScreen.cs" Line="11" Column="25" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True" selected="True" />
+        <State expanded="True">
+          <Node name="Assembly-CSharp" expanded="True">
+            <Node name="Code" expanded="True">
+              <Node name="Model" expanded="True" />
+              <Node name="Scenes" expanded="True">
+                <Node name="WorldTestController.cs" selected="True" />
+              </Node>
+              <Node name="States" expanded="True" />
+            </Node>
+          </Node>
+        </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

@@ -76,6 +76,7 @@ public class WorldTestController : MonoBehaviour {
 
     private Texture2D GenerateTexture(World world) {
         XYZ worldChunks = world.Config.WorldChunks;
+        XYZ screenChunks = world.Config.ScreenChunks;
         int elevations = world.Config.ScreenChunks.Y;
 
         int width = worldChunks.X;
@@ -90,6 +91,31 @@ public class WorldTestController : MonoBehaviour {
             for(int x = 0; x < width; x++) {
                 float sample = world.Noise[x, y] * normalizeRatio;
                 pixels[y * width + x] = new Color(sample, sample, sample);
+            }
+        }
+
+        int count = 0;
+
+        foreach(KeyValuePair<XY, WorldScreen> pair in world.Screens) {
+            XY screenCoord = pair.Key;
+            WorldScreen screen = pair.Value;
+        //XY screenCoord = new XY(0, 0);
+        //WorldScreen screen = world.Screens[screenCoord];
+
+        //Debug.Log(screen.Rooms.Count);
+
+            foreach(ScreenRoom room in screen.Rooms) {
+                Color roomColor = new Color(Random.value, Random.value, Random.value);
+
+        //        Debug.Log(roomColor);
+
+                foreach(XY coord in room.EdgeCoords) {
+                    count++;
+                    XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
+        
+                    XY edgeCoord = screenOffset + coord;
+                    pixels[edgeCoord.Y * width + edgeCoord.X] = roomColor;
+                }
             }
         }
 
