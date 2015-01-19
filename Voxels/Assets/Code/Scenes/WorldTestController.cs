@@ -66,10 +66,10 @@ public class WorldTestController : MonoBehaviour {
         XYZ screenCount = new XYZ((int)ScreenCount.x, (int)ScreenCount.y, (int)ScreenCount.z);
         WorldConfig worldConfig = new WorldConfig(8, screenChunks, screenCount);
 
-        _worldGenerator = new WorldGenerator();
-        World world = _worldGenerator.GenerateWorld(worldConfig);
+        _worldGenerator = new WorldGenerator(worldConfig);
+        _worldGenerator.GenerateWorld();
 
-        _currentWorld = world;
+        _currentWorld = _worldGenerator.World;
         _currentTexture = GenerateTexture(_currentWorld);
         Canvas.renderer.material.mainTexture = _currentTexture;
     }
@@ -99,17 +99,11 @@ public class WorldTestController : MonoBehaviour {
         foreach(KeyValuePair<XY, WorldScreen> pair in world.Screens) {
             XY screenCoord = pair.Key;
             WorldScreen screen = pair.Value;
-        //XY screenCoord = new XY(0, 0);
-        //WorldScreen screen = world.Screens[screenCoord];
 
-        //Debug.Log(screen.Rooms.Count);
-
-            foreach(ScreenRoom room in screen.Rooms) {
+            foreach(Room room in screen.Rooms) {
                 Color roomColor = new Color(Random.value, Random.value, Random.value);
 
-        //        Debug.Log(roomColor);
-
-                foreach(XY coord in room.EdgeCoords) {
+                foreach(XY coord in room.Perimeter) {
                     count++;
                     XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
         
