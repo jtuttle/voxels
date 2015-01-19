@@ -12,8 +12,8 @@ public class World {
         get {
             List<Room> rooms = new List<Room>();
             
-            foreach(WorldScreen screen in world.Screens) {
-                foreach(Room room in screen.Rooms)
+            foreach(KeyValuePair<XY, WorldScreen> pair in Screens) {
+                foreach(Room room in pair.Value.Rooms)
                     rooms.Add(room);
             }
 
@@ -32,5 +32,9 @@ public class World {
         Screens[coord] = screen;
     }
 
+    public WorldScreen GetScreen(XY coord) {
+        if(!Screens.ContainsKey(coord)) return null;
+        return Screens[coord];
+    }
 
 }

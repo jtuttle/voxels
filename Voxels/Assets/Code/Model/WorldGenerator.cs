@@ -79,9 +79,9 @@ public class WorldGenerator {
                     }
                 }
 
-                FindScreenRooms(screen, roomCoords);
-
                 world.AddScreen(screenCoord, screen);
+
+                FindScreenRooms(world, screenCoord, roomCoords);
             }
         }
     }
@@ -92,7 +92,16 @@ public class WorldGenerator {
 
     // IDEA: pre-divide screencoords by elevation, so that each time you have to remove or 
     // check whether you've already seen a coord you're searching a smaller list.
-    private void FindScreenRooms(WorldScreen worldScreen, Dictionary<XY, RoomCoord> roomCoords) {
+    private void FindScreenRooms(World world, XY screenCoord, Dictionary<XY, RoomCoord> roomCoords) {
+        WorldScreen worldScreen = world.GetScreen(screenCoord);
+
+        // We compare against top and left screens to find connected rooms.
+        WorldScreen topScreen = world.GetScreen(screenCoord - new XY(0, 1));
+        WorldScreen leftScreen = world.GetScreen(screenCoord - new XY(1, 0));
+
+
+
+        
         // Use queue to choose first coord of each new room from which to search.
         Queue<RoomCoord> coordQueue = new Queue<RoomCoord>(roomCoords.Values);
 
