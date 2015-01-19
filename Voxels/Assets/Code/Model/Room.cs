@@ -7,7 +7,7 @@ public class Room {
 
     // when you have internet, find a way to make this immutable?
     private HashSet<XY> _perimeter;
-    public HashSet<XY> Perimeter { get; private set; }
+    public HashSet<XY> Perimeter { get { return _perimeter; } }
 
     public float Elevation  { get; private set; }
     public float Intensity { get; private set; }
