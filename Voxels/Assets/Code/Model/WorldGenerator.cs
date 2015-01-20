@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class WorldGenerator {
     public World World { get; private set; }
@@ -128,7 +129,8 @@ public class WorldGenerator {
 
             Room room = new Room(startCoord.Elevation, 1.0f);
 
-            List<Room> neighbors = new List<Room>();
+            HashSet<Room> neighbors = new HashSet<Room>();
+            Room neighbor;
 
             // Create neighbor entry for new room.
             RoomNeighbors[room] = new List<Room>();
@@ -142,36 +144,41 @@ public class WorldGenerator {
                 foreach(XY offset in neighborOffsets) {
                     XY neighborCoord = searchCoord.Coord + offset;
 
-                    RoomCoord neighbor = null;
+                    RoomCoord neighborRoomCoord = null;
 
-                    bool hasKey = roomCoords.TryGetValue(neighborCoord, out neighbor);
+                    bool hasKey = roomCoords.TryGetValue(neighborCoord, out neighborRoomCoord);
 
-                    if(neighbor == null) {
+                    if(neighborRoomCoord == null) {
                         // Search coord is on edge of the screen.
                         if(!hasKey) isEdge = true;
 
                         // Check for neighbor relationships with the previous horizontal screen.
                         if(searchCoord.Coord.X == 0 && leftScreen != null) {
                             XY leftCoord = neighborCoord + new XY(world.Config.ScreenChunks.X, 0);
-                            FindNeighbor(room, leftScreen, leftCoord);
+
+                            neighbor = FindNeighbor(room, leftScreen, leftCoord);
+                            if(neighbor != null) neighbors.Add(neighbor);
                         }
 
                         // Check for neighbor relationships with the previous vertical screen.
                         if(searchCoord.Coord.Y == 0 && downScreen != null) {
                             XY downCoord = neighborCoord + new XY(0, world.Config.ScreenChunks.Y);
-                            FindNeighbor(room, downScreen, downCoord);
+
+                            neighbor = FindNeighbor(room, downScreen, downCoord);
+                            if(neighbor != null) neighbors.Add(neighbor);
                         }
                     } else {
-                        if(searchCoord.Elevation == neighbor.Elevation && !visited.Contains(neighbor)) {
-                            visited.Add(neighbor);
-                            searchQueue.Enqueue(neighbor);
+                        if(searchCoord.Elevation == neighborRoomCoord.Elevation && !visited.Contains(neighborRoomCoord)) {
+                            visited.Add(neighborRoomCoord);
+                            searchQueue.Enqueue(neighborRoomCoord);
                         }
 
-                        if(searchCoord.Elevation != neighbor.Elevation) {
+                        if(searchCoord.Elevation != neighborRoomCoord.Elevation) {
                             isEdge = true;
 
                             // Check for internal neighbor relationships.
-                            FindNeighbor(room, currentScreen, neighborCoord);
+                            neighbor = FindNeighbor(room, currentScreen, neighborCoord);
+                            if(neighbor != null) neighbors.Add(neighbor);
                         }
                     }
                 }
@@ -181,8 +188,14 @@ public class WorldGenerator {
 
             // IDEA: store neighbors in a local list until this point, then only add them
             // to the neighbor map if the min room size condition is met.
-            //if(room.Coords.Count >= _worldConfig.MinRoomSize)
+            if(room.Coords.Count >= _worldConfig.MinRoomSize) {
+                foreach(Room neigh in neighbors.ToList()) {
+                    RoomNeighbors[room].Add(neigh);
+                    RoomNeighbors[neigh].Add(room);
+                }
+
                 currentScreen.AddRoom(room);
+            }
         }
     }
 
