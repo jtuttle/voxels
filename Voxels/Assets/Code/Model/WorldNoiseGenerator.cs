@@ -73,6 +73,7 @@ public class WorldNoiseGenerator {
                 // TODO: Shouldn't this is biasing our noise upwards by quite a bit?
                 // I don't see how there would be many zero values left afterwards...
                 int boundIndex = bounds.FindIndex(b => b >= samples[x, y]);
+                // TODO: I VERY RARELY GET OUTOFBOUNDS ERROR HERE
                 output[x, y] = bounds[boundIndex - 1];
             }
         }
