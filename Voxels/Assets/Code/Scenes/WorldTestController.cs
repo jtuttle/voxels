@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class WorldTestController : MonoBehaviour {
@@ -15,7 +16,16 @@ public class WorldTestController : MonoBehaviour {
 
     private Texture2D _currentTexture;
 
+    private bool _drawRooms = true;
+    private bool _drawCenters = true;
+    private bool _drawConnections = true;
+    private bool _drawSpanningTree = false;
+
+    private Dictionary<Room, XY> _centroids;
+
     protected void Start() {
+        _centroids = new Dictionary<Room, XY>();
+
         RefreshWorld();
     }
 
@@ -24,11 +34,23 @@ public class WorldTestController : MonoBehaviour {
     }
 
     protected void OnGUI() {
-        if(GUI.Button(new Rect(20, 40, 80, 20), "Refresh"))
+        if(GUI.Button(new Rect(10, 10, 100, 30), "New World"))
             OnRefreshClick();
 
-        //if(GUI.Button(new Rect(20, 80, 80, 20), "Find Rooms"))
-        //    OnFindRoomsClick();
+        if(GUI.Button(new Rect(10, 50, 100, 30), (_drawRooms ? "Hide" : "Show") + " Rooms")) {
+            _drawRooms = !_drawRooms;
+            UpdateTexture();
+        }
+
+        if(GUI.Button(new Rect(10, 90, 100, 30), (_drawCenters ? "Hide" : "Show") + " Centers")) {
+            _drawCenters = !_drawCenters;
+            UpdateTexture();
+        }
+
+        if(GUI.Button(new Rect(10, 130, 100, 30), (_drawConnections ? "Hide" : "Show") + " Connections")) {
+            _drawConnections = !_drawConnections;
+            UpdateTexture();
+        }
 
         /*
         if(GUI.Button(new Rect(20, 120, 80, 20), "Weight"))
@@ -70,6 +92,22 @@ public class WorldTestController : MonoBehaviour {
         _worldGenerator.GenerateWorld();
 
         _currentWorld = _worldGenerator.World;
+
+        // Pre-calculate centroids of rooms in current world.
+        _centroids.Clear();
+
+        foreach(KeyValuePair<XY, WorldScreen> pair in _currentWorld.Screens) {
+            XY screenCoord = pair.Key;
+            XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
+
+            foreach(Room room in pair.Value.Rooms)
+                _centroids[room] = screenOffset + XY.Average(room.Perimeter.ToList());
+        }
+
+        UpdateTexture();
+    }
+
+    private void UpdateTexture() {
         _currentTexture = GenerateTexture(_currentWorld);
         Canvas.renderer.material.mainTexture = _currentTexture;
     }
@@ -94,21 +132,52 @@ public class WorldTestController : MonoBehaviour {
             }
         }
 
-        int count = 0;
+        // Prevent room border colors from changing when other features are toggled.
+        Random.seed = 0;
 
-        foreach(KeyValuePair<XY, WorldScreen> pair in world.Screens) {
-            XY screenCoord = pair.Key;
-            WorldScreen screen = pair.Value;
+        foreach(KeyValuePair<XY, WorldScreen> screenPair in world.Screens) {
+            XY screenCoord = screenPair.Key;
+            WorldScreen screen = screenPair.Value;
+
+            XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
 
             foreach(Room room in screen.Rooms) {
-                Color roomColor = new Color(Random.value, Random.value, Random.value);
+                // Draw a colored border around the perimeter of the room.
+                if(_drawRooms) {
+                    Color roomColor = new Color(Random.value, Random.value, Random.value);
 
-                foreach(XY coord in room.Perimeter) {
-                    count++;
-                    XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
-        
-                    XY edgeCoord = screenOffset + coord;
-                    pixels[edgeCoord.Y * width + edgeCoord.X] = roomColor;
+                    foreach(XY coord in room.Perimeter) {
+                        XY edgeCoord = screenOffset + coord;
+                        pixels[edgeCoord.Y * width + edgeCoord.X] = roomColor;
+                    }
+                }
+
+                XY centroid = _centroids[room];
+
+                // Draw lines between the centers of all connected rooms.
+                if(_drawConnections) {
+                    List<Room> neighbors = _worldGenerator.RoomNeighbors[room];
+
+                    foreach(Room neighbor in neighbors) {
+                        List<XY> line = MathUtils.CalculateLineCoords(_centroids[room], _centroids[neighbor]);
+
+                        foreach(XY point in line) {
+                            //if(point.Y * width + point.X < pixels.Length)
+                                pixels[point.Y * width + point.X] = Color.blue;
+                        }
+                    }
+                }
+
+                // 
+                if(_drawSpanningTree) {
+
+                }
+
+                // Draw a dot in the center of the room. The method used for calculating the
+                // centroid does not work well for convex polygons. A true centroid calculation
+                // is currently impossible because our lists of perimeter coords are not ordered.
+                if(_drawCenters) {
+                    pixels[centroid.Y * width + centroid.X] = Color.red;
                 }
             }
         }

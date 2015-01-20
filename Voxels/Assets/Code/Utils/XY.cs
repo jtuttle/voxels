@@ -92,4 +92,16 @@ public class XY {
     public override int GetHashCode() {
         return X ^ Y;
     }
+
+    public static XY Average(List<XY> coords) {
+        XY avg = new XY(0, 0);
+
+        if(coords.Count == 0) return avg;
+
+        foreach(XY coord in coords)
+            avg += coord;
+
+        return new XY((int)Math.Round((double)avg.X / coords.Count),
+                      (int)Math.Round((double)avg.Y / coords.Count));
+    }
 }

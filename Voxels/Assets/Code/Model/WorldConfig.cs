@@ -12,6 +12,8 @@ public class WorldConfig {
 
     public XYZ WorldChunks { get; private set; }
 
+    public int MinRoomSize { get; private set; }
+
     public WorldConfig(int chunkSize, XYZ screenChunks, XYZ screenCount) {
         ChunkSize = chunkSize;
         ScreenChunks = screenChunks;
@@ -22,5 +24,7 @@ public class WorldConfig {
         WorldChunks = new XYZ(screenChunks.X * screenCount.X,
                               screenChunks.Y * screenCount.Y,
                               screenChunks.Z * screenCount.Z);
+
+        MinRoomSize = 16;
 	}
 }
