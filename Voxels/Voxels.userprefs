@@ -1,36 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Code/Model/Room.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Code/Model/WorldNoiseGenerator.cs">
     <Files>
-      <File FileName="Assets/Code/Model/RoomEdge.cs" Line="9" Column="20" />
-      <File FileName="Assets/Code/Model/WorldGenerator.cs" Line="32" Column="9" />
-      <File FileName="Assets/Code/Scenes/WorldTestController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Code/Model/WorldScreen.cs" Line="1" Column="1" />
-      <File FileName="Assets/Code/Model/WorldNoiseGenerator.cs" Line="1" Column="1" />
-      <File FileName="Assets/Code/Model/RoomCoord.cs" Line="3" Column="23" />
-      <File FileName="Assets/Code/Model/Room.cs" Line="5" Column="16" />
+      <File FileName="../../pigment/PigmentClientUnity/Assets/Code/States/LevelLoadState.cs" Line="1" Column="1" />
+      <File FileName="Assets/Code/Model/WorldNoiseGenerator.cs" Line="46" Column="17" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="Assembly-CSharp" expanded="True">
-            <Node name="Code" expanded="True">
-              <Node name="Model" expanded="True">
-                <Node name="Room.cs" selected="True" />
-              </Node>
-              <Node name="Scenes" expanded="True" />
-              <Node name="Scripts" expanded="True" />
-              <Node name="States" expanded="True" />
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
-    <Watch file="Assets/Code/Scripts/World.cs" line="138" offsetX="394" offsetY="2055" expression="y" liveUpdate="False" />
-  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
