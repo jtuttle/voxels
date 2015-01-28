@@ -38,6 +38,7 @@ public class WorldGenerator {
 
 
 
+
         // 4. build graph from rooms
         // - for each room, create one graph node
         // - for each edge node in each room, create one graph edge
@@ -62,6 +63,8 @@ public class WorldGenerator {
         return worldNoise;
     }
 
+    // This method divides the world's noise into screen based on the dimensions specified in the
+    // world config. It also calls another method to find the rooms in each screen.
     private void FindWorldRooms(World world) {
         XYZ screenCount = world.Config.ScreenCount;
         XYZ screenChunks = world.Config.ScreenChunks;
@@ -100,6 +103,10 @@ public class WorldGenerator {
 
     // IDEA: pre-divide screencoords by elevation, so that each time you have to remove or 
     // check whether you've already seen a coord you're searching a smaller list.
+
+    // This method divides a screen into rooms based on the edges of the screen as well as any
+    // internal elevation changes. It also builds a dictionary of connections between rooms to
+    // be used when generating the spanning tree in the next step.
     private void FindScreenRooms(World world, XY screenCoord, Dictionary<XY, RoomCoord> roomCoords) {
         WorldScreen currentScreen = world.GetScreen(screenCoord);
 
@@ -132,7 +139,7 @@ public class WorldGenerator {
             HashSet<Room> neighbors = new HashSet<Room>();
             Room neighbor;
 
-            // Create neighbor entry for new room.
+            // Create empty neighbor entry for new room.
             RoomNeighbors[room] = new List<Room>();
 
             // Perform BFS on the start coord.
@@ -186,12 +193,11 @@ public class WorldGenerator {
                 room.AddCoord(searchCoord.Coord, isEdge);
             }
 
-            // IDEA: store neighbors in a local list until this point, then only add them
-            // to the neighbor map if the min room size condition is met.
+            // Only add room and neighbors if room meets minimum size requirement.
             if(room.Coords.Count >= _worldConfig.MinRoomSize) {
-                foreach(Room neigh in neighbors.ToList()) {
-                    RoomNeighbors[room].Add(neigh);
-                    RoomNeighbors[neigh].Add(room);
+                foreach(Room neighborRoom in neighbors.ToList()) {
+                    RoomNeighbors[room].Add(neighborRoom);
+                    RoomNeighbors[neighborRoom].Add(room);
                 }
 
                 currentScreen.AddRoom(room);
@@ -201,26 +207,64 @@ public class WorldGenerator {
 
     private Room FindNeighbor(Room room, WorldScreen screen, XY neighborCoord) {
         foreach(Room neighborRoom in screen.Rooms) {
-            if(neighborRoom.Coords.Contains(neighborCoord)) {
+            if(neighborRoom.Coords.Contains(neighborCoord))
                 return neighborRoom;
-
-                /*
-                if(!RoomNeighbors[room].Contains(neighborRoom)) 
-                    RoomNeighbors[room].Add(neighborRoom);
-                if(!RoomNeighbors[neighborRoom].Contains(room)) 
-                    RoomNeighbors[neighborRoom].Add(room);
-                return;
-                */
-            }
         }
         return null;
     }
 
     private void CreateSpanningTree(World world) {
-        // do we need neighbor relationships beyond generating this graph?
+        List<Room> rooms = world.Rooms;
 
-        foreach(Room room in world.Rooms) {
+        // Keep track of rooms that have been expanded TO.
+        HashSet<Room> visited = new HashSet<Room>();
 
+        // This list will represent visited nodes with unvisited neighbors.
+        List<Room> expandables = new List<Room>();
+
+        Room firstRoom = rooms[Random.Range(0, world.Rooms.Count - 1)]; 
+        expandables.Add(firstRoom);
+        visited.Add(firstRoom);
+
+        Room currentRoom;
+        Room nextRoom;
+
+        while(visited.Count != rooms.Count) {
+            // Select random expandable room.
+            currentRoom = expandables[Random.Range(0, expandables.Count - 1)];
+
+            // Find unvisited neighbors of current room.
+            List<Room> neighbors = RoomNeighbors[currentRoom].Where(x => !visited.Contains(x)).ToList();
+
+            // Remove old room from expandables if this is the last unvisited neighbor.
+            // NOTE: This is redundant with the step near the end of the method, though perhaps a tad faster.
+            //if(neighbors.Count == 1)
+            //    expandables.Remove(currentRoom);
+
+            // Select a random unvisited neighbor.
+            nextRoom = neighbors[Random.Range(0, neighbors.Count - 1)];
+
+            // Set up parent-child relationship.
+            nextRoom.SetParent(currentRoom);
+            currentRoom.AddChild(nextRoom);
+
+            // edge?
+
+            // Mark new room as visited.
+            visited.Add(nextRoom);
+
+            List<Room> nextRoomNeighbors = RoomNeighbors[nextRoom];
+
+            // Add newly-visited room to expandables if it has unvisited neighbors.
+            if(nextRoomNeighbors.Where(x => !visited.Contains(x)).ToList().Count > 0)
+                expandables.Add(nextRoom);
+
+            // Remove expandable neighbors if this room was the last option for expansion.
+            // TODO: This seems like it would be quite expensive. Find a way to avoid it?
+            foreach(Room room in nextRoomNeighbors.Where(x => expandables.Contains(x)).ToList()) {
+                if(RoomNeighbors[room].Where(x => !visited.Contains(x)).ToList().Count == 0) 
+                    expandables.Remove(room);
+            }
         }
     }
 }

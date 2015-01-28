@@ -20,14 +20,12 @@ public class Room {
         get { return _children.AsReadOnly(); }
     }
 
-    // Convenience method for getting all connected Rooms.
-    public List<Room> Neighbors {
-        get {
-            List<Room> neighbors = new List<Room>(Children);
-            neighbors.Add(Parent);
-            return neighbors;
-        }
+    /*
+    private List<Room> _neighbors;
+    public ReadOnlyCollection<Room> Neighbors {
+        get { return _neighbors.AsReadOnly(); }
     }
+    */
 
     public Room(float elevation, float intensity) {
         Elevation = elevation;
@@ -35,10 +33,21 @@ public class Room {
 
         Coords = new HashSet<XY>();
         _perimeter = new HashSet<XY>();
+
+        _children = new List<Room>();
     }
 
     public void AddCoord(XY coord, bool isEdge) {
         Coords.Add(coord);
         if(isEdge) _perimeter.Add(coord);
+    }
+
+    public void SetParent(Room parent) {
+        Parent = parent;
+        //_neighbors.Add(parent);
+    }
+
+    public void AddChild(Room child) {
+        _children.Add(child);
     }
 }

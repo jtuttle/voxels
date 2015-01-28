@@ -43,7 +43,7 @@ public class WorldNoiseGenerator {
                 float yCoord = (float)y / height;
                 
                 float sample = generator.GetValue(xCoord, yCoord, 0);
-                
+
                 // PinkNoise usually returns value in [-1,1] but this is not guaranteed.
                 sample = Mathf.Clamp(sample, -1, 1);
                 

@@ -19,7 +19,7 @@ public class WorldTestController : MonoBehaviour {
     private bool _drawRooms = true;
     private bool _drawCenters = true;
     private bool _drawConnections = true;
-    private bool _drawSpanningTree = false;
+    private bool _drawSpanningTree = true;
 
     private Dictionary<Room, XY> _centroids;
 
@@ -49,6 +49,11 @@ public class WorldTestController : MonoBehaviour {
 
         if(GUI.Button(new Rect(10, 130, 100, 30), (_drawConnections ? "Hide" : "Show") + " Connections")) {
             _drawConnections = !_drawConnections;
+            UpdateTexture();
+        }
+
+        if(GUI.Button(new Rect(10, 170, 100, 30), (_drawConnections ? "Hide" : "Show") + " Tree")) {
+            _drawSpanningTree = !_drawSpanningTree;
             UpdateTexture();
         }
 
@@ -168,9 +173,19 @@ public class WorldTestController : MonoBehaviour {
                     }
                 }
 
-                // 
+                // Draw lines between rooms that contain edges in the spanning tree.
                 if(_drawSpanningTree) {
+                    List<Room> neighbors = _worldGenerator.RoomNeighbors[room];
+                    
+                    foreach(Room neighbor in neighbors) {
 
+                        if(room.Parent == neighbor || neighbor.Parent == room) {
+                            List<XY> line = MathUtils.CalculateLineCoords(_centroids[room], _centroids[neighbor]);
+                            
+                            foreach(XY point in line)
+                                pixels[point.Y * width + point.X] = Color.green;
+                        }
+                    }
                 }
 
                 // Draw a dot in the center of the room. The method used for calculating the
