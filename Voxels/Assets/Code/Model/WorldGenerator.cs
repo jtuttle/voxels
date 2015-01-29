@@ -92,7 +92,7 @@ public class WorldGenerator {
                 WorldScreen screen = new WorldScreen(screenCoord);
 
                 // Create queue of coords to be searched for rooms.
-                Dictionary<XY, RoomCoord> roomCoords = new Dictionary<XY, RoomCoord>();
+                Dictionary<XY, RoomTile> roomTiles = new Dictionary<XY, RoomTile>();
 
                 for(int roomZ = 0; roomZ < screenChunks.Z; roomZ++) {
                     for(int roomX = 0; roomX < screenChunks.X; roomX++) {
@@ -101,13 +101,13 @@ public class WorldGenerator {
                         XY noiseCoord = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z) + roomCoord;
                         float elevation = world.Noise[noiseCoord.X, noiseCoord.Y];
 
-                        roomCoords[roomCoord] = new RoomCoord(roomCoord, elevation);
+                        roomTiles[roomCoord] = new RoomTile(roomCoord, elevation);
                     }
                 }
 
                 world.AddScreen(screenCoord, screen);
 
-                FindScreenRooms(world, screenCoord, roomCoords);
+                FindScreenRooms(world, screenCoord, roomTiles);
             }
         }
     }
@@ -122,7 +122,7 @@ public class WorldGenerator {
     // This method divides a screen into rooms based on the edges of the screen as well as any
     // internal elevation changes. It also builds a dictionary of connections between rooms to
     // be used when generating the spanning tree in the next step.
-    private void FindScreenRooms(World world, XY screenCoord, Dictionary<XY, RoomCoord> roomCoords) {
+    private void FindScreenRooms(World world, XY screenCoord, Dictionary<XY, RoomTile> roomTiles) {
         WorldScreen currentScreen = world.GetScreen(screenCoord);
 
         // We compare against previously created screens to find connected rooms.
@@ -130,26 +130,26 @@ public class WorldGenerator {
         WorldScreen leftScreen = world.GetScreen(screenCoord - new XY(1, 0));
 
         // Use queue to choose first coord of each new room from which to search.
-        Queue<RoomCoord> coordQueue = new Queue<RoomCoord>(roomCoords.Values);
+        Queue<RoomTile> tileQueue = new Queue<RoomTile>(roomTiles.Values);
 
         // Use queue to fill out a room during the BFS stage.
-        Queue<RoomCoord> searchQueue = new Queue<RoomCoord>();
+        Queue<RoomTile> searchQueue = new Queue<RoomTile>();
 
         List<XY> neighborOffsets = new List<XY> { new XY(0, 1), new XY(-1, 0), new XY(1, 0), new XY(0, -1) };
 
-        HashSet<RoomCoord> visited = new HashSet<RoomCoord>();
+        HashSet<RoomTile> visited = new HashSet<RoomTile>();
 
-        while(coordQueue.Count > 0) {
-            RoomCoord startCoord = coordQueue.Dequeue();
+        while(tileQueue.Count > 0) {
+            RoomTile startTile = tileQueue.Dequeue();
 
             // Skip this coord if it has already been visited.
-            if(visited.Contains(startCoord)) continue;
+            if(visited.Contains(startTile)) continue;
 
             // Place first coord of room in search queue.
-            searchQueue.Enqueue(startCoord);
-            visited.Add(startCoord);
+            searchQueue.Enqueue(startTile);
+            visited.Add(startTile);
 
-            Room room = new Room(startCoord.Elevation, 1.0f);
+            Room room = new Room(startTile.Elevation, 1.0f);
 
             HashSet<Room> neighbors = new HashSet<Room>();
             Room neighbor;
@@ -159,23 +159,23 @@ public class WorldGenerator {
 
             // Perform BFS on the start coord.
             while(searchQueue.Count > 0) {
-                RoomCoord searchCoord = searchQueue.Dequeue();
+                RoomTile searchTile = searchQueue.Dequeue();
 
                 bool isEdge = false;
 
                 foreach(XY offset in neighborOffsets) {
-                    XY neighborCoord = searchCoord.Coord + offset;
+                    XY neighborCoord = searchTile.Coord + offset;
 
-                    RoomCoord neighborRoomCoord = null;
+                    RoomTile neighborTile = null;
 
-                    bool hasKey = roomCoords.TryGetValue(neighborCoord, out neighborRoomCoord);
+                    bool hasKey = roomTiles.TryGetValue(neighborCoord, out neighborTile);
 
-                    if(neighborRoomCoord == null) {
+                    if(neighborTile == null) {
                         // Search coord is on edge of the screen.
                         if(!hasKey) isEdge = true;
 
                         // Check for neighbor relationships with the previous horizontal screen.
-                        if(searchCoord.Coord.X == 0 && leftScreen != null) {
+                        if(searchTile.Coord.X == 0 && leftScreen != null) {
                             XY leftCoord = neighborCoord + new XY(world.Config.ScreenChunks.X, 0);
 
                             neighbor = FindNeighbor(room, leftScreen, leftCoord);
@@ -183,19 +183,19 @@ public class WorldGenerator {
                         }
 
                         // Check for neighbor relationships with the previous vertical screen.
-                        if(searchCoord.Coord.Y == 0 && downScreen != null) {
+                        if(searchTile.Coord.Y == 0 && downScreen != null) {
                             XY downCoord = neighborCoord + new XY(0, world.Config.ScreenChunks.Y);
 
                             neighbor = FindNeighbor(room, downScreen, downCoord);
                             if(neighbor != null) neighbors.Add(neighbor);
                         }
                     } else {
-                        if(searchCoord.Elevation == neighborRoomCoord.Elevation && !visited.Contains(neighborRoomCoord)) {
-                            visited.Add(neighborRoomCoord);
-                            searchQueue.Enqueue(neighborRoomCoord);
+                        if(searchTile.Elevation == neighborTile.Elevation && !visited.Contains(neighborTile)) {
+                            visited.Add(neighborTile);
+                            searchQueue.Enqueue(neighborTile);
                         }
 
-                        if(searchCoord.Elevation != neighborRoomCoord.Elevation) {
+                        if(searchTile.Elevation != neighborTile.Elevation) {
                             isEdge = true;
 
                             // Check for internal neighbor relationships.
@@ -205,7 +205,7 @@ public class WorldGenerator {
                     }
                 }
 
-                room.AddCoord(searchCoord.Coord, isEdge);
+                room.AddCoord(searchTile.Coord, isEdge);
             }
 
             // Only add room and neighbors if room meets minimum size requirement.
