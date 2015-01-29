@@ -47,12 +47,12 @@ public class WorldTestController : MonoBehaviour {
             UpdateTexture();
         }
 
-        if(GUI.Button(new Rect(10, 130, 100, 30), (_drawConnections ? "Hide" : "Show") + " Connections")) {
+        if(GUI.Button(new Rect(10, 130, 100, 30), (_drawConnections ? "Hide" : "Show") + " Neighbors")) {
             _drawConnections = !_drawConnections;
             UpdateTexture();
         }
 
-        if(GUI.Button(new Rect(10, 170, 100, 30), (_drawConnections ? "Hide" : "Show") + " Tree")) {
+        if(GUI.Button(new Rect(10, 170, 100, 30), (_drawSpanningTree ? "Hide" : "Show") + " Tree")) {
             _drawSpanningTree = !_drawSpanningTree;
             UpdateTexture();
         }
