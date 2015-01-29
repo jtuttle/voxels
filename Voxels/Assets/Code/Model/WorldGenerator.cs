@@ -25,7 +25,8 @@ public class WorldGenerator {
         //worldConfig.Validate();
 
         // 1. generate noise
-        float[,] worldNoise = GenerateWorldNoise(_worldConfig);
+        //float[,] worldNoise = GenerateWorldNoise(_worldConfig);
+        float[,] worldNoise = GenerateFakeWorldNoise(_worldConfig);
 
         // 2. create world object
         World = new World(_worldConfig, worldNoise);
@@ -59,6 +60,20 @@ public class WorldGenerator {
 
         worldNoise = worldNoiseGen.ShiftNoise(0, 1, 0, worldChunks.Y, worldNoise);
         worldNoise = worldNoiseGen.DiscretizeDenormalizedNoise(worldNoise);
+
+        return worldNoise;
+    }
+
+    private float[,] GenerateFakeWorldNoise(WorldConfig worldConfig) {
+
+        float[,] worldNoise = new float[16 * 2, 12 * 2];
+
+        for(int y = 0; y < 24; y++) {
+            for(int x = 0; x < 32; x++) {
+                int index = y * 32 + x;
+                worldNoise[x,y] = (y < 8 ? 0 : 1);
+            }
+        }
 
         return worldNoise;
     }
@@ -214,6 +229,8 @@ public class WorldGenerator {
     }
 
     private void CreateSpanningTree(World world) {
+        // TODO: exclude rooms that are too small from this process (though we will
+        // need to remember them as neighbors so we can block them off).
         List<Room> rooms = world.Rooms;
 
         // Keep track of rooms that have been expanded TO.
