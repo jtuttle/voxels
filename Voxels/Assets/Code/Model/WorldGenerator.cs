@@ -2,14 +2,20 @@
 using System.Linq;
 using UnityEngine;
 
+// TODO: Implement critical path, otherwise there's going to be way too much backtracking.
+
 public class WorldGenerator {
     public World World { get; private set; }
 
     private WorldConfig _worldConfig;
 
+    // Cached list of offsets to use when BFS searching neighboring tiles.
+    private List<XY> _neighborOffsets = new List<XY> { new XY(0, 1), new XY(-1, 0), new XY(1, 0), new XY(0, -1) };
+
     // We must temporarily store all room neighbor relationships in order
     // to build a spanning tree over the world. This knowledge is no longer
-    // useful following dungeon creation (I think).
+    // useful following dungeon creation (I think). For now, I'm exposing it
+    // for debug visualizations.
     public Dictionary<Room, List<Room>> RoomNeighbors { get; private set; }
 
     public WorldGenerator(WorldConfig worldConfig) {
@@ -37,16 +43,11 @@ public class WorldGenerator {
         // 4. Create spanning tree
         CreateSpanningTree(World);
 
+        // 5. Place keys
+        // After assigning key levels, we'll want to place keys 
+        // randomly in each group of key level nodes
+        PlaceKeys(World);
 
-
-
-        // 4. build graph from rooms
-        // - for each room, create one graph node
-        // - for each edge node in each room, create one graph edge
-        //   if it doesn't already exist
-
-        // 5. apply lock and key algorithm to rooms
-        // - keys will be dungeons for the overworld
 
     }
 
@@ -78,7 +79,7 @@ public class WorldGenerator {
         return worldNoise;
     }
 
-    // This method divides the world's noise into screen based on the dimensions specified in the
+    // This method divides the world's noise into screens based on the dimensions specified in the
     // world config. It also calls another method to find the rooms in each screen.
     private void FindWorldRooms(World world) {
         XYZ screenCount = world.Config.ScreenCount;
@@ -119,9 +120,9 @@ public class WorldGenerator {
     // IDEA: pre-divide screencoords by elevation, so that each time you have to remove or 
     // check whether you've already seen a coord you're searching a smaller list.
 
-    // This method divides a screen into rooms based on the edges of the screen as well as any
-    // internal elevation changes. It also builds a dictionary of connections between rooms to
-    // be used when generating the spanning tree in the next step.
+    // This method uses repeated BFS to divide a screen into rooms based on the screen's edges 
+    // and any internal elevation changes. It also builds a dictionary of connections between 
+    // rooms to be used when generating the spanning tree in the next step.
     private void FindScreenRooms(World world, XY screenCoord, Dictionary<XY, RoomTile> roomTiles) {
         WorldScreen currentScreen = world.GetScreen(screenCoord);
 
@@ -129,49 +130,45 @@ public class WorldGenerator {
         WorldScreen downScreen = world.GetScreen(screenCoord - new XY(0, 1));
         WorldScreen leftScreen = world.GetScreen(screenCoord - new XY(1, 0));
 
-        // Use queue to choose first coord of each new room from which to search.
+        // Queue used to choose first coord of each new room from which to search.
+        // Start with all tiles and remove as we go.
         Queue<RoomTile> tileQueue = new Queue<RoomTile>(roomTiles.Values);
 
-        // Use queue to fill out a room during the BFS stage.
+        // Queue used to fill out a room during the BFS stage.
         Queue<RoomTile> searchQueue = new Queue<RoomTile>();
-
-        List<XY> neighborOffsets = new List<XY> { new XY(0, 1), new XY(-1, 0), new XY(1, 0), new XY(0, -1) };
 
         HashSet<RoomTile> visited = new HashSet<RoomTile>();
 
         while(tileQueue.Count > 0) {
             RoomTile startTile = tileQueue.Dequeue();
 
-            // Skip this coord if it has already been visited.
             if(visited.Contains(startTile)) continue;
 
-            // Place first coord of room in search queue.
             searchQueue.Enqueue(startTile);
             visited.Add(startTile);
 
-            Room room = new Room(startTile.Elevation, 1.0f);
+            Room room = new Room(startTile.Elevation);
 
             HashSet<Room> neighbors = new HashSet<Room>();
             Room neighbor;
 
-            // Create empty neighbor entry for new room.
             RoomNeighbors[room] = new List<Room>();
 
-            // Perform BFS on the start coord.
+            // Perform BFS on the chosen tile, stopping at screen edges and elevation changes.
             while(searchQueue.Count > 0) {
                 RoomTile searchTile = searchQueue.Dequeue();
 
                 bool isEdge = false;
 
-                foreach(XY offset in neighborOffsets) {
+                foreach(XY offset in _neighborOffsets) {
                     XY neighborCoord = searchTile.Coord + offset;
 
                     RoomTile neighborTile = null;
 
                     bool hasKey = roomTiles.TryGetValue(neighborCoord, out neighborTile);
 
+                    // Search coord is on edge of the screen.
                     if(neighborTile == null) {
-                        // Search coord is on edge of the screen.
                         if(!hasKey) isEdge = true;
 
                         // Check for neighbor relationships with the previous horizontal screen.
@@ -195,6 +192,7 @@ public class WorldGenerator {
                             searchQueue.Enqueue(neighborTile);
                         }
 
+                        // Search tile is on the edge of an elevation change.
                         if(searchTile.Elevation != neighborTile.Elevation) {
                             isEdge = true;
 
@@ -209,6 +207,7 @@ public class WorldGenerator {
             }
 
             // Only add room and neighbors if room meets minimum size requirement.
+            // TODO: check min width / height instead of total area.
             if(room.Coords.Count >= _worldConfig.MinRoomSize) {
                 foreach(Room neighborRoom in neighbors.ToList()) {
                     RoomNeighbors[room].Add(neighborRoom);
@@ -229,6 +228,13 @@ public class WorldGenerator {
     }
 
     private void CreateSpanningTree(World world) {
+        int keyLevel = 0;
+        int keyLevelCount = 0;
+
+        // The number of rooms after which to increment the key level.
+        // TODO: find some way to vary this reasonably
+        int keyLevelInterval = (int)Mathf.Ceil(world.Rooms.Count / world.Config.KeyLevels);
+
         // TODO: exclude rooms that are too small from this process (though we will
         // need to remember them as neighbors so we can block them off).
         List<Room> rooms = world.Rooms;
@@ -242,6 +248,9 @@ public class WorldGenerator {
         Room firstRoom = rooms[Random.Range(0, world.Rooms.Count - 1)]; 
         expandables.Add(firstRoom);
         visited.Add(firstRoom);
+
+        firstRoom.KeyLevel = keyLevel;
+        keyLevelCount++;
 
         Room currentRoom;
         Room nextRoom;
@@ -265,9 +274,16 @@ public class WorldGenerator {
             nextRoom.SetParent(currentRoom);
             currentRoom.AddChild(nextRoom);
 
+            // Assign a key level to the new room and increment if necessary.
+            nextRoom.KeyLevel = keyLevel;
+
+            if(++keyLevelCount == keyLevelInterval) {
+                keyLevel++;
+                keyLevelCount = 0;
+            }
+
             // edge?
 
-            // Mark new room as visited.
             visited.Add(nextRoom);
 
             List<Room> nextRoomNeighbors = RoomNeighbors[nextRoom];
@@ -282,6 +298,25 @@ public class WorldGenerator {
                 if(RoomNeighbors[room].Where(x => !visited.Contains(x)).ToList().Count == 0) 
                     expandables.Remove(room);
             }
+        }
+    }
+
+    // Choose a random room from each key level and mark it as the key location.
+    private void PlaceKeys(World world) {
+        Dictionary<int, List<Room>> keyLevels = new Dictionary<int, List<Room>>();
+
+        foreach(Room room in world.Rooms) {
+            if(keyLevels[room.KeyLevel] == null)
+                keyLevels[room.KeyLevel] = new List<Room>();
+
+            keyLevels[room.KeyLevel].Add(room);
+        }
+
+        for(int i = 0; i < world.Config.KeyLevels - 1; i++) {
+            List<Room> rooms = keyLevels[i];
+
+            Room keyRoom = rooms[Random.Range(0, rooms.Count)];
+            keyRoom.AddSymbol(RoomSymbols.HAS_KEY);
         }
     }
 }
