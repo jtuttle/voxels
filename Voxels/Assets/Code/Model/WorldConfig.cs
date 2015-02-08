@@ -14,6 +14,8 @@ public class WorldConfig {
 
     public int MinRoomSize { get; private set; }
 
+    public int KeyLevels { get; private set; }
+
     public WorldConfig(int chunkSize, XYZ screenChunks, XYZ screenCount) {
         ChunkSize = chunkSize;
         ScreenChunks = screenChunks;
@@ -25,6 +27,8 @@ public class WorldConfig {
                               screenChunks.Y * screenCount.Y,
                               screenChunks.Z * screenCount.Z);
 
+        // TODO: parameterize these
         MinRoomSize = 16;
+        KeyLevels = 2;
 	}
 }

@@ -1,15 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
 
+public enum RoomSymbols {
+    HAS_KEY
+}
+
 public class Room {
     public HashSet<XY> Coords;
+
+    public List<RoomSymbols> Symbols { get; private set; }
 
     // when you have internet, find a way to make this immutable?
     private HashSet<XY> _perimeter;
     public HashSet<XY> Perimeter { get { return _perimeter; } }
 
     public float Elevation  { get; private set; }
+    public int KeyLevel;
     public float Intensity { get; private set; }
 
     // Parent and Children are used while building a spanning tree.
@@ -27,9 +35,10 @@ public class Room {
     }
     */
 
-    public Room(float elevation, float intensity) {
+    public Room(float elevation) {
         Elevation = elevation;
-        Intensity = intensity;
+        //KeyLevel = keyLevel;
+        //Intensity = intensity;
 
         Coords = new HashSet<XY>();
         _perimeter = new HashSet<XY>();
@@ -40,6 +49,13 @@ public class Room {
     public void AddCoord(XY coord, bool isEdge) {
         Coords.Add(coord);
         if(isEdge) _perimeter.Add(coord);
+    }
+
+    public void AddSymbol(RoomSymbols symbol) {
+        if(Symbols.Contains(symbol))
+            throw new Exception("Symbol already added to room.");
+
+        Symbols.Add(symbol);
     }
 
     public void SetParent(Room parent) {
