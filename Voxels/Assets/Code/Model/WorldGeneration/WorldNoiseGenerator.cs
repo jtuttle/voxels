@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // This class is responsible for generating the initial Perlin noise we use to create 
-// the world and modifying it to have discrete elevations, flatter areas, ocean in the 
-// south and mountains in the north, etc. Methods are exposed for piecemeal testing.
+// the world and modifying it to have discrete elevations, flatter areas, and a gradient 
+// that places ocean in the south and mountains in the north. Methods are exposed for 
+// debug visualization.
+
 public class WorldNoiseGenerator {
     public int Seed { get; private set; }
 
