@@ -5,7 +5,7 @@ using System.Collections;
 using UnityEngine;
 
 public enum GameState {
-    WorldCreate, WorldNavigate, WorldScreenChangeState
+    WorldName, WorldCreate, WorldNavigate, WorldScreenChange
 }
 
 public class GameController : MonoBehaviour {
@@ -13,17 +13,23 @@ public class GameController : MonoBehaviour {
 
     protected void Awake() {
         _fsm = new FiniteStateMachine();
+        _fsm.AddState(new WorldNameState());
         _fsm.AddState(new WorldCreateState());
         _fsm.AddState(new WorldNavigateState());
         _fsm.AddState(new WorldScreenChangeState());
     }
 
     protected void Start() {
-        _fsm.ChangeState(new FSMTransition(GameState.WorldCreate));
+        _fsm.ChangeState(new FSMTransition(GameState.WorldName));
 	}
 
     protected void Update() {
         if(_fsm != null)
             _fsm.Update();
+    }
+
+    protected void OnGUI() {
+        if(_fsm != null)
+            _fsm.OnGUI();
     }
 }

@@ -70,8 +70,10 @@
      <Compile Include="Assets\Code\Scripts\WorldComponent.cs" />
      <Compile Include="Assets\Code\Scripts\WorldScreenComponent.cs" />
      <Compile Include="Assets\Code\States\WorldCreateState.cs" />
+     <Compile Include="Assets\Code\States\WorldNameState.cs" />
      <Compile Include="Assets\Code\States\WorldNavigateState.cs" />
      <Compile Include="Assets\Code\States\WorldScreenChangeState.cs" />
+     <Compile Include="Assets\Code\Transitions\WorldCreateTransition.cs" />
      <Compile Include="Assets\Code\Transitions\WorldScreenChangeTransition.cs" />
      <Compile Include="Assets\Code\Utils\GameObjectPool.cs" />
      <Compile Include="Assets\Code\Utils\MathUtils.cs" />

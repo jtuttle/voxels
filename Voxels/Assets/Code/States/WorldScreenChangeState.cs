@@ -9,7 +9,7 @@ public class WorldScreenChangeState : FSMState {
     private Player _player;
 
     public WorldScreenChangeState()
-        : base(GameState.WorldScreenChangeState) {
+        : base(GameState.WorldScreenChange) {
 
     }
 

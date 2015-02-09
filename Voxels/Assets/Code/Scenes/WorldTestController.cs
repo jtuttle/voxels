@@ -101,9 +101,6 @@ public class WorldTestController : MonoBehaviour {
         // Pre-calculate centroids of rooms in current world.
         _centroids.Clear();
 
-        //foreach(KeyValuePair<XY, WorldScreen> pair in _currentWorld.Screens) {
-            //XY screenCoord = pair.Key;
-
         foreach(WorldScreen screen in _currentWorld.Screens) {
             XY screenCoord = screen.Coord;
             XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
@@ -143,9 +140,6 @@ public class WorldTestController : MonoBehaviour {
         // Prevent room border colors from changing when other features are toggled.
         Random.seed = 0;
 
-        //foreach(KeyValuePair<XY, WorldScreen> screenPair in world.Screens) {
-        //    XY screenCoord = screenPair.Key;
-
         foreach(WorldScreen screen in world.Screens) {
             //WorldScreen screen = screenPair.Value;
             XY screenCoord = screen.Coord;
@@ -161,7 +155,15 @@ public class WorldTestController : MonoBehaviour {
                         pixels[edgeCoord.Y * width + edgeCoord.X] = roomColor;
                     }
                 }
+            }
+        }
 
+        foreach(WorldScreen screen in world.Screens) {
+            //WorldScreen screen = screenPair.Value;
+            XY screenCoord = screen.Coord;
+            XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
+            
+            foreach(Room room in screen.Rooms) {
                 XY centroid = _centroids[room];
 
                 // Draw lines between the centers of all connected rooms.
@@ -175,11 +177,18 @@ public class WorldTestController : MonoBehaviour {
                         }
                     }
                 }
+            }
+        }
 
+        foreach(WorldScreen screen in world.Screens) {
+            //WorldScreen screen = screenPair.Value;
+            XY screenCoord = screen.Coord;
+            XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
+            
+            foreach(Room room in screen.Rooms) {
                 // Draw lines between rooms that contain edges in the spanning tree.
                 if(_drawSpanningTree) {                    
                     foreach(Room neighbor in room.Neighbors) {
-
                         if(room.Parent == neighbor || neighbor.Parent == room) {
                             List<XY> line = MathUtils.CalculateLineCoords(_centroids[room], _centroids[neighbor]);
                             
@@ -188,6 +197,16 @@ public class WorldTestController : MonoBehaviour {
                         }
                     }
                 }
+            }
+        }
+
+        foreach(WorldScreen screen in world.Screens) {
+            //WorldScreen screen = screenPair.Value;
+            XY screenCoord = screen.Coord;
+            XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
+            
+            foreach(Room room in screen.Rooms) {
+                XY centroid = _centroids[room];
 
                 // Draw a dot in the center of the room. The method used for calculating the
                 // centroid does not work well for convex polygons. A true centroid calculation
