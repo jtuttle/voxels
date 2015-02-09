@@ -1,18 +1,32 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Code/Model/WorldGenerator.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Code/Transitions/WorldScreenChangeTransition.cs">
     <Files>
-      <File FileName="Assets/Code/Model/WorldGenerator.cs" Line="316" Column="32" />
-      <File FileName="Assets/Code/Scenes/WorldTestController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Code/Model/WorldConfig.cs" Line="32" Column="22" />
-      <File FileName="Assets/Code/Model/RoomTile.cs" Line="3" Column="22" />
-      <File FileName="Assets/Code/GameController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Code/Model/World.cs" Line="18" Column="14" />
-      <File FileName="Assets/Code/Model/WorldScreen.cs" Line="18" Column="1" />
-      <File FileName="Assets/Code/Model/Room.cs" Line="8" Column="2" />
-      <File FileName="Assets/Code/States/WorldCreateState.cs" Line="1" Column="1" />
-      <File FileName="Assets/Code/Scripts/WorldScreenComponent.cs" Line="21" Column="24" />
+      <File FileName="Assets/Code/States/WorldNameState.cs" Line="22" Column="66" />
+      <File FileName="Assets/Code/States/WorldCreateState.cs" Line="33" Column="54" />
+      <File FileName="Assets/Code/GameController.cs" Line="33" Column="23" />
+      <File FileName="Assets/Code/Utils/State/FiniteStateMachine.cs" Line="79" Column="22" />
+      <File FileName="Assets/Code/Scenes/WorldTestController.cs" Line="51" Column="37" />
+      <File FileName="Assets/Code/States/WorldScreenChangeState.cs" Line="1" Column="1" />
+      <File FileName="Assets/Code/States/WorldNavigateState.cs" Line="15" Column="9" />
+      <File FileName="Assets/Code/Transitions/WorldScreenChangeTransition.cs" Line="1" Column="1" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Assembly-CSharp" expanded="True">
+            <Node name="Code" expanded="True">
+              <Node name="Scenes" expanded="True" />
+              <Node name="States" expanded="True" />
+              <Node name="Transitions" expanded="True" selected="True" />
+              <Node name="Utils" expanded="True">
+                <Node name="State" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

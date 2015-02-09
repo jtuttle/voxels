@@ -21,8 +21,8 @@ public class WorldGenerator {
         //worldConfig.Validate();
 
         // 1. generate noise
-        //float[,] worldNoise = GenerateWorldNoise(_worldConfig);
-        float[,] worldNoise = GenerateFakeWorldNoise(_worldConfig);
+        float[,] worldNoise = GenerateWorldNoise(_worldConfig);
+        //float[,] worldNoise = GenerateFakeWorldNoise(_worldConfig);
 
         // 2. create world object
         World = new World(_worldConfig, worldNoise);
