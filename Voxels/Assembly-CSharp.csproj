@@ -54,8 +54,9 @@
      <Compile Include="Assets\Code\Model\TextureAtlas.cs" />
      <Compile Include="Assets\Code\Model\World.cs" />
      <Compile Include="Assets\Code\Model\WorldConfig.cs" />
-     <Compile Include="Assets\Code\Model\WorldGenerator.cs" />
-     <Compile Include="Assets\Code\Model\WorldNoiseGenerator.cs" />
+     <Compile Include="Assets\Code\Model\WorldGeneration\WorldGenerator.cs" />
+     <Compile Include="Assets\Code\Model\WorldGeneration\WorldNoiseGenerator.cs" />
+     <Compile Include="Assets\Code\Model\WorldGeneration\WorldRoomFinder.cs" />
      <Compile Include="Assets\Code\Model\WorldScreen.cs" />
      <Compile Include="Assets\Code\Scenes\NoiseTestController.cs" />
      <Compile Include="Assets\Code\Scenes\WorldTestController.cs" />

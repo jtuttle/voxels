@@ -1,40 +1,38 @@
-using UnityEngine;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using UnityEngine;
 
 public class World {
     public WorldConfig Config { get; private set; }
     public float[,] Noise { get; private set; }
 
-    public Dictionary<XY, WorldScreen> Screens { get; private set; }
+    private Dictionary<XY, WorldScreen> _screens;
+    public ReadOnlyCollection<WorldScreen> Screens {
+        get { return new List<WorldScreen>(_screens.Values).AsReadOnly(); }
+    }
 
-    // TODO: consider caching this.
-    public List<Room> Rooms {
-        get {
-            List<Room> rooms = new List<Room>();
-            
-            foreach(KeyValuePair<XY, WorldScreen> pair in Screens) {
-                foreach(Room room in pair.Value.Rooms)
-                    rooms.Add(room);
-            }
-
-            return rooms;
-        }
+    private List<Room> _rooms;
+    public ReadOnlyCollection<Room> Rooms { 
+        get { return _rooms.AsReadOnly(); }
     }
 
     public World(WorldConfig config, float[,] noise) {
         Config = config;
         Noise = noise;
 
-        Screens = new Dictionary<XY, WorldScreen>();
+        _screens = new Dictionary<XY, WorldScreen>();
+        _rooms = new List<Room>();
     }
 
     public void AddScreen(XY coord, WorldScreen screen) {
-        Screens[coord] = screen;
+        _screens[coord] = screen;
+
+        foreach(Room room in screen.Rooms)
+            _rooms.Add(room);
     }
 
     public WorldScreen GetScreen(XY coord) {
-        if(!Screens.ContainsKey(coord)) return null;
-        return Screens[coord];
+        if(!_screens.ContainsKey(coord)) return null;
+        return _screens[coord];
     }
-
 }

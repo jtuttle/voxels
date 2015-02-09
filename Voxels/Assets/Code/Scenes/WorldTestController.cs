@@ -101,11 +101,14 @@ public class WorldTestController : MonoBehaviour {
         // Pre-calculate centroids of rooms in current world.
         _centroids.Clear();
 
-        foreach(KeyValuePair<XY, WorldScreen> pair in _currentWorld.Screens) {
-            XY screenCoord = pair.Key;
+        //foreach(KeyValuePair<XY, WorldScreen> pair in _currentWorld.Screens) {
+            //XY screenCoord = pair.Key;
+
+        foreach(WorldScreen screen in _currentWorld.Screens) {
+            XY screenCoord = screen.Coord;
             XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
 
-            foreach(Room room in pair.Value.Rooms)
+            foreach(Room room in screen.Rooms)
                 _centroids[room] = screenOffset + XY.Average(room.Perimeter.ToList());
         }
 
@@ -140,10 +143,12 @@ public class WorldTestController : MonoBehaviour {
         // Prevent room border colors from changing when other features are toggled.
         Random.seed = 0;
 
-        foreach(KeyValuePair<XY, WorldScreen> screenPair in world.Screens) {
-            XY screenCoord = screenPair.Key;
-            WorldScreen screen = screenPair.Value;
+        //foreach(KeyValuePair<XY, WorldScreen> screenPair in world.Screens) {
+        //    XY screenCoord = screenPair.Key;
 
+        foreach(WorldScreen screen in world.Screens) {
+            //WorldScreen screen = screenPair.Value;
+            XY screenCoord = screen.Coord;
             XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
 
             foreach(Room room in screen.Rooms) {
@@ -161,9 +166,7 @@ public class WorldTestController : MonoBehaviour {
 
                 // Draw lines between the centers of all connected rooms.
                 if(_drawConnections) {
-                    List<Room> neighbors = _worldGenerator.RoomNeighbors[room];
-
-                    foreach(Room neighbor in neighbors) {
+                    foreach(Room neighbor in room.Neighbors) {
                         List<XY> line = MathUtils.CalculateLineCoords(_centroids[room], _centroids[neighbor]);
 
                         foreach(XY point in line) {
@@ -174,10 +177,8 @@ public class WorldTestController : MonoBehaviour {
                 }
 
                 // Draw lines between rooms that contain edges in the spanning tree.
-                if(_drawSpanningTree) {
-                    List<Room> neighbors = _worldGenerator.RoomNeighbors[room];
-                    
-                    foreach(Room neighbor in neighbors) {
+                if(_drawSpanningTree) {                    
+                    foreach(Room neighbor in room.Neighbors) {
 
                         if(room.Parent == neighbor || neighbor.Parent == room) {
                             List<XY> line = MathUtils.CalculateLineCoords(_centroids[room], _centroids[neighbor]);

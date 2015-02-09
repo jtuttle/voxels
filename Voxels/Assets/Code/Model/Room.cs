@@ -20,6 +20,11 @@ public class Room {
     public int KeyLevel;
     public float Intensity { get; private set; }
 
+    private List<Room> _neighbors;
+    public ReadOnlyCollection<Room> Neighbors {
+        get { return _neighbors.AsReadOnly(); }
+    }
+
     // Parent and Children are used while building a spanning tree.
     public Room Parent { get; private set; }
 
@@ -27,13 +32,6 @@ public class Room {
     public ReadOnlyCollection<Room> Children {
         get { return _children.AsReadOnly(); }
     }
-
-    /*
-    private List<Room> _neighbors;
-    public ReadOnlyCollection<Room> Neighbors {
-        get { return _neighbors.AsReadOnly(); }
-    }
-    */
 
     public Room(float elevation) {
         Elevation = elevation;
@@ -43,6 +41,7 @@ public class Room {
         Coords = new HashSet<XY>();
         _perimeter = new HashSet<XY>();
 
+        _neighbors = new List<Room>();
         _children = new List<Room>();
     }
 
@@ -58,9 +57,13 @@ public class Room {
         Symbols.Add(symbol);
     }
 
+    public void AddNeighbor(Room neighbor) {
+        if(!_neighbors.Contains(neighbor))
+            _neighbors.Add(neighbor);
+    }
+
     public void SetParent(Room parent) {
         Parent = parent;
-        //_neighbors.Add(parent);
     }
 
     public void AddChild(Room child) {
