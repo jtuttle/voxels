@@ -4,17 +4,17 @@ using System.Linq;
 using UnityEngine;
 
 public class WorldGenerator {
-    public World World { get; private set; }
+    //public World World { get; private set; }
 
+    private string _worldName;
     private WorldConfig _worldConfig;
 
-    public WorldGenerator(WorldConfig worldConfig) {
+    public WorldGenerator(string worldName, WorldConfig worldConfig) {
+        _worldName = worldName;
         _worldConfig = worldConfig;
-
-
     }
 
-    public void GenerateWorld() {
+    public World GenerateWorld() {
         // 0. validate world config
         // Maybe store the information such that it shouldn't need to be
         // validated and the potentially invalid values are computed.
@@ -25,20 +25,20 @@ public class WorldGenerator {
         //float[,] worldNoise = GenerateFakeWorldNoise(_worldConfig);
 
         // 2. create world object
-        World = new World(_worldConfig, worldNoise);
+        World world = new World(_worldConfig, worldNoise);
 
         // 3. split world into "rooms"
-        new WorldRoomFinder(World).Find();
+        new WorldRoomFinder(world).Find();
 
         // 4. Create spanning tree
-        CreateSpanningTree(World);
+        CreateSpanningTree(world);
 
         // 5. Place keys
         // After assigning key levels, we'll want to place keys 
         // randomly in each group of key level nodes
         //PlaceKeys(World);
 
-
+        return world;
     }
 
     private float[,] GenerateWorldNoise(WorldConfig worldConfig) {
