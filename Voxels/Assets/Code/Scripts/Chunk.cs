@@ -19,24 +19,12 @@ public class Chunk : MonoBehaviour {
 	private List<Vector2> newUV = new List<Vector2>();
 	private int faceCount;
 
-	// TODO - abstract texture handling
-	private float tUnit = 0.25f;
-    private Vector2 tGrass = new Vector2(0, 3);
-    /*
-	private Vector2 tStone = new Vector2(1, 15);
-	private Vector2 tDirt = new Vector2(2, 15);
-	private Vector2 tGrassTop = new Vector2(1, 6);
-	private Vector2 tGrassSide = new Vector2(3, 15);
-    */
     private TextureAtlas _textureAtlas;
     private int _textureIndex;
-
 
 	protected void Start() {
 		mesh = GetComponent<MeshFilter>().mesh;
 		col = GetComponent<MeshCollider>();
-
-		//GenerateMesh();
 	}
 
 	protected void LateUpdate() {
@@ -148,18 +136,7 @@ public class Chunk : MonoBehaviour {
 		newVertices.Add(new Vector3(x + 1, y, z));
 		newVertices.Add(new Vector3(x, y, z));
 
-		Vector2 texturePos = new Vector2(0, 0);
-
-        texturePos = tGrass;
-
-        /*
-		if(block == 1)
-			texturePos = tStone;
-		else if(block == 2)
-			texturePos = tGrassTop;
-		*/
-
-		Cube(texturePos);
+		Cube();
 	}
 
 	private void CubeNorth(int x, int y, int z, byte block) {
@@ -200,40 +177,14 @@ public class Chunk : MonoBehaviour {
 		newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
 		newVertices.Add(new Vector3(x, y - 1, z + 1));
 
-		Vector2 texturePos = new Vector2(0, 0);
-
-        texturePos = tGrass;
-
-		/*
-		if(block == 1)
-			texturePos = tStone;
-		else if(block == 2)
-			texturePos = tDirt;
-		*/
-
-		Cube(texturePos);
+		Cube();
 	}
 
 	private void CubeSide(int x, int y, int z, byte block) {
-		Vector2 texturePos = new Vector2(0, 0);
-
-		texturePos = tGrass;
-
-		/*
-		if(block == 1)
-			texturePos = tStone;
-		else if(block == 2) {
-			if(Block(x, y + 1, z) == 0)
-				texturePos = tGrassSide;
-			else
-				texturePos = tDirt;
-		}
-        */
-
-		Cube(texturePos);
+		Cube();
 	}
 
-	private void Cube(Vector2 texturePos) {
+	private void Cube() {
 		int offset = faceCount * 4;
 
 		newTriangles.Add(offset + 0); //1
@@ -242,13 +193,6 @@ public class Chunk : MonoBehaviour {
 		newTriangles.Add(offset + 0); //1
 		newTriangles.Add(offset + 2); //3
 		newTriangles.Add(offset + 3); //4
-
-        /*
-		newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y));
-		newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y + tUnit));
-		newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y + tUnit));
-		newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y));
-        */      
 
         newUV.AddRange(_textureAtlas.getUVCoords(_textureIndex));
 

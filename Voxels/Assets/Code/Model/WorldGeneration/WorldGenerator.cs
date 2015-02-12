@@ -30,6 +30,9 @@ public class WorldGenerator {
         // 3. split world into "rooms"
         new WorldRoomFinder(world).Find();
 
+        // 3.5 Choose initial room
+        ChooseInitialRoom(world);
+
         // 4. Create spanning tree
         CreateSpanningTree(world);
 
@@ -69,6 +72,9 @@ public class WorldGenerator {
         return worldNoise;
     }
 
+    private void ChooseInitialRoom(World world) {
+
+    }
 
     // TODO: Implement critical path, otherwise there's going to be way too much backtracking.
     private void CreateSpanningTree(World world) {
