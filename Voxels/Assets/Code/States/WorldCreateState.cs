@@ -102,6 +102,9 @@ public class WorldCreateState : FSMState {
     // Creates the initial set of six chunk groups around the player's starting point.
     // TODO: make this draw from a pool of reusable chunk groups
     private void CreateInitialScreens(WorldComponent world, XY startCoords) {
+        world.CreateScreen(startCoords);
+
+        /*
         XYZ screenCount = world.Config.ScreenCount;
 
         WorldConfig config = world.Config;
@@ -114,5 +117,6 @@ public class WorldCreateState : FSMState {
                     world.CreateScreen(new XY(x, y));
             }
         }
+        */
     }
 }
