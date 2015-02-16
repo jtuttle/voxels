@@ -45,17 +45,7 @@ public class WorldScreenComponent : MonoBehaviour {
         Chunks = new Chunk[_samples.GetLength(0), 
                            screenHeight, 
                            _samples.GetLength(1)];
-        
-        // coastline test
-        /*
-        for(int i = 0; i < samples.Length; i++) {
-            if(i > 30)
-                samples[i] = 1;
-            else
-                samples[i] = 0;
-        }
-        */
-        
+
         for(int x = 0; x < _samples.GetLength(0); x++) {
             for(int z = 0; z < _samples.GetLength(1); z++) {
                 for(int y = 0; y < screenHeight; y++) {
@@ -72,12 +62,7 @@ public class WorldScreenComponent : MonoBehaviour {
 
                     float sample = _samples[x, z];
                     bool solid = (y <= sample);
-                    
-                    // TODO - need to raise water by 1 and lower snow by 1
-                    // not really sure what this was doing...
-                    //if(y == 0)
-                    //    solid = (y <= samples[z * Config.ChunkCountX + x] + 1);
-                    
+
                     int textureIndex = 12;
                     
                     if(y == 0)

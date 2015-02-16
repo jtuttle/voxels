@@ -21,7 +21,7 @@ public class GameController : MonoBehaviour {
 
     protected void Start() {
         _fsm.ChangeState(new FSMTransition(GameState.WorldName));
-	}
+    }
 
     protected void Update() {
         if(_fsm != null)

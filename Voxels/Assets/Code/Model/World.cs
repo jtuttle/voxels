@@ -6,6 +6,8 @@ public class World {
     public WorldConfig Config { get; private set; }
     public float[,] Noise { get; private set; }
 
+    public Room InitialRoom;
+
     private Dictionary<XY, WorldScreen> _screens;
     public ReadOnlyCollection<WorldScreen> Screens {
         get { return new List<WorldScreen>(_screens.Values).AsReadOnly(); }
