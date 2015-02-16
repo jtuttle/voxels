@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class WorldComponent : MonoBehaviour {
-	public WorldConfig Config { get; private set; }
+    public WorldConfig Config { get; private set; }
 
-	public GameObjectPool ChunkPool;
-	public Chunk[,,] Chunks;
+    public GameObjectPool ChunkPool;
+    public Chunk[,,] Chunks;
 
     public TextureAtlas TextureAtlas { get; private set; }
 
@@ -18,12 +18,12 @@ public class WorldComponent : MonoBehaviour {
         _screens = new Dictionary<XY, WorldScreenComponent>();
     }
 
-	public void Initialize(WorldConfig config, float[,] noise) {
-		Config = config;
+    public void Initialize(WorldConfig config, float[,] noise) {
+        Config = config;
         _noise = noise;
 
         TextureAtlas = new TextureAtlas(4, 4);
-	}
+    }
 
     public void CreateScreen(XY screenCoords) {
         XYZ screenChunks = Config.ScreenChunks;

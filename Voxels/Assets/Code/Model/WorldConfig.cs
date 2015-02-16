@@ -30,5 +30,5 @@ public class WorldConfig {
         // TODO: parameterize these
         MinRoomSize = 16;
         KeyLevels = 2;
-	}
+    }
 }

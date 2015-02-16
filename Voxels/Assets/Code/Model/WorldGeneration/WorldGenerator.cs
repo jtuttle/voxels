@@ -73,7 +73,17 @@ public class WorldGenerator {
     }
 
     private void ChooseInitialRoom(World world) {
+        List<WorldScreen> innerScreens = world.Screens.
+            Where(screen => screen.Coord.X > 3 && screen.Coord.X < 12 
+                            && screen.Coord.Y > 3 && screen.Coord.Y < 8).ToList();
 
+        WorldScreen initialScreen = innerScreens[Random.Range(0, innerScreens.Count - 1)];
+        Room initialRoom = initialScreen.Rooms[Random.Range(0, initialScreen.Rooms.Count - 1)];
+
+        initialRoom.AddSymbol(RoomSymbols.INITIAL);
+        world.InitialRoom = initialRoom;
+
+        Debug.Log("initial room: " + initialScreen.Coord);
     }
 
     // TODO: Implement critical path, otherwise there's going to be way too much backtracking.
@@ -95,11 +105,11 @@ public class WorldGenerator {
         // This list will represent visited nodes with unvisited neighbors.
         List<Room> expandables = new List<Room>();
 
-        Room firstRoom = rooms[Random.Range(0, world.Rooms.Count - 1)]; 
-        expandables.Add(firstRoom);
-        visited.Add(firstRoom);
+        Room initialRoom = world.InitialRoom;
+        expandables.Add(initialRoom);
+        visited.Add(initialRoom);
 
-        firstRoom.KeyLevel = keyLevel;
+        initialRoom.KeyLevel = keyLevel;
         keyLevelCount++;
 
         Room currentRoom;

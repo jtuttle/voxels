@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using UnityEngine;
 
 public enum RoomSymbols {
-    HAS_KEY
+    INITIAL, HAS_KEY
 }
 
 public class Room {
