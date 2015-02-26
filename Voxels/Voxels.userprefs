@@ -1,27 +1,21 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Code/Scripts/WorldScreenComponent.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Code/Scripts/ChunkGroup.cs">
     <Files>
-      <File FileName="Assets/Code/Scripts/WorldScreenComponent.cs" Line="6" Column="34" />
-      <File FileName="Assets/Code/States/WorldCreateState.cs" Line="1" Column="1" />
-      <File FileName="Assets/Code/GameData.cs" Line="1" Column="1" />
-      <File FileName="Assets/Code/Scripts/Chunk.cs" Line="6" Column="23" />
+      <File FileName="Assets/Code/Scripts/WorldScreenManager.cs" Line="76" Column="23" />
+      <File FileName="Assets/Code/Scripts/Chunk.cs" Line="6" Column="27" />
+      <File FileName="Assets/Code/Scripts/WorldComponent.cs" Line="14" Column="43" />
+      <File FileName="Assets/Code/Scripts/WorldScreenComponent.cs" Line="82" Column="44" />
+      <File FileName="Assets/Code/Scripts/ChunkGroup.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="Code" expanded="True">
-              <Node name="Model" expanded="True">
-                <Node name="WorldGeneration" expanded="True" />
-              </Node>
-              <Node name="Scenes" expanded="True" />
-              <Node name="Scripts" expanded="True">
-                <Node name="WorldScreenComponent.cs" selected="True" />
-              </Node>
+              <Node name="Model" expanded="True" />
+              <Node name="Scripts" expanded="True" selected="True" />
               <Node name="States" expanded="True" />
-              <Node name="Transitions" expanded="True" />
-              <Node name="Utils" expanded="True" />
             </Node>
           </Node>
         </State>

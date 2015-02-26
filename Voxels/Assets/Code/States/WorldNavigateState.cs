@@ -19,7 +19,7 @@ public class WorldNavigateState : FSMState {
     public override void EnterState(FSMTransition transition) {
         base.EnterState(transition);
 
-        _navBounds = GameData.CurrentScreen.NavBounds;
+        //_navBounds = GameData.CurrentScreen.NavBounds;
     }
     
     public override void ExitState(FSMTransition nextStateTransition) {
@@ -45,7 +45,7 @@ public class WorldNavigateState : FSMState {
     private XY GetTransitionCoords() {
         Vector3 playerPos = _player.transform.position;
 
-        XY currentCoords = GameData.CurrentScreen.Coords;
+        //XY currentCoords = GameData.CurrentScreen.Coords;
         XY shiftCoord = null;
 
         if(playerPos.x <= _navBounds.xMin) {
@@ -58,6 +58,7 @@ public class WorldNavigateState : FSMState {
             shiftCoord = new XY(0, 1);
         }
 
-        return currentCoords + shiftCoord;
+        //return currentCoords + shiftCoord;
+        return shiftCoord;
     }
 }

@@ -39,7 +39,7 @@ public class ScreenCamera : MonoBehaviour {
 
     public void UpdateBounds(XY screenCoord) {
         // TODO: un-hardcode this edge value, maybe.
-        Bounds = GameData.World.GetScreenBounds(screenCoord, 25.0f, 13.0f);
+        //Bounds = GameData.World.GetScreenBounds(screenCoord, 25.0f, 13.0f);
     }
 
     private void SmoothFollowPosition() {

@@ -37,4 +37,29 @@ public class World {
         if(!_screens.ContainsKey(coord)) return null;
         return _screens[coord];
     }
+
+    public WorldScreen GetScreen(Room room) {
+        foreach(WorldScreen screen in _screens.Values) {
+            if(screen.Rooms.Contains(room))
+                return screen;
+        }
+        return null;
+    }
+
+    public float[,] GetScreenNoise(XY screenCoord) {
+        XYZ screenChunks = Config.ScreenChunks;
+
+        float[,] screenNoise = new float[screenChunks.X, screenChunks.Z];
+
+        int startX = screenCoord.X * screenChunks.X;
+        int startY = screenCoord.Y * screenChunks.Z;
+        
+        for(int x = 0; x < screenChunks.X; x++) {
+            for(int y = 0; y < screenChunks.Z; y++) {
+                screenNoise[x, y] = Noise[startX + x, startY + y];
+            }
+        }
+
+        return screenNoise;
+    }
 }
