@@ -78,7 +78,7 @@ public class WorldScreenComponent : MonoBehaviour {
                     newChunk.Initialize(chunkSize, solid, _world.TextureAtlas, textureIndex);
                     //newChunk.transform.parent = transform;
 
-                    newChunk.chunkGroup = this;
+                    //newChunk.chunkGroup = this;
                     newChunk.chunkOffset = new XYZ(x * chunkSize, y * chunkSize, z * chunkSize);
 
                     Chunks[x, y, z] = newChunk;

@@ -23,8 +23,10 @@ public class WorldScreenChangeState : FSMState {
 
         _nextScreenCoords = (transition as WorldScreenChangeTransition).NextScreenCoords;
 
+        /*
         XY coordDiff = _nextScreenCoords - GameData.CurrentScreen.Coords;
         _coordDifference = new Vector2(coordDiff.X, coordDiff.Y);
+        */
 
         _camera = Camera.main;
         _player = GameData.Player;
@@ -57,8 +59,10 @@ public class WorldScreenChangeState : FSMState {
     
     public override void ExitState(FSMTransition nextStateTransition) {
         // Update game state stuff.
+        /*
         GameData.CurrentScreen = GameData.World.GetScreen(_nextScreenCoords);
         _camera.GetComponent<ScreenCamera>().UpdateBounds(_nextScreenCoords);
+        */
 
         // Re-enable camera and player movement scripts.
         _camera.GetComponent<ScreenCamera>().enabled = true;
@@ -102,6 +106,8 @@ public class WorldScreenChangeState : FSMState {
     }
 
     private Vector2 GetDistanceToEdge(Transform transform) {
+        return new Vector2();
+        /*
         WorldComponent world = GameData.World;
         XY currentScreenCoords = GameData.CurrentScreen.Coords;
 
@@ -119,6 +125,7 @@ public class WorldScreenChangeState : FSMState {
         distanceToCenter.Scale(_coordDifference);
 
         return halfScreenDimensions - distanceToCenter;
+        */
     }
 
     private void OnTweenComplete() {

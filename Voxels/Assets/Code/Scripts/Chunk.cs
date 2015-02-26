@@ -1,10 +1,9 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Chunk : MonoBehaviour {
-    public WorldScreenComponent chunkGroup;
-
+    public ChunkGroup chunkGroup;
     public XYZ chunkOffset;
 
     private byte[,,] _blocks;
@@ -37,8 +36,9 @@ public class Chunk : MonoBehaviour {
     public void Initialize(int chunkSize, bool solid, TextureAtlas textureAtlas, int textureIndex) {
         _blocks = new byte[chunkSize, chunkSize, chunkSize];
 
-        // for now this is just going to be hard-coded to be
-        // completely filled or completely empty
+        // TODO: For now this is just going to be hard-coded to be
+        // completely filled or completely empty. Eventually we will
+        // want more interestingly-shaped chunks.
         byte blockData = (byte)(solid ? 1 : 0);
 
         for(int x = 0; x < chunkSize; x++) {
