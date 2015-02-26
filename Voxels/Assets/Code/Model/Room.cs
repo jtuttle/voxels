@@ -39,6 +39,7 @@ public class Room {
         //Intensity = intensity;
 
         Coords = new HashSet<XY>();
+        Symbols = new List<RoomSymbols>();
         _perimeter = new HashSet<XY>();
 
         _neighbors = new List<Room>();

@@ -28,14 +28,20 @@ public class WorldCreateState : FSMState {
 
         WorldConfig worldConfig = new WorldConfig(chunkSize, screenChunks, screenCount);
 
+        World world = new WorldGenerator((transition as WorldCreateTransition).WorldName, worldConfig).GenerateWorld();
+
+
         XYZ worldChunks = worldConfig.WorldChunks;
 
+        /*
         WorldNoiseGenerator worldNoiseGen = new WorldNoiseGenerator(Random.Range(1, 65536));
         float[,] worldNoise = worldNoiseGen.GenerateWorldNoise(worldChunks.X, worldChunks.Z, worldChunks.Y);
+        */
 
         // TEMP - just to see full noise map
         // BUG - this seems to give a pretty different map than is generated in the world,
         // should really make these two sync up.
+        /*
         NoiseCanvas.renderer.material.mainTexture = GenerateTexture(worldChunks.X, 
                                                                     worldChunks.Z, 
                                                                     worldNoise);
@@ -43,19 +49,20 @@ public class WorldCreateState : FSMState {
         // Shift noise to ints for easier processing
         worldNoise = worldNoiseGen.ShiftNoise(0, 1, 0, worldChunks.Y, worldNoise);
         worldNoise = worldNoiseGen.DiscretizeDenormalizedNoise(worldNoise);
+        */
 
-        WorldComponent world = GameObject.Find("World").GetComponent<WorldComponent>();
-        world.Initialize(worldConfig, worldNoise);
+        WorldComponent worldComponent = GameObject.Find("World").GetComponent<WorldComponent>();
+        worldComponent.Initialize(world);
 
         // TODO: This is always coming up ocean, something's wrong!
         XY startCoords = new XY(0, 0);
-        CreateInitialScreens(world, startCoords);
+        CreateInitialScreens(worldComponent, startCoords);
 
-        GameData.World = world;
-        GameData.CurrentScreen = world.GetScreen(startCoords);
+        GameData.World = worldComponent;
+        GameData.CurrentScreen = worldComponent.GetScreen(startCoords);
 
         // TEMP - place the player
-        Vector2 screenCenter = world.GetScreenCenter(startCoords);
+        Vector2 screenCenter = worldComponent.GetScreenCenter(startCoords);
         Vector3 playerStartPos = new Vector3(screenCenter.x, 50, screenCenter.y);
 
         GameObject playerGo = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Player"));

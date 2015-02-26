@@ -3,14 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class WorldComponent : MonoBehaviour {
-    public WorldConfig Config { get; private set; }
+    public WorldConfig Config { get { return _world.Config; } }
+
+    private World _world;
+    private float[,] _noise;
 
     public GameObjectPool ChunkPool;
     public Chunk[,,] Chunks;
 
     public TextureAtlas TextureAtlas { get; private set; }
-
-    private float[,] _noise;
 
     private Dictionary<XY, WorldScreenComponent> _screens;
 
@@ -18,9 +19,13 @@ public class WorldComponent : MonoBehaviour {
         _screens = new Dictionary<XY, WorldScreenComponent>();
     }
 
-    public void Initialize(WorldConfig config, float[,] noise) {
+    public void Initialize(World world) {
+        _world = world;
+
+        /*
         Config = config;
         _noise = noise;
+        */
 
         TextureAtlas = new TextureAtlas(4, 4);
     }
@@ -35,7 +40,7 @@ public class WorldComponent : MonoBehaviour {
 
         for(int x = 0; x < screenChunks.X; x++) {
             for(int y = 0; y < screenChunks.Z; y++) {
-                screenNoise[x, y] = _noise[startX + x, startY + y];
+                screenNoise[x, y] = _world.Noise[startX + x, startY + y];
             }
         }
 
