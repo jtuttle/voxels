@@ -38,16 +38,14 @@ public class ScreenCamera : MonoBehaviour {
     }
 
     public void SetBounds(Rect bounds) {
-        // TODO: un-hardcode this edge value, maybe.
-        //Bounds = GameData.World.GetScreenBounds(screenCoord, 25.0f, 13.0f);
         Bounds = bounds;
     }
 
     private void SmoothFollowPosition() {
         //transform.position = Vector3.Lerp(transform.position, getTarget(), Time.deltaTime);
 
-        transform.position = getTarget();
-        //transform.LookAt(Player.transform);
+        //transform.position = getTarget();
+        transform.LookAt(Player.transform);
     }
     
     private Vector3 getTarget() {

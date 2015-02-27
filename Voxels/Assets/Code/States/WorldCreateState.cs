@@ -32,11 +32,12 @@ public class WorldCreateState : FSMState {
         GameData.World = world;
 
         WorldScreen initialScreen = world.GetScreen(world.InitialRoom);
-        _worldScreenManager.CreateScreen(initialScreen);
+
+        CreateInitialScreens(initialScreen.Coord);
 
         // TEMP - place the player
         Vector2 screenCenter = _worldScreenManager.GetScreenCenter(initialScreen.Coord);
-        Vector3 playerStartPos = new Vector3(screenCenter.x, 50, screenCenter.y);
+        Vector3 playerStartPos = new Vector3(screenCenter.x, 100, screenCenter.y);
 
         GameObject playerGo = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Player"));
         Player player = playerGo.GetComponent<Player>();
@@ -46,6 +47,7 @@ public class WorldCreateState : FSMState {
 
         ScreenCamera screenCam = Camera.main.GetComponent<ScreenCamera>();
         screenCam.Player = player;
+        // TODO: un-hardcode this edge value, maybe.
         screenCam.SetBounds(_worldScreenManager.GetScreenBounds(initialScreen.Coord, 25.0f, 13.0f));
 
         //ExitState(new FSMTransition(GameState.WorldNavigate));
@@ -74,7 +76,15 @@ public class WorldCreateState : FSMState {
         return new WorldConfig(chunkSize, screenChunks, screenCount);
     }
 
+    private void CreateInitialScreens(XY coord) {
+        for(int x = coord.X - 1; x <= coord.X + 1; x++) {
+            for(int y = coord.Y; y <= coord.Y + 1; y++)
+                _worldScreenManager.CreateScreen(new XY(x, y));
+        }
+    }
+
     // TODO: This should be on a NoiseCanvas script or something
+    /*
     private Texture2D GenerateTexture(int width, int height, float[,] samples) {
         Texture2D texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
         
@@ -92,4 +102,5 @@ public class WorldCreateState : FSMState {
         
         return texture;
     }
+    */
 }
