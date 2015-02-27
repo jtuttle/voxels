@@ -34,9 +34,8 @@ public class WorldCreateState : FSMState {
         WorldScreen initialScreen = world.GetScreen(world.InitialRoom);
         _worldScreenManager.CreateScreen(initialScreen);
 
-        /*
         // TEMP - place the player
-        Vector2 screenCenter = worldComponent.GetScreenCenter(startCoords);
+        Vector2 screenCenter = _worldScreenManager.GetScreenCenter(initialScreen.Coord);
         Vector3 playerStartPos = new Vector3(screenCenter.x, 50, screenCenter.y);
 
         GameObject playerGo = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Player"));
@@ -47,8 +46,7 @@ public class WorldCreateState : FSMState {
 
         ScreenCamera screenCam = Camera.main.GetComponent<ScreenCamera>();
         screenCam.Player = player;
-        screenCam.UpdateBounds(startCoords);
-        */
+        screenCam.SetBounds(_worldScreenManager.GetScreenBounds(initialScreen.Coord, 25.0f, 13.0f));
 
         //ExitState(new FSMTransition(GameState.WorldNavigate));
     }

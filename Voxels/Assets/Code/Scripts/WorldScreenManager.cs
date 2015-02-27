@@ -22,7 +22,7 @@ public class WorldScreenManager : MonoBehaviour {
 	public void CreateScreen(WorldScreen screen) {
         float[,] screenNoise = GameData.World.GetScreenNoise(screen.Coord);
 
-        ChunkGroup screenChunks = CreateScreenChunks(screenNoise);
+        ChunkGroup screenChunks = CreateScreenChunks(screen.Coord, screenNoise);
 
         _screenChunks[screen.Coord] = screenChunks;
     }
@@ -31,7 +31,41 @@ public class WorldScreenManager : MonoBehaviour {
 
     }
 
-    private ChunkGroup CreateScreenChunks(float[,] screenNoise) {
+    public Vector2 GetScreenDimensions() {
+        XYZ screenSize = GameData.World.Config.ScreenSize;
+        return new Vector2(screenSize.X, screenSize.Z);
+    }
+    
+    public Vector2 GetScreenCorner(XY screenCoords) {
+        XYZ screenSize = GameData.World.Config.ScreenSize;
+        
+        return new Vector2((float)screenCoords.X * screenSize.X,
+                           (float)screenCoords.Y * screenSize.Z);
+    }
+    
+    public Vector2 GetScreenCenter(XY screenCoords) {
+        XYZ screenSize = GameData.World.Config.ScreenSize;
+        
+        Vector2 corner = GetScreenCorner(screenCoords);
+        
+        return corner + new Vector2(screenSize.X / 2, screenSize.Z / 2);
+    }
+    
+    // The edge size is pretty arbitrary and depends on camera angle/distance.
+    // 13 works well for an angle/distance of 40/40.
+    public Rect GetScreenBounds(XY screenCoords, float horizontalEdge, float verticalEdge) {
+        Vector2 corner = GetScreenCorner(screenCoords);
+        Vector2 dimensions = GetScreenDimensions();
+        
+        int chunkSize = GameData.World.Config.ChunkSize;
+        
+        return new Rect(corner.x + horizontalEdge,
+                        corner.y + verticalEdge,
+                        dimensions.x - horizontalEdge * 2,
+                        dimensions.y - verticalEdge * 2);
+    }
+
+    private ChunkGroup CreateScreenChunks(XY screenCoord, float[,] screenNoise) {
         WorldConfig worldConfig = GameData.World.Config;
 
         int chunkSize = worldConfig.ChunkSize;
@@ -40,14 +74,17 @@ public class WorldScreenManager : MonoBehaviour {
         Chunk[,,] chunks = new Chunk[screenNoise.GetLength(0), 
                                      screenHeight, 
                                      screenNoise.GetLength(1)];
-        
+
+        Vector2 screenOffset = new Vector2(screenCoord.X * worldConfig.ScreenSize.X,
+                                           screenCoord.Y * worldConfig.ScreenSize.Z);
+
         for(int x = 0; x < screenNoise.GetLength(0); x++) {
             for(int z = 0; z < screenNoise.GetLength(1); z++) {
                 int y = (int)screenNoise[x, z];
 
-                Vector3 chunkPos = new Vector3(x * chunkSize - 0.5f, 
+                Vector3 chunkPos = new Vector3(screenOffset.x + (x * chunkSize - 0.5f), 
                                                y * chunkSize + 0.5f, 
-                                               z * chunkSize - 0.5f);
+                                               screenOffset.y + (z * chunkSize - 0.5f));
                     
                 //GameObject newChunkGo = Instantiate(_world.ChunkPrototype, chunkPos,
                 //                                    new Quaternion(0, 0, 0, 0)) as GameObject;
