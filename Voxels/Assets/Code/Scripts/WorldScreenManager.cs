@@ -27,6 +27,10 @@ public class WorldScreenManager : MonoBehaviour {
         _screenChunks[screen.Coord] = screenChunks;
     }
 
+    public void DestroyScreen(XY coord) {
+
+    }
+
     private ChunkGroup CreateScreenChunks(float[,] screenNoise) {
         WorldConfig worldConfig = GameData.World.Config;
 
@@ -39,37 +43,34 @@ public class WorldScreenManager : MonoBehaviour {
         
         for(int x = 0; x < screenNoise.GetLength(0); x++) {
             for(int z = 0; z < screenNoise.GetLength(1); z++) {
-                for(int y = 0; y < screenHeight; y++) {
-                    Vector3 chunkPos = new Vector3(x * chunkSize - 0.5f, 
-                                                   y * chunkSize + 0.5f, 
-                                                   z * chunkSize - 0.5f);
-                    
-                    //GameObject newChunkGo = Instantiate(_world.ChunkPrototype, chunkPos,
-                    //                                    new Quaternion(0, 0, 0, 0)) as GameObject;
-                    
-                    GameObject newChunkGo = _chunkPool.GetObject();
-                    newChunkGo.transform.position = chunkPos;
-                    newChunkGo.transform.parent = transform;
-                    
-                    float sample = screenNoise[x, z];
-                    bool solid = (y <= sample);
-                    
-                    int textureIndex = 12;
-                    
-                    if(y == 0)
-                        textureIndex = 14;
-                    else if(y == 1)
-                        textureIndex = 13;
-                    else if(y == 5)
-                        textureIndex = 15;
-                    else if(y == 6)
-                        textureIndex = 8;
-                    
-                    Chunk newChunk = newChunkGo.GetComponent("Chunk") as Chunk;
-                    newChunk.Initialize(chunkSize, solid, GameData.TextureAtlas, textureIndex);
+                int y = (int)screenNoise[x, z];
 
-                    chunks[x, y, z] = newChunk;
-                }
+                Vector3 chunkPos = new Vector3(x * chunkSize - 0.5f, 
+                                               y * chunkSize + 0.5f, 
+                                               z * chunkSize - 0.5f);
+                    
+                //GameObject newChunkGo = Instantiate(_world.ChunkPrototype, chunkPos,
+                //                                    new Quaternion(0, 0, 0, 0)) as GameObject;
+                
+                GameObject newChunkGo = _chunkPool.GetObject();
+                newChunkGo.transform.position = chunkPos;
+                newChunkGo.transform.parent = transform;
+                    
+                int textureIndex = 12;
+                    
+                if(y == 0)
+                    textureIndex = 14;
+                else if(y == 1)
+                    textureIndex = 13;
+                else if(y == 5)
+                    textureIndex = 15;
+                else if(y == 6)
+                    textureIndex = 8;
+                    
+                Chunk newChunk = newChunkGo.GetComponent("Chunk") as Chunk;
+                newChunk.Initialize(chunkSize, true, GameData.TextureAtlas, textureIndex);
+
+                chunks[x, y, z] = newChunk;
             }
         }
 
@@ -77,16 +78,16 @@ public class WorldScreenManager : MonoBehaviour {
         
         for(int x = 0; x < screenNoise.GetLength(0); x++) {
             for(int z = 0; z < screenNoise.GetLength(1); z++) {
-                for(int y = 0; y < screenHeight; y++) {
-                    Chunk chunk = chunks[x, y, z];
+                int y = (int)screenNoise[x, z];
 
-                    // Set the variables necessary for mesh generation optimization
-                    // TODO: This can probably be handled more gracefully
-                    chunk.chunkGroup = chunkGroup;
-                    chunk.chunkOffset = new XYZ(x * chunkSize, y * chunkSize, z * chunkSize);
+                Chunk chunk = chunks[x, y, z];
 
-                    chunk.GenerateMesh();
-                }
+                // Set the variables necessary for mesh generation optimization
+                // TODO: This can probably be handled more gracefully
+                chunk.chunkGroup = chunkGroup;
+                chunk.chunkOffset = new XYZ(x * chunkSize, y * chunkSize, z * chunkSize);
+
+                chunk.GenerateMesh();
             }
         }
 

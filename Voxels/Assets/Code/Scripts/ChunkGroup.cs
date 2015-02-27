@@ -16,7 +16,9 @@ public class ChunkGroup {
                                   (int)Mathf.Floor(z / chunkSize));
         
         Chunk chunk = Chunks[chunkCoords.X, chunkCoords.Y, chunkCoords.Z];
-        
+
+        if(chunk == null) return 0;
+
         return chunk.GetBlock(x % chunkSize, y % chunkSize, z % chunkSize);
     }
 }
