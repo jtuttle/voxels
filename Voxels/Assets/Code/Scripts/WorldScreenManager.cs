@@ -19,8 +19,11 @@ public class WorldScreenManager : MonoBehaviour {
         _screenChunks = new Dictionary<XY, ChunkGroup>();
     }
 
-	public void CreateScreen(WorldScreen screen) {
-        float[,] screenNoise = GameData.World.GetScreenNoise(screen.Coord);
+	public void CreateScreen(XY screenCoord) {
+        World world = GameData.World;
+
+        WorldScreen screen = world.GetScreen(screenCoord);
+        float[,] screenNoise = world.GetScreenNoise(screen.Coord);
 
         ChunkGroup screenChunks = CreateScreenChunks(screen.Coord, screenNoise);
 
