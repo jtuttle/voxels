@@ -2,11 +2,11 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class WorldCreateState : FSMState {
+public class PlayerCreateState : FSMState {
     private WorldScreenManager _worldScreenManager;
 
-    public WorldCreateState()
-        : base(GameState.WorldCreate) {
+    public PlayerCreateState()
+        : base(GameState.PlayerCreate) {
 
     }
 
@@ -20,25 +20,25 @@ public class WorldCreateState : FSMState {
     public override void EnterState(FSMTransition transition) {
         base.EnterState(transition);
 
-        // TODO: currently all this does is perform calculations to get the 
-        // correct square from the chunk texture, which is 4 x 4. It should  
-        // probably store the texture as well at some point.
-        GameData.TextureAtlas = new TextureAtlas(4, 4);
-
-        string worldName = (transition as WorldCreateTransition).WorldName;
-        WorldConfig worldConfig = CreateWorldConfig();
-
-        World world = 
-            new WorldGenerator().GenerateWorld(worldName, worldConfig);
-
-        GameData.World = world;
-
+        World world = GameData.World;
         WorldScreen initialScreen = world.GetScreen(world.InitialRoom);
 
-        CreateInitialScreens(initialScreen.Coord);
-        GameData.CurrentScreenCoord = initialScreen.Coord;
+        Vector2 screenCenter = 
+            _worldScreenManager.GetScreenCenter(initialScreen.Coord);
 
-        ExitState(new FSMTransition(GameState.PlayerCreate));
+        Vector3 playerStartPos = 
+            new Vector3(screenCenter.x, 100, screenCenter.y);
+
+        GameObject playerGo = (GameObject)GameObject.
+            Instantiate(Resources.Load("Prefabs/Player"));
+
+        Player player = playerGo.GetComponent<Player>();
+        player.transform.name = "Player";
+        player.transform.position = playerStartPos;
+
+        Camera.main.GetComponent<BoundedTargetCamera>().Target = playerGo;
+
+        ExitState(new FSMTransition(GameState.WorldNavigate));
     }
 
     public override void ExitState(FSMTransition nextStateTransition) {
@@ -51,7 +51,7 @@ public class WorldCreateState : FSMState {
         base.Dispose();
     }
 
-    // TODO: This should probably be taken from some global config file or
+    // TODO: This should probably be taken from some global config file or 
     // GameObject so that it can be tweaked without touching the code.
     private WorldConfig CreateWorldConfig() {
         // each loaded screen could be 16 x 12 chunks
@@ -65,8 +65,6 @@ public class WorldCreateState : FSMState {
     }
 
     private void CreateInitialScreens(XY coord) {
-        _worldScreenManager.CreateScreen(coord);
-
         for(int x = coord.X - 1; x <= coord.X + 1; x++) {
             for(int y = coord.Y; y <= coord.Y + 1; y++)
                 _worldScreenManager.CreateScreen(new XY(x, y));

@@ -60,6 +60,7 @@
      <Compile Include="Assets\Code\Model\WorldScreen.cs" />
      <Compile Include="Assets\Code\Scenes\NoiseTestController.cs" />
      <Compile Include="Assets\Code\Scenes\WorldTestController.cs" />
+     <Compile Include="Assets\Code\Scripts\BoundedTargetCamera.cs" />
      <Compile Include="Assets\Code\Scripts\Chunk.cs" />
      <Compile Include="Assets\Code\Scripts\ChunkGroup.cs" />
      <Compile Include="Assets\Code\Scripts\CubeEffect.cs" />
@@ -67,10 +68,10 @@
      <Compile Include="Assets\Code\Scripts\ModifyTerrain.cs" />
      <Compile Include="Assets\Code\Scripts\Player.cs" />
      <Compile Include="Assets\Code\Scripts\PlayerCamera.cs" />
-     <Compile Include="Assets\Code\Scripts\ScreenCamera.cs" />
      <Compile Include="Assets\Code\Scripts\WorldComponent.cs" />
      <Compile Include="Assets\Code\Scripts\WorldScreenComponent.cs" />
      <Compile Include="Assets\Code\Scripts\WorldScreenManager.cs" />
+     <Compile Include="Assets\Code\States\PlayerCreateState.cs" />
      <Compile Include="Assets\Code\States\WorldCreateState.cs" />
      <Compile Include="Assets\Code\States\WorldNameState.cs" />
      <Compile Include="Assets\Code\States\WorldNavigateState.cs" />

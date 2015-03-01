@@ -5,5 +5,5 @@ public class GameData {
     public static TextureAtlas TextureAtlas;
 
     public static World World;
-    public static Player Player;
+    public static XY CurrentScreenCoord;
 }
