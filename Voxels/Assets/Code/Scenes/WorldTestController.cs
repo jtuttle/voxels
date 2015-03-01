@@ -93,8 +93,8 @@ public class WorldTestController : MonoBehaviour {
         XYZ screenCount = new XYZ((int)ScreenCount.x, (int)ScreenCount.y, (int)ScreenCount.z);
         WorldConfig worldConfig = new WorldConfig(8, screenChunks, screenCount);
 
-        _worldGenerator = new WorldGenerator(Random.Range(0, 60000).ToString(), worldConfig);
-        _currentWorld = _worldGenerator.GenerateWorld();
+        _worldGenerator = new WorldGenerator();
+        _currentWorld = _worldGenerator.GenerateWorld(Random.Range(0, 60000).ToString(), worldConfig);
 
         // Pre-calculate centroids of rooms in current world.
         _centroids.Clear();

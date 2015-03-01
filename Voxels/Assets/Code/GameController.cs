@@ -20,7 +20,11 @@ public class GameController : MonoBehaviour {
     }
 
     protected void Start() {
-        _fsm.ChangeState(new FSMTransition(GameState.WorldName));
+        // Start in world create state
+        WorldCreateTransition createTransition = new WorldCreateTransition("Voxworld");
+        _fsm.ChangeState(createTransition);
+
+        //_fsm.ChangeState(new FSMTransition(GameState.WorldName));
     }
 
     protected void Update() {
