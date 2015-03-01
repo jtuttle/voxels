@@ -33,17 +33,17 @@ public class Chunk : MonoBehaviour {
         }
     }
 
-    public void Initialize(int chunkSize, bool solid, TextureAtlas textureAtlas, int textureIndex) {
-        _blocks = new byte[chunkSize, chunkSize, chunkSize];
+    public void Initialize(int size, bool solid, TextureAtlas textureAtlas, int textureIndex) {
+        _blocks = new byte[size, size, size];
 
         // TODO: For now this is just going to be hard-coded to be
         // completely filled or completely empty. Eventually we will
         // want more interestingly-shaped chunks.
         byte blockData = (byte)(solid ? 1 : 0);
 
-        for(int x = 0; x < chunkSize; x++) {
-            for(int y = 0; y < chunkSize; y++) {
-                for(int z = 0; z < chunkSize; z++) {
+        for(int x = 0; x < size; x++) {
+            for(int y = 0; y < size; y++) {
+                for(int z = 0; z < size; z++) {
                     _blocks[x, y, z] = blockData;
                 }   
             }
@@ -66,41 +66,41 @@ public class Chunk : MonoBehaviour {
                     byte block = GetBlock(x, y, z);
 
                     // Skip render if block is empty.
-                    if(block != 0) {
-                        // The below logic is an optimization to only render block faces that
-                        // are next to an empty block (and therefore potentially visible).
-                        int worldCoordX = chunkOffset.X + x;
-                        int worldCoordY = chunkOffset.Y + y;
-                        int worldCoordZ = chunkOffset.Z + z;
+                    if(block == 0) continue;
 
-                        int maxBlockX = chunkGroup.Chunks.GetLength(0) * chunkSize - 1;
-                        int maxBlockY = chunkGroup.Chunks.GetLength(1) * chunkSize - 1;
-                        int maxBlockZ = chunkGroup.Chunks.GetLength(2) * chunkSize - 1;
+                    // The below logic is an optimization to only render block faces that
+                    // are next to an empty block (and therefore potentially visible).
+                    int worldCoordX = chunkOffset.X + x;
+                    int worldCoordY = chunkOffset.Y + y;
+                    int worldCoordZ = chunkOffset.Z + z;
 
-                        // block above is empty
-                        if(worldCoordY + 1 > maxBlockY || chunkGroup.GetBlock(worldCoordX, worldCoordY + 1, worldCoordZ) == 0)
-                            CubeTop(x, y, z, block);
+                    int maxBlockX = chunkGroup.Chunks.GetLength(0) * chunkSize - 1;
+                    int maxBlockY = chunkGroup.Chunks.GetLength(1) * chunkSize - 1;
+                    int maxBlockZ = chunkGroup.Chunks.GetLength(2) * chunkSize - 1;
 
-                        // block below is empty
-                        if(worldCoordY - 1 < 0 || chunkGroup.GetBlock(worldCoordX, worldCoordY - 1, worldCoordZ) == 0)
-                            CubeBot(x, y, z, block);
+                    // block above is empty
+                    if(worldCoordY + 1 > maxBlockY || chunkGroup.GetBlock(worldCoordX, worldCoordY + 1, worldCoordZ) == 0)
+                        CubeTop(x, y, z, block);
 
-                        // block east is empty
-                        if(worldCoordX + 1 > maxBlockX || chunkGroup.GetBlock(worldCoordX + 1, worldCoordY, worldCoordZ) == 0)
-                            CubeEast(x, y, z, block);
+                    // block below is empty
+                    if(worldCoordY - 1 < 0 || chunkGroup.GetBlock(worldCoordX, worldCoordY - 1, worldCoordZ) == 0)
+                        CubeBot(x, y, z, block);
 
-                        // block west is empty
-                        if(worldCoordX - 1 < 0 || chunkGroup.GetBlock(worldCoordX - 1, worldCoordY, worldCoordZ) == 0)
-                            CubeWest(x, y, z, block);
+                    // block east is empty
+                    if(worldCoordX + 1 > maxBlockX || chunkGroup.GetBlock(worldCoordX + 1, worldCoordY, worldCoordZ) == 0)
+                        CubeEast(x, y, z, block);
 
-                        // block north is empty
-                        if(worldCoordZ + 1 > maxBlockZ || chunkGroup.GetBlock(worldCoordX, worldCoordY, worldCoordZ + 1) == 0)
-                            CubeNorth(x, y, z, block);
+                    // block west is empty
+                    if(worldCoordX - 1 < 0 || chunkGroup.GetBlock(worldCoordX - 1, worldCoordY, worldCoordZ) == 0)
+                        CubeWest(x, y, z, block);
 
-                        // block south is empty
-                        if(worldCoordZ - 1 < 0 || chunkGroup.GetBlock(worldCoordX, worldCoordY, worldCoordZ - 1) == 0)
-                            CubeSouth(x, y, z, block);
-                    }
+                    // block north is empty
+                    if(worldCoordZ + 1 > maxBlockZ || chunkGroup.GetBlock(worldCoordX, worldCoordY, worldCoordZ + 1) == 0)
+                        CubeNorth(x, y, z, block);
+
+                    // block south is empty
+                    if(worldCoordZ - 1 < 0 || chunkGroup.GetBlock(worldCoordX, worldCoordY, worldCoordZ - 1) == 0)
+                        CubeSouth(x, y, z, block);
                 }
             }
         }

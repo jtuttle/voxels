@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: This can be a singleton
+// TODO: This could be a singleton...
 
-// The WorldScreenManager component handles WorldScreens as they appear in Unity. It
-// is responsible for using the chunk pool to build and destroy them on demand and 
-// providing information about screen dimensions and boundaries.
+// The WorldScreenManager is responsible for managing the Unity representation
+// of WorldScreens. It uses the chunk pool to build and destroy them on demand 
+// and provides information about screen dimensions and boundaries.
 
 public class WorldScreenManager : MonoBehaviour {
     private GameObjectPool _chunkPool;
@@ -14,7 +14,8 @@ public class WorldScreenManager : MonoBehaviour {
     private Dictionary<XY, ChunkGroup> _screenChunks;
 
     protected void Awake() {
-        _chunkPool = GameObject.Find("ChunkPool").GetComponent<GameObjectPool>();
+        _chunkPool = GameObject.Find("ChunkPool").
+            GetComponent<GameObjectPool>();
 
         _screenChunks = new Dictionary<XY, ChunkGroup>();
     }
@@ -39,62 +40,75 @@ public class WorldScreenManager : MonoBehaviour {
         return new Vector2(screenSize.X, screenSize.Z);
     }
     
-    public Vector2 GetScreenCorner(XY screenCoords) {
+    public Vector2 GetScreenCorner(XY screenCoord) {
         XYZ screenSize = GameData.World.Config.ScreenSize;
         
-        return new Vector2((float)screenCoords.X * screenSize.X,
-                           (float)screenCoords.Y * screenSize.Z);
+        return new Vector2((float)screenCoord.X * screenSize.X,
+                           (float)screenCoord.Y * screenSize.Z);
     }
     
-    public Vector2 GetScreenCenter(XY screenCoords) {
+    public Vector2 GetScreenCenter(XY screenCoord) {
         XYZ screenSize = GameData.World.Config.ScreenSize;
         
-        Vector2 corner = GetScreenCorner(screenCoords);
+        Vector2 corner = GetScreenCorner(screenCoord);
         
         return corner + new Vector2(screenSize.X / 2, screenSize.Z / 2);
     }
-    
-    // The edge size is pretty arbitrary and depends on camera angle/distance.
-    // 13 works well for an angle/distance of 40/40.
-    public Rect GetScreenBounds(XY screenCoords, float horizontalEdge, float verticalEdge) {
-        Vector2 corner = GetScreenCorner(screenCoords);
+
+    public Rect GetScreenBounds(XY screenCoord) {
+        Vector2 corner = GetScreenCorner(screenCoord);
         Vector2 dimensions = GetScreenDimensions();
         
         int chunkSize = GameData.World.Config.ChunkSize;
         
-        return new Rect(corner.x + horizontalEdge,
-                        corner.y + verticalEdge,
-                        dimensions.x - horizontalEdge * 2,
-                        dimensions.y - verticalEdge * 2);
+        return new Rect(corner.x, corner.y, dimensions.x, dimensions.y);
+    }
+
+    public Rect GetScreenCameraBounds(XY screenCoord) {
+        Rect screenBounds = GetScreenBounds(screenCoord);
+
+        // TODO: un-hardcode these?
+        float top = 40;
+        float bottom = 26;
+        float left, right;
+        left = right = 25;
+
+        Rect blah = new Rect(screenBounds.xMin + left,
+                        screenBounds.yMin + bottom,
+                        screenBounds.width - left - right,
+                        screenBounds.height - top - bottom);
+
+        return blah;
     }
 
     private ChunkGroup CreateScreenChunks(XY screenCoord, float[,] screenNoise) {
         WorldConfig worldConfig = GameData.World.Config;
 
         int chunkSize = worldConfig.ChunkSize;
+        XYZ screenSize = worldConfig.ScreenSize;
         int screenHeight = worldConfig.ScreenChunks.Y;
         
         Chunk[,,] chunks = new Chunk[screenNoise.GetLength(0), 
                                      screenHeight, 
                                      screenNoise.GetLength(1)];
 
-        Vector2 screenOffset = new Vector2(screenCoord.X * worldConfig.ScreenSize.X,
-                                           screenCoord.Y * worldConfig.ScreenSize.Z);
+        Vector2 screenOffset = new Vector2(screenCoord.X * screenSize.X,
+                                           screenCoord.Y * screenSize.Z);
 
         for(int x = 0; x < screenNoise.GetLength(0); x++) {
             for(int z = 0; z < screenNoise.GetLength(1); z++) {
                 int y = (int)screenNoise[x, z];
 
-                Vector3 chunkPos = new Vector3(screenOffset.x + (x * chunkSize - 0.5f), 
-                                               y * chunkSize + 0.5f, 
-                                               screenOffset.y + (z * chunkSize - 0.5f));
+                Vector3 chunkPos = new Vector3(screenOffset.x + x * chunkSize, 
+                                               y * chunkSize, 
+                                               screenOffset.y + z * chunkSize);
                     
                 //GameObject newChunkGo = Instantiate(_world.ChunkPrototype, chunkPos,
                 //                                    new Quaternion(0, 0, 0, 0)) as GameObject;
                 
-                GameObject newChunkGo = _chunkPool.GetObject();
-                newChunkGo.transform.position = chunkPos;
-                newChunkGo.transform.parent = transform;
+                GameObject chunkGo = _chunkPool.GetObject();
+                chunkGo.transform.position = chunkPos;
+                chunkGo.transform.parent = transform;
                     
                 int textureIndex = 12;
                     
@@ -107,10 +121,10 @@ public class WorldScreenManager : MonoBehaviour {
                 else if(y == 6)
                     textureIndex = 8;
                     
-                Chunk newChunk = newChunkGo.GetComponent("Chunk") as Chunk;
-                newChunk.Initialize(chunkSize, true, GameData.TextureAtlas, textureIndex);
+                Chunk chunk = chunkGo.GetComponent("Chunk") as Chunk;
+                chunk.Initialize(chunkSize, true, GameData.TextureAtlas, textureIndex);
 
-                chunks[x, y, z] = newChunk;
+                chunks[x, y, z] = chunk;
             }
         }
 

@@ -16,7 +16,6 @@ public class WorldGenerator {
         float[,] worldNoise = GenerateWorldNoise(worldName, worldConfig);
         //float[,] worldNoise = GenerateFakeWorldNoise(_worldConfig);
 
-        // 2. create world object
         World world = new World(worldName, worldConfig, worldNoise);
 
         Random.seed = world.Seed;
@@ -58,7 +57,7 @@ public class WorldGenerator {
 
         for(int y = 0; y < 24; y++) {
             for(int x = 0; x < 32; x++) {
-                int index = y * 32 + x;
+                //int index = y * 32 + x;
                 worldNoise[x,y] = (y < 8 ? 0 : 1);
             }
         }

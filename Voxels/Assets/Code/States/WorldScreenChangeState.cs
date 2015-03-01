@@ -1,12 +1,14 @@
 using Holoville.HOTween;
 using UnityEngine;
 
-public class WorldScreenChangeState : FSMState {
-    private XY _nextScreenCoords;
-    private Vector2 _coordDifference;
+// The WorldScreenChangeState is responsible for handling a transition between
+// world screens. This includes tweening the player and camera, and creating or
+// destroying screens where necessary.
 
-    private Camera _camera;
-    private Player _player;
+public class WorldScreenChangeState : FSMState {
+    private WorldScreenManager _worldScreenManager;
+    private BoundedTargetCamera _camera;
+    private GameObject _player;
 
     public WorldScreenChangeState()
         : base(GameState.WorldScreenChange) {
@@ -16,27 +18,26 @@ public class WorldScreenChangeState : FSMState {
     public override void InitState(FSMTransition transition) {
         base.InitState(transition);
 
+        _worldScreenManager = GameObject.Find("WorldScreenManager").
+            GetComponent<WorldScreenManager>();
+
+        _camera = Camera.main.GetComponent<BoundedTargetCamera>();
     }
     
     public override void EnterState(FSMTransition transition) {
         base.EnterState(transition);
 
-        _nextScreenCoords = (transition as WorldScreenChangeTransition).NextScreenCoords;
+        if(_player == null)
+            _player = GameObject.Find("Player");
 
-        /*
-        XY coordDiff = _nextScreenCoords - GameData.CurrentScreen.Coords;
-        _coordDifference = new Vector2(coordDiff.X, coordDiff.Y);
-        */
-
-        _camera = Camera.main;
-        _player = GameData.Player;
+        XY coordDelta = (transition as WorldScreenChangeTransition).CoordDelta;
 
         // Disable camera and player movement scripts.
-        _camera.GetComponent<ScreenCamera>().enabled = false;
+        _camera.GetComponent<BoundedTargetCamera>().enabled = false;
         _player.GetComponent<CharacterController>().enabled = false;
 
-        // Set up tween to move player across screen edge.
-        Vector3 newPlayerPos = GetNewPlayerPosition(_player);
+        // Tween player one half chunk into next screen.
+        Vector3 newPlayerPos = GetNewPlayerPosition(coordDelta);
         
         TweenParms playerParms = new TweenParms();
         playerParms.Prop("position", newPlayerPos);
@@ -45,87 +46,71 @@ public class WorldScreenChangeState : FSMState {
         
         HOTween.To(_player.transform, 1, playerParms);
 
-        // Set up tween to move camera across screen edge.
-        // TODO: made the camera navbounds bigger and now it's jumping again.
-        // should probably come up with a cleaner solution for this...
-        Vector3 newCameraPos = GetNewCameraPosition(_camera, newPlayerPos);
+        // Tween camera to bound of next screen.
+        Vector3 newCameraPos = GetNewCameraPosition(coordDelta);
 
         TweenParms cameraParms = new TweenParms();
         cameraParms.Prop("position", newCameraPos);
         cameraParms.Ease(EaseType.Linear);
 
         HOTween.To(_camera.transform, 1, cameraParms);
+
+        // Update current screen coordinate.
+        GameData.CurrentScreenCoord = GameData.CurrentScreenCoord + coordDelta;
     }
     
     public override void ExitState(FSMTransition nextStateTransition) {
-        // Update game state stuff.
-        /*
-        GameData.CurrentScreen = GameData.World.GetScreen(_nextScreenCoords);
-        _camera.GetComponent<ScreenCamera>().UpdateBounds(_nextScreenCoords);
-        */
-
         // Re-enable camera and player movement scripts.
-        _camera.GetComponent<ScreenCamera>().enabled = true;
+        _camera.GetComponent<BoundedTargetCamera>().enabled = true;
         _player.GetComponent<CharacterController>().enabled = true;
-
-        _nextScreenCoords = null;
-        _coordDifference = Vector2.zero;
-        _camera = null;
-        _player = null;
 
         base.ExitState(nextStateTransition);
     }
 
     public override void Dispose() {
+        _camera = null;
+        _player = null;
 
         base.Dispose();
     }
 
-    // Move player to one chunk farther than the screen edge.
-    private Vector3 GetNewPlayerPosition(Player player) {
-        Vector2 distanceToEdge = GetDistanceToEdge(player.transform);
+    // Move player one half chunk's length onto the next screen.
+    private Vector3 GetNewPlayerPosition(XY coordDelta) {
+        Vector3 playerPos = _player.transform.position;
+        float halfChunkSize = GameData.World.Config.ChunkSize / 2.0f;
 
-        // For now, we'll just place the player one chunk away from the screen edge.
-        WorldConfig worldConfig = GameData.World.Config;
-        Vector2 chunkSize = 2 * new Vector2(worldConfig.ChunkSize, worldConfig.ChunkSize);
-        chunkSize.Scale(_coordDifference);
-        
-        return player.transform.position + new Vector3(distanceToEdge.x + chunkSize.x, 0, distanceToEdge.y + chunkSize.y);
+        return playerPos + new Vector3(coordDelta.X * halfChunkSize,
+                                       0,
+                                       coordDelta.Y * halfChunkSize);
     }
 
-    // New camera position needs to match player's.
-    private Vector3 GetNewCameraPosition(Camera camera, Vector3 newPlayerPos) {
-        Vector3 cameraPos = camera.transform.position;
+    private Vector3 GetNewCameraPosition(XY coordDelta) {
+        XY nextCoord = GameData.CurrentScreenCoord + coordDelta;
 
-        if(_coordDifference.x != 0)
-            cameraPos = new Vector3(newPlayerPos.x, cameraPos.y, cameraPos.z);
+        Rect nextCameraBounds = 
+            _worldScreenManager.GetScreenCameraBounds(nextCoord);
+
+        Vector3 camPos = _camera.transform.position;
+
+        float newX, newZ;
+
+        if(coordDelta.X == -1)
+            newX = nextCameraBounds.xMax;
+        else if(coordDelta.X == 1)
+            newX = nextCameraBounds.xMin;
         else
-            cameraPos = new Vector3(cameraPos.x, cameraPos.y, newPlayerPos.z);
+            newX = camPos.x;
 
-        return cameraPos;
-    }
+        float adj = Mathf.Sin(_camera.Angle * Mathf.Deg2Rad) * _camera.Distance;
 
-    private Vector2 GetDistanceToEdge(Transform transform) {
-        return new Vector2();
-        /*
-        WorldComponent world = GameData.World;
-        XY currentScreenCoords = GameData.CurrentScreen.Coords;
+        if(coordDelta.Y == -1)
+            newZ = nextCameraBounds.yMax - adj;
+        else if(coordDelta.Y == 1)
+            newZ = nextCameraBounds.yMin - adj;
+        else
+            newZ = camPos.z;
 
-        Vector3 pos = transform.position;
-
-        // Calculate absolute value of distance to center.
-        Vector2 center = world.GetScreenCenter(currentScreenCoords);
-        Vector2 distanceToCenter = new Vector2(pos.x, pos.z) - center;
-        distanceToCenter = new Vector2(Mathf.Abs(distanceToCenter.x), Mathf.Abs(distanceToCenter.y));
-        
-        Vector2 halfScreenDimensions = world.GetScreenDimensions() / 2;
-
-        // Use coordinate different to mask the desired dimensions.
-        halfScreenDimensions.Scale(_coordDifference);
-        distanceToCenter.Scale(_coordDifference);
-
-        return halfScreenDimensions - distanceToCenter;
-        */
+        return new Vector3(newX, camPos.y, newZ);
     }
 
     private void OnTweenComplete() {

@@ -1,8 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// The WorldNavigateState is responsible for updating the camera's bounds to 
+// match those of the current screen and listening for when the player crosses 
+// the edge of the current screen.
+
 public class WorldNavigateState : FSMState {
-    private Player _player;
+    private WorldScreenManager _worldScreenManager;
+    private GameObject _player;
+    private BoundedTargetCamera _camera;
+
     private Rect _navBounds;
 
     public WorldNavigateState()
@@ -13,13 +20,22 @@ public class WorldNavigateState : FSMState {
     public override void InitState(FSMTransition transition) {
         base.InitState(transition);
 
-        _player = GameData.Player;
+        _worldScreenManager = GameObject.Find("WorldScreenManager").
+            GetComponent<WorldScreenManager>();
+
+        _camera = Camera.main.GetComponent<BoundedTargetCamera>();
     }
     
     public override void EnterState(FSMTransition transition) {
         base.EnterState(transition);
 
-        //_navBounds = GameData.CurrentScreen.NavBounds;
+        if(_player == null)
+            _player = GameObject.Find("Player");
+
+        XY screenCoord = GameData.CurrentScreenCoord;
+
+        _navBounds = _worldScreenManager.GetScreenBounds(screenCoord);
+        _camera.Bounds = _worldScreenManager.GetScreenCameraBounds(screenCoord);
     }
     
     public override void ExitState(FSMTransition nextStateTransition) {
@@ -31,8 +47,9 @@ public class WorldNavigateState : FSMState {
         Vector3 playerPos = _player.transform.position;
 
         if(!_navBounds.Contains(new Vector2(playerPos.x, playerPos.z))) {
-            XY nextScreenCoords = GetTransitionCoords();
-            ExitState(new WorldScreenChangeTransition(nextScreenCoords, true));
+            //XY currentCoord = GameData.CurrentScreenCoord;
+            XY coordDelta = GetCoordDelta();
+            ExitState(new WorldScreenChangeTransition(coordDelta, true));
         }
     }
     
@@ -42,23 +59,29 @@ public class WorldNavigateState : FSMState {
         base.Dispose();
     }
 
-    private XY GetTransitionCoords() {
+    private Rect GetRectWithBounds(Rect rect, float top, float bottom, 
+                                   float left, float right) {
+       
+        return new Rect(rect.xMin + left,
+                        rect.yMin + bottom,
+                        rect.width - left - right,
+                        rect.height - top - bottom);
+    }
+
+    private XY GetCoordDelta() {
         Vector3 playerPos = _player.transform.position;
 
-        //XY currentCoords = GameData.CurrentScreen.Coords;
-        XY shiftCoord = null;
+        XY coordDelta = null;
 
-        if(playerPos.x <= _navBounds.xMin) {
-            shiftCoord = new XY(-1, 0);
-        } else if(playerPos.x >= _navBounds.xMax) {
-            shiftCoord = new XY(1, 0);
-        } else if(playerPos.y <= _navBounds.yMin) {
-            shiftCoord = new XY(0, -1);
-        } else if(playerPos.y >= _navBounds.yMax) {
-            shiftCoord = new XY(0, 1);
-        }
+        if(playerPos.x <= _navBounds.xMin)
+            coordDelta = new XY(-1, 0);
+        else if(playerPos.x >= _navBounds.xMax)
+            coordDelta = new XY(1, 0);
+        else if(playerPos.z <= _navBounds.yMin)
+            coordDelta = new XY(0, -1);
+        else if(playerPos.z >= _navBounds.yMax)
+            coordDelta = new XY(0, 1);
 
-        //return currentCoords + shiftCoord;
-        return shiftCoord;
+        return coordDelta;
     }
 }
