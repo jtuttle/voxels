@@ -28,7 +28,7 @@ public class WorldCreateState : FSMState {
 
         WorldConfig worldConfig = CreateWorldConfig();
 
-        World world = new WorldGenerator((transition as WorldCreateTransition).WorldName, worldConfig).GenerateWorld();
+        World world = new WorldGenerator().GenerateWorld((transition as WorldCreateTransition).WorldName, worldConfig);
         GameData.World = world;
 
         WorldScreen initialScreen = world.GetScreen(world.InitialRoom);
@@ -48,7 +48,7 @@ public class WorldCreateState : FSMState {
         ScreenCamera screenCam = Camera.main.GetComponent<ScreenCamera>();
         screenCam.Player = player;
         // TODO: un-hardcode this edge value, maybe.
-        screenCam.SetBounds(_worldScreenManager.GetScreenBounds(initialScreen.Coord, 25.0f, 13.0f));
+        screenCam.Bounds = _worldScreenManager.GetScreenBounds(initialScreen.Coord, 25.0f, 13.0f);
 
         //ExitState(new FSMTransition(GameState.WorldNavigate));
     }

@@ -3,8 +3,11 @@ using System.Collections.ObjectModel;
 using UnityEngine;
 
 public class World {
+    public string Name { get; private set; }
     public WorldConfig Config { get; private set; }
     public float[,] Noise { get; private set; }
+
+    public int Seed { get; private set; }
 
     public Room InitialRoom;
 
@@ -18,10 +21,13 @@ public class World {
         get { return _rooms.AsReadOnly(); }
     }
 
-    public World(WorldConfig config, float[,] noise) {
+    public World(string name, WorldConfig config, float[,] noise) {
+        Name = name;
         Config = config;
         Noise = noise;
 
+        Seed = name.GetHashCode();
+        Debug.Log(Name + " " + Seed);
         _screens = new Dictionary<XY, WorldScreen>();
         _rooms = new List<Room>();
     }

@@ -4,28 +4,22 @@ using System.Linq;
 using UnityEngine;
 
 public class WorldGenerator {
-    //public World World { get; private set; }
+    public WorldGenerator() { }
 
-    private string _worldName;
-    private WorldConfig _worldConfig;
-
-    public WorldGenerator(string worldName, WorldConfig worldConfig) {
-        _worldName = worldName;
-        _worldConfig = worldConfig;
-    }
-
-    public World GenerateWorld() {
+    public World GenerateWorld(string worldName, WorldConfig worldConfig) {
         // 0. validate world config
         // Maybe store the information such that it shouldn't need to be
         // validated and the potentially invalid values are computed.
         //worldConfig.Validate();
 
         // 1. generate noise
-        float[,] worldNoise = GenerateWorldNoise(_worldConfig);
+        float[,] worldNoise = GenerateWorldNoise(worldName, worldConfig);
         //float[,] worldNoise = GenerateFakeWorldNoise(_worldConfig);
 
         // 2. create world object
-        World world = new World(_worldConfig, worldNoise);
+        World world = new World(worldName, worldConfig, worldNoise);
+
+        Random.seed = world.Seed;
 
         // 3. split world into "rooms"
         new WorldRoomFinder(world).Find();
@@ -44,10 +38,10 @@ public class WorldGenerator {
         return world;
     }
 
-    private float[,] GenerateWorldNoise(WorldConfig worldConfig) {
+    private float[,] GenerateWorldNoise(string worldName, WorldConfig worldConfig) {
         XYZ worldChunks = worldConfig.WorldChunks;
 
-        WorldNoiseGenerator worldNoiseGen = new WorldNoiseGenerator(Random.Range(1, 65536));
+        WorldNoiseGenerator worldNoiseGen = new WorldNoiseGenerator(worldName.GetHashCode());
         float[,] worldNoise = worldNoiseGen.GenerateWorldNoise(worldChunks.X, 
                                                                worldChunks.Z,
                                                                worldChunks.Y);

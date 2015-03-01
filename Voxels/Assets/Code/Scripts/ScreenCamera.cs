@@ -8,7 +8,7 @@ public class ScreenCamera : MonoBehaviour {
     public float Angle = 40.0f;
     public float Distance = 40.0f;
 
-    public Rect Bounds { get; private set; }
+    public Rect Bounds { get; set; }
     
     void Start() {
         
@@ -34,24 +34,11 @@ public class ScreenCamera : MonoBehaviour {
             float adj = Mathf.Cos(Angle * Mathf.Deg2Rad) * Distance;
 
             transform.position = target + new Vector3(0, adj, -opp);
+            transform.LookAt(target);
         }
     }
 
     public void SetBounds(Rect bounds) {
         Bounds = bounds;
-    }
-
-    private void SmoothFollowPosition() {
-        //transform.position = Vector3.Lerp(transform.position, getTarget(), Time.deltaTime);
-
-        //transform.position = getTarget();
-        transform.LookAt(Player.transform);
-    }
-    
-    private Vector3 getTarget() {
-        float opp = Mathf.Sin(Angle * Mathf.Deg2Rad) * Distance;
-        float adj = Mathf.Cos(Angle * Mathf.Deg2Rad) * Distance;
-        
-        return Player.transform.position + new Vector3(0, adj, -opp);
     }
 }
