@@ -9,15 +9,22 @@ using UnityEngine;
 // and provides information about screen dimensions and boundaries.
 
 public class WorldScreenManager : MonoBehaviour {
+    // TODO: Pool this.
+    public GameObject DynamicMeshPrototype;
+
     private GameObjectPool _chunkPool;
 
     private Dictionary<XY, ChunkGroup> _screenChunks;
+
+    private Dictionary<XY, GameObject> _screenMeshes;
 
     protected void Awake() {
         _chunkPool = GameObject.Find("ChunkPool").
             GetComponent<GameObjectPool>();
 
         _screenChunks = new Dictionary<XY, ChunkGroup>();
+
+        _screenMeshes = new Dictionary<XY, GameObject>();
     }
 
 	public void CreateScreen(XY screenCoord) {
@@ -26,10 +33,210 @@ public class WorldScreenManager : MonoBehaviour {
         WorldScreen screen = world.GetScreen(screenCoord);
         float[,] screenNoise = world.GetScreenNoise(screen.Coord);
 
-        ChunkGroup screenChunks = CreateScreenChunks(screen.Coord, screenNoise);
+        //ChunkGroup screenChunks = CreateScreenChunks(screen.Coord, screenNoise);
+        //_screenChunks[screen.Coord] = screenChunks;
 
-        _screenChunks[screen.Coord] = screenChunks;
+        GenerateMesh(screenCoord, screenNoise);
     }
+
+    private void GenerateMesh(XY screenCoord, float[,] screenNoise) {
+        float startTime = Time.time;
+
+        WorldConfig worldConfig = GameData.World.Config;
+
+        List<Vector3> verts = new List<Vector3>();
+        List<int> tris = new List<int>();
+        List<Vector2> uvs = new List<Vector2>();
+
+        // Offset of vertices from which to make a triangle in verts array.
+        int offset = 0;
+
+        int chunkSize = worldConfig.ChunkSize;
+        float voxelSize = 1.0f / chunkSize;
+
+        for(int sx = 0; sx < screenNoise.GetLength(0); sx++) {
+            for(int sz = 0; sz < screenNoise.GetLength(1); sz++) {
+                float sample = (int)screenNoise[sx, sz];
+
+                // top face
+                for(int vx = 0; vx < chunkSize; vx++) {
+                    for(int vz = 0; vz < chunkSize; vz++) {
+                        float x = sx + vx * voxelSize;
+                        float y = sample;
+                        float z = sz + vz * voxelSize;
+
+                        CubeTop(verts, x, y, z, voxelSize, (byte)0);
+                        CubeFaceTris(tris, offset);
+                        
+                        offset += 4;
+                    }
+                }
+
+                // west face
+                if(sx > 0 && screenNoise[sx - 1, sz] < sample) {
+                    for(int vz = 0; vz < chunkSize; vz++) {
+                        for(int vy = 0; vy < chunkSize; vy++) {
+                            float x = sx;
+                            float y = sample - vy * voxelSize;
+                            float z = sz + vz * voxelSize;
+                            
+                            CubeWestVerts(verts, x, y, z, voxelSize, (byte)0);
+                            CubeFaceTris(tris, offset);
+                            
+                            offset += 4;
+                        }
+                    }
+                }
+
+                // east face 
+                if(sx < screenNoise.GetLength(0) - 1 && screenNoise[sx + 1, sz] < sample) {
+                    float x = sx + voxelSize * (chunkSize - 1);
+
+                    for(int vz = 0; vz < chunkSize; vz++) {
+                        for(int vy = 0; vy < chunkSize; vy++) {
+                            float y = sample - vy * voxelSize;
+                            float z = sz + vz * voxelSize;
+                            
+                            CubeEastVerts(verts, x, y, z, voxelSize, (byte)0);
+                            CubeFaceTris(tris, offset);
+                            
+                            offset += 4;
+                        }
+                    }
+                }
+
+                // south face 
+                if(sz > 0 && screenNoise[sx, sz - 1] < sample) {
+                    for(int vx = 0; vx < chunkSize; vx++) {
+                        for(int vy = 0; vy < chunkSize; vy++) {
+                            float x = sx + vx * voxelSize;
+                            float y = sample - vy * voxelSize;
+                            float z = sz;
+                            
+                            CubeSouthVerts(verts, x, y, z, voxelSize, (byte)0);
+                            CubeFaceTris(tris, offset);
+                            
+                            offset += 4;
+                        }
+                    }
+                }
+
+                // north face 
+                if(sz < screenNoise.GetLength(1) - 1 && screenNoise[sx, sz + 1] < sample) {
+                    float z = sz + voxelSize * (chunkSize - 1);
+
+                    for(int vx = 0; vx < chunkSize; vx++) {
+                        for(int vy = 0; vy < chunkSize; vy++) {
+                            float x = sx + vx * voxelSize;
+                            float y = sample - vy * voxelSize;
+                            
+                            CubeNorthVerts(verts, x, y, z, voxelSize, (byte)0);
+                            CubeFaceTris(tris, offset);
+                            
+                            offset += 4;
+                        }
+                    }
+                }
+            }
+        }
+
+        XYZ screenChunks = worldConfig.ScreenChunks;
+
+        Vector3 screenPos = new Vector3(screenCoord.X * screenChunks.X,
+                                        0,
+                                        screenCoord.Y * screenChunks.Z);
+
+        GameObject dynamicMesh = (GameObject)Instantiate(DynamicMeshPrototype, 
+                                                         screenPos, 
+                                                         Quaternion.identity);
+
+        // Generate the mesh object.
+        Mesh mesh = new Mesh();
+        mesh.vertices = verts.ToArray();
+        mesh.triangles = tris.ToArray();
+        mesh.uv = uvs.ToArray();
+
+        // Don't think this is necessary
+        //mesh.RecalculateBounds();
+
+        mesh.Optimize();
+        mesh.RecalculateNormals();
+
+        dynamicMesh.GetComponent<MeshFilter>().mesh = mesh;
+
+        MeshCollider collider = dynamicMesh.GetComponent<MeshCollider>();
+        collider.sharedMesh = null;
+        collider.sharedMesh = mesh;
+
+        _screenMeshes[screenCoord] = dynamicMesh;
+
+        float diff = Time.time - startTime;
+        Debug.Log("ProceduralTerrain was generated in " + diff + " seconds.");
+    }
+
+    // TODO: Abstract all this stuff to a helper class.
+    private void CubeTop(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+        verts.Add(new Vector3(x, y, z + size));
+        verts.Add(new Vector3(x + size, y, z + size));
+        verts.Add(new Vector3(x + size, y, z));
+        verts.Add(new Vector3(x, y, z));
+    }
+    
+    private void CubeNorthVerts(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+        verts.Add(new Vector3(x + size, y - size, z + size));
+        verts.Add(new Vector3(x + size, y, z + size));
+        verts.Add(new Vector3(x, y, z + size));
+        verts.Add(new Vector3(x, y - size, z + size));
+    }
+    
+    private void CubeEastVerts(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+        verts.Add(new Vector3(x + size, y - size, z));
+        verts.Add(new Vector3(x + size, y, z));
+        verts.Add(new Vector3(x + size, y, z + size));
+        verts.Add(new Vector3(x + size, y - size, z + size));
+    }
+    
+    private void CubeSouthVerts(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+        verts.Add(new Vector3(x, y - size, z));
+        verts.Add(new Vector3(x, y, z));
+        verts.Add(new Vector3(x + size, y, z));
+        verts.Add(new Vector3(x + size, y - size, z));
+    }
+    
+    private void CubeWestVerts(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+        verts.Add(new Vector3(x, y - size, z + size));
+        verts.Add(new Vector3(x, y, z + size));
+        verts.Add(new Vector3(x, y, z));
+        verts.Add(new Vector3(x, y - size, z));
+    }
+    
+    private void CubeBotVerts(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+        verts.Add(new Vector3(x, y - size, z));
+        verts.Add(new Vector3(x + size, y - size, z));
+        verts.Add(new Vector3(x + size, y - size, z + size));
+        verts.Add(new Vector3(x, y - size, z + size));
+    }
+
+    private void CubeFaceTris(List<int> tris, int offset) {
+        //int offset = faceCount * 4;
+        
+        tris.Add(offset + 0); //1
+        tris.Add(offset + 1); //2
+        tris.Add(offset + 2); //3
+        //tris.Add(offset + 0); //1
+        //tris.Add(offset + 2); //3
+        //tris.Add(offset + 3); //4
+        
+        //newUV.AddRange(_textureAtlas.getUVCoords(_textureIndex));
+        
+        //faceCount++;
+    }
+
+
+
+
+
+
 
     public void DestroyScreen(XY coord) {
 
