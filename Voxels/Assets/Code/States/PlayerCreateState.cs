@@ -26,8 +26,10 @@ public class PlayerCreateState : FSMState {
         Vector2 screenCenter = 
             _worldScreenManager.GetScreenCenter(initialScreen.Coord);
 
-        Vector3 playerStartPos = 
-            new Vector3(screenCenter.x, 100, screenCenter.y);
+        // TEMP
+        //Vector3 playerStartPos = 
+        //    new Vector3(screenCenter.x, 100, screenCenter.y);
+        Vector3 playerStartPos = new Vector3(1, 20, 1);
 
         GameObject playerGo = (GameObject)GameObject.
             Instantiate(Resources.Load("Prefabs/Player"));
@@ -38,7 +40,8 @@ public class PlayerCreateState : FSMState {
 
         Camera.main.GetComponent<BoundedTargetCamera>().Target = playerGo;
 
-        ExitState(new FSMTransition(GameState.WorldNavigate));
+        // TEMP
+        //ExitState(new FSMTransition(GameState.WorldNavigate));
     }
 
     public override void ExitState(FSMTransition nextStateTransition) {
