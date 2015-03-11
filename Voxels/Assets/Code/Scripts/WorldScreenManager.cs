@@ -179,9 +179,12 @@ public class WorldScreenManager : MonoBehaviour {
 
         dynamicMesh.GetComponent<MeshFilter>().mesh = mesh;
 
+        // Mesh colliders are super slow. Use box colliders on the surfaces.
+        /*
         MeshCollider collider = dynamicMesh.GetComponent<MeshCollider>();
         collider.sharedMesh = null;
         collider.sharedMesh = mesh;
+        */
 
         _screenMeshes[screenCoord] = dynamicMesh;
     }

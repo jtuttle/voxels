@@ -66,14 +66,13 @@ public class WorldCreateState : FSMState {
 
     private void CreateInitialScreens(XY coord) {
         //_worldScreenManager.CreateScreen(new XY(0, 0));
-        _worldScreenManager.CreateScreen(coord);
+        //_worldScreenManager.CreateScreen(coord);
 
-        /*
+
         for(int x = coord.X - 1; x <= coord.X + 1; x++) {
             for(int y = coord.Y; y <= coord.Y + 1; y++)
                 _worldScreenManager.CreateScreen(new XY(x, y));
         }
-        */
     }
 
     // TODO: This should be on a NoiseCanvas script or something
