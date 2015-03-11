@@ -32,6 +32,8 @@ public class WorldScreenChangeState : FSMState {
 
         XY coordDelta = (transition as WorldScreenChangeTransition).CoordDelta;
 
+        //_worldScreenManager.CreateScreen(GameData.CurrentScreenCoord + coordDelta);
+
         // Disable camera and player movement scripts.
         _camera.GetComponent<BoundedTargetCamera>().enabled = false;
         _player.GetComponent<CharacterController>().enabled = false;
@@ -77,7 +79,7 @@ public class WorldScreenChangeState : FSMState {
     // Move player one half chunk's length onto the next screen.
     private Vector3 GetNewPlayerPosition(XY coordDelta) {
         Vector3 playerPos = _player.transform.position;
-        float halfChunkSize = GameData.World.Config.ChunkSize / 2.0f;
+        float halfChunkSize = 0.5f;
 
         return playerPos + new Vector3(coordDelta.X * halfChunkSize,
                                        0,

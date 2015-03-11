@@ -21,7 +21,10 @@ public class WorldConfig {
         ScreenChunks = screenChunks;
         ScreenCount = screenCount;
 
-        ScreenSize = ScreenChunks * chunkSize;
+        // Now that 1 chunk = 1 unit, these are the same thing. This will 
+        // allow altering the number of voxels per chunk without changing
+        // the size of everything.
+        ScreenSize = ScreenChunks; // * chunkSize;
 
         WorldChunks = new XYZ(screenChunks.X * screenCount.X,
                               screenChunks.Y * screenCount.Y,

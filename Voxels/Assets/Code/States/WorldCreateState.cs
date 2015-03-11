@@ -65,7 +65,8 @@ public class WorldCreateState : FSMState {
     }
 
     private void CreateInitialScreens(XY coord) {
-        _worldScreenManager.CreateScreen(new XY(0, 0));
+        //_worldScreenManager.CreateScreen(new XY(0, 0));
+        _worldScreenManager.CreateScreen(coord);
 
         /*
         for(int x = coord.X - 1; x <= coord.X + 1; x++) {

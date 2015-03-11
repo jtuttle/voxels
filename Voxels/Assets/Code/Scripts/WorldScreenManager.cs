@@ -40,8 +40,6 @@ public class WorldScreenManager : MonoBehaviour {
     }
 
     private void GenerateMesh(XY screenCoord, float[,] screenNoise) {
-        float startTime = Time.time;
-
         WorldConfig worldConfig = GameData.World.Config;
 
         List<Vector3> verts = new List<Vector3>();
@@ -57,6 +55,7 @@ public class WorldScreenManager : MonoBehaviour {
         for(int sx = 0; sx < screenNoise.GetLength(0); sx++) {
             for(int sz = 0; sz < screenNoise.GetLength(1); sz++) {
                 float sample = (int)screenNoise[sx, sz];
+                int textureIndex = 12;
 
                 // top face
                 for(int vx = 0; vx < chunkSize; vx++) {
@@ -65,10 +64,13 @@ public class WorldScreenManager : MonoBehaviour {
                         float y = sample;
                         float z = sz + vz * voxelSize;
 
-                        CubeTop(verts, x, y, z, voxelSize, (byte)0);
+                        CubeTop(verts, x, y, z, voxelSize);
                         CubeFaceTris(tris, offset);
                         
                         offset += 4;
+
+                        TextureAtlas atlas = GameData.TextureAtlas;
+                        uvs.AddRange(atlas.getUVCoords(textureIndex));
                     }
                 }
 
@@ -80,10 +82,13 @@ public class WorldScreenManager : MonoBehaviour {
                             float y = sample - vy * voxelSize;
                             float z = sz + vz * voxelSize;
                             
-                            CubeWestVerts(verts, x, y, z, voxelSize, (byte)0);
+                            CubeWestVerts(verts, x, y, z, voxelSize);
                             CubeFaceTris(tris, offset);
                             
                             offset += 4;
+
+                            TextureAtlas atlas = GameData.TextureAtlas;
+                            uvs.AddRange(atlas.getUVCoords(textureIndex));
                         }
                     }
                 }
@@ -97,10 +102,13 @@ public class WorldScreenManager : MonoBehaviour {
                             float y = sample - vy * voxelSize;
                             float z = sz + vz * voxelSize;
                             
-                            CubeEastVerts(verts, x, y, z, voxelSize, (byte)0);
+                            CubeEastVerts(verts, x, y, z, voxelSize);
                             CubeFaceTris(tris, offset);
                             
                             offset += 4;
+
+                            TextureAtlas atlas = GameData.TextureAtlas;
+                            uvs.AddRange(atlas.getUVCoords(textureIndex));
                         }
                     }
                 }
@@ -113,10 +121,13 @@ public class WorldScreenManager : MonoBehaviour {
                             float y = sample - vy * voxelSize;
                             float z = sz;
                             
-                            CubeSouthVerts(verts, x, y, z, voxelSize, (byte)0);
+                            CubeSouthVerts(verts, x, y, z, voxelSize);
                             CubeFaceTris(tris, offset);
                             
                             offset += 4;
+
+                            TextureAtlas atlas = GameData.TextureAtlas;
+                            uvs.AddRange(atlas.getUVCoords(textureIndex));
                         }
                     }
                 }
@@ -130,10 +141,13 @@ public class WorldScreenManager : MonoBehaviour {
                             float x = sx + vx * voxelSize;
                             float y = sample - vy * voxelSize;
                             
-                            CubeNorthVerts(verts, x, y, z, voxelSize, (byte)0);
+                            CubeNorthVerts(verts, x, y, z, voxelSize);
                             CubeFaceTris(tris, offset);
                             
                             offset += 4;
+
+                            TextureAtlas atlas = GameData.TextureAtlas;
+                            uvs.AddRange(atlas.getUVCoords(textureIndex));
                         }
                     }
                 }
@@ -149,6 +163,7 @@ public class WorldScreenManager : MonoBehaviour {
         GameObject dynamicMesh = (GameObject)Instantiate(DynamicMeshPrototype, 
                                                          screenPos, 
                                                          Quaternion.identity);
+        dynamicMesh.transform.parent = transform;
 
         // Generate the mesh object.
         Mesh mesh = new Mesh();
@@ -169,48 +184,45 @@ public class WorldScreenManager : MonoBehaviour {
         collider.sharedMesh = mesh;
 
         _screenMeshes[screenCoord] = dynamicMesh;
-
-        float diff = Time.time - startTime;
-        Debug.Log("ProceduralTerrain was generated in " + diff + " seconds.");
     }
 
     // TODO: Abstract all this stuff to a helper class.
-    private void CubeTop(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+    private void CubeTop(List<Vector3> verts, float x, float y, float z, float size) {
         verts.Add(new Vector3(x, y, z + size));
         verts.Add(new Vector3(x + size, y, z + size));
         verts.Add(new Vector3(x + size, y, z));
         verts.Add(new Vector3(x, y, z));
     }
     
-    private void CubeNorthVerts(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+    private void CubeNorthVerts(List<Vector3> verts, float x, float y, float z, float size) {
         verts.Add(new Vector3(x + size, y - size, z + size));
         verts.Add(new Vector3(x + size, y, z + size));
         verts.Add(new Vector3(x, y, z + size));
         verts.Add(new Vector3(x, y - size, z + size));
     }
     
-    private void CubeEastVerts(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+    private void CubeEastVerts(List<Vector3> verts, float x, float y, float z, float size) {
         verts.Add(new Vector3(x + size, y - size, z));
         verts.Add(new Vector3(x + size, y, z));
         verts.Add(new Vector3(x + size, y, z + size));
         verts.Add(new Vector3(x + size, y - size, z + size));
     }
     
-    private void CubeSouthVerts(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+    private void CubeSouthVerts(List<Vector3> verts, float x, float y, float z, float size) {
         verts.Add(new Vector3(x, y - size, z));
         verts.Add(new Vector3(x, y, z));
         verts.Add(new Vector3(x + size, y, z));
         verts.Add(new Vector3(x + size, y - size, z));
     }
     
-    private void CubeWestVerts(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+    private void CubeWestVerts(List<Vector3> verts, float x, float y, float z, float size) {
         verts.Add(new Vector3(x, y - size, z + size));
         verts.Add(new Vector3(x, y, z + size));
         verts.Add(new Vector3(x, y, z));
         verts.Add(new Vector3(x, y - size, z));
     }
     
-    private void CubeBotVerts(List<Vector3> verts, float x, float y, float z, float size, byte block) {
+    private void CubeBotVerts(List<Vector3> verts, float x, float y, float z, float size) {
         verts.Add(new Vector3(x, y - size, z));
         verts.Add(new Vector3(x + size, y - size, z));
         verts.Add(new Vector3(x + size, y - size, z + size));
@@ -218,25 +230,13 @@ public class WorldScreenManager : MonoBehaviour {
     }
 
     private void CubeFaceTris(List<int> tris, int offset) {
-        //int offset = faceCount * 4;
-        
         tris.Add(offset + 0); //1
         tris.Add(offset + 1); //2
         tris.Add(offset + 2); //3
-        //tris.Add(offset + 0); //1
-        //tris.Add(offset + 2); //3
-        //tris.Add(offset + 3); //4
-        
-        //newUV.AddRange(_textureAtlas.getUVCoords(_textureIndex));
-        
-        //faceCount++;
+        tris.Add(offset + 0); //1
+        tris.Add(offset + 2); //3
+        tris.Add(offset + 3); //4
     }
-
-
-
-
-
-
 
     public void DestroyScreen(XY coord) {
 
@@ -275,19 +275,20 @@ public class WorldScreenManager : MonoBehaviour {
         Rect screenBounds = GetScreenBounds(screenCoord);
 
         // TODO: un-hardcode these?
-        float top = 40;
-        float bottom = 26;
+        float top = 0;
+        float bottom = 0;
         float left, right;
-        left = right = 25;
+        left = right = 0;
 
-        Rect blah = new Rect(screenBounds.xMin + left,
-                        screenBounds.yMin + bottom,
-                        screenBounds.width - left - right,
-                        screenBounds.height - top - bottom);
+        Rect camBounds = new Rect(screenBounds.xMin + left,
+                                  screenBounds.yMin + bottom,
+                                  screenBounds.width - left - right,
+                                  screenBounds.height - top - bottom);
 
-        return blah;
+        return camBounds;
     }
 
+    /*
     private ChunkGroup CreateScreenChunks(XY screenCoord, float[,] screenNoise) {
         WorldConfig worldConfig = GameData.World.Config;
 
@@ -354,4 +355,5 @@ public class WorldScreenManager : MonoBehaviour {
 
         return chunkGroup;
     }
+    */
 }
