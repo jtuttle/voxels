@@ -28,36 +28,54 @@ public class WorldScreenManager : MonoBehaviour {
     }
 
 	public void CreateScreen(XY screenCoord) {
-        World world = GameData.World;
+        //World world = GameData.World;
 
-        WorldScreen screen = world.GetScreen(screenCoord);
-        float[,] screenNoise = world.GetScreenNoise(screen.Coord);
+        //WorldScreen screen = world.GetScreen(screenCoord);
+        //float[,] screenNoise = world.GetScreenNoise(screen.Coord);
 
         //ChunkGroup screenChunks = CreateScreenChunks(screen.Coord, screenNoise);
         //_screenChunks[screen.Coord] = screenChunks;
 
-        GenerateMesh(screenCoord, screenNoise);
+        GenerateMesh(screenCoord);
     }
 
-    private void GenerateMesh(XY screenCoord, float[,] screenNoise) {
+    private void GenerateMesh(XY screenCoord) {
         WorldConfig worldConfig = GameData.World.Config;
+        TextureAtlas atlas = GameData.TextureAtlas;
+        float[,] worldNoise = GameData.World.Noise;
 
+        // Structures for creating terrain mesh.
         List<Vector3> verts = new List<Vector3>();
         List<int> tris = new List<int>();
         List<Vector2> uvs = new List<Vector2>();
+        int offset = 0; // Offset of vertices to make a triangle in verts array.
 
-        // Offset of vertices from which to make a triangle in verts array.
-        int offset = 0;
+        // Structures for creating collider mesh.
+        List<Vector3> cVerts = new List<Vector3>();
+        List<int> cTris = new List<int>();
+        int cOffset = 0;
 
         int chunkSize = worldConfig.ChunkSize;
+        XYZ screenChunks = worldConfig.ScreenChunks;
         float voxelSize = 1.0f / chunkSize;
 
-        for(int sx = 0; sx < screenNoise.GetLength(0); sx++) {
-            for(int sz = 0; sz < screenNoise.GetLength(1); sz++) {
-                float sample = (int)screenNoise[sx, sz];
-                int textureIndex = 12;
+        for(int sx = 0; sx < screenChunks.X; sx++) {
+            for(int sz = 0; sz < screenChunks.Z; sz++) {
+                // Calculate world coords. Since we have to check neighbors
+                // across screen boundaries, screen coords will not suffice.
+                int wx = screenCoord.X * screenChunks.X + sx;
+                int wz = screenCoord.Y * screenChunks.Z + sz;
+
+                float sample = (int)worldNoise[wx, wz];
+                int textureIndex = 12; // TEMP
 
                 // top face
+
+                // collider
+                CubeTop(cVerts, sx, sample, sz, 1);
+                CubeFaceTris(cTris, cOffset);
+                cOffset += 4;
+
                 for(int vx = 0; vx < chunkSize; vx++) {
                     for(int vz = 0; vz < chunkSize; vz++) {
                         float x = sx + vx * voxelSize;
@@ -69,13 +87,17 @@ public class WorldScreenManager : MonoBehaviour {
                         
                         offset += 4;
 
-                        TextureAtlas atlas = GameData.TextureAtlas;
                         uvs.AddRange(atlas.getUVCoords(textureIndex));
                     }
                 }
 
                 // west face
-                if(sx > 0 && screenNoise[sx - 1, sz] < sample) {
+                if(wx > 0 && worldNoise[wx - 1, wz] < sample) {
+                    // collider
+                    CubeWestVerts(cVerts, sx, sample, sz, 1);
+                    CubeFaceTris(cTris, cOffset);
+                    cOffset += 4;
+
                     for(int vz = 0; vz < chunkSize; vz++) {
                         for(int vy = 0; vy < chunkSize; vy++) {
                             float x = sx;
@@ -87,14 +109,18 @@ public class WorldScreenManager : MonoBehaviour {
                             
                             offset += 4;
 
-                            TextureAtlas atlas = GameData.TextureAtlas;
                             uvs.AddRange(atlas.getUVCoords(textureIndex));
                         }
                     }
                 }
 
                 // east face 
-                if(sx < screenNoise.GetLength(0) - 1 && screenNoise[sx + 1, sz] < sample) {
+                if(wx < worldNoise.GetLength(0) - 1 && worldNoise[wx + 1, wz] < sample) {
+                    // collider
+                    CubeEastVerts(cVerts, sx, sample, sz, 1);
+                    CubeFaceTris(cTris, cOffset);
+                    cOffset += 4;
+
                     float x = sx + voxelSize * (chunkSize - 1);
 
                     for(int vz = 0; vz < chunkSize; vz++) {
@@ -107,14 +133,18 @@ public class WorldScreenManager : MonoBehaviour {
                             
                             offset += 4;
 
-                            TextureAtlas atlas = GameData.TextureAtlas;
                             uvs.AddRange(atlas.getUVCoords(textureIndex));
                         }
                     }
                 }
 
                 // south face 
-                if(sz > 0 && screenNoise[sx, sz - 1] < sample) {
+                if(wz > 0 && worldNoise[wx, wz - 1] < sample) {
+                    // collider
+                    CubeSouthVerts(cVerts, sx, sample, sz, 1);
+                    CubeFaceTris(cTris, cOffset);
+                    cOffset += 4;
+
                     for(int vx = 0; vx < chunkSize; vx++) {
                         for(int vy = 0; vy < chunkSize; vy++) {
                             float x = sx + vx * voxelSize;
@@ -126,14 +156,18 @@ public class WorldScreenManager : MonoBehaviour {
                             
                             offset += 4;
 
-                            TextureAtlas atlas = GameData.TextureAtlas;
                             uvs.AddRange(atlas.getUVCoords(textureIndex));
                         }
                     }
                 }
 
                 // north face 
-                if(sz < screenNoise.GetLength(1) - 1 && screenNoise[sx, sz + 1] < sample) {
+                if(wz < worldNoise.GetLength(1) - 1 && worldNoise[wx, wz + 1] < sample) {
+                    // collider
+                    CubeNorthVerts(cVerts, sx, sample, sz, 1);
+                    CubeFaceTris(cTris, cOffset);
+                    cOffset += 4;
+
                     float z = sz + voxelSize * (chunkSize - 1);
 
                     for(int vx = 0; vx < chunkSize; vx++) {
@@ -146,15 +180,12 @@ public class WorldScreenManager : MonoBehaviour {
                             
                             offset += 4;
 
-                            TextureAtlas atlas = GameData.TextureAtlas;
                             uvs.AddRange(atlas.getUVCoords(textureIndex));
                         }
                     }
                 }
             }
         }
-
-        XYZ screenChunks = worldConfig.ScreenChunks;
 
         Vector3 screenPos = new Vector3(screenCoord.X * screenChunks.X,
                                         0,
@@ -179,7 +210,13 @@ public class WorldScreenManager : MonoBehaviour {
 
         dynamicMesh.GetComponent<MeshFilter>().mesh = mesh;
 
-        // Mesh colliders are super slow. Use box colliders on the surfaces.
+        // Generate low-poly mesh collider.
+        Mesh cMesh = new Mesh();
+        cMesh.vertices = cVerts.ToArray();
+        cMesh.triangles = cTris.ToArray();
+        dynamicMesh.GetComponent<MeshCollider>().sharedMesh = cMesh;
+
+        // High-poly mesh collider is way too slow.
         /*
         MeshCollider collider = dynamicMesh.GetComponent<MeshCollider>();
         collider.sharedMesh = null;
