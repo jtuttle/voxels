@@ -52,6 +52,7 @@ public class World {
         return null;
     }
 
+    /*
     public float[,] GetScreenNoise(XY screenCoord) {
         XYZ screenChunks = Config.ScreenChunks;
 
@@ -68,4 +69,5 @@ public class World {
 
         return screenNoise;
     }
+    */
 }
