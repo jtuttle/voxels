@@ -32,6 +32,8 @@ public class WorldScreenChangeState : FSMState {
 
         XY coordDelta = (transition as WorldScreenChangeTransition).CoordDelta;
 
+        CreateScreens(GameData.CurrentScreenCoord, coordDelta);
+
         // Disable camera and player movement scripts.
         _camera.GetComponent<BoundedTargetCamera>().enabled = false;
         _player.GetComponent<CharacterController>().enabled = false;
@@ -42,7 +44,7 @@ public class WorldScreenChangeState : FSMState {
         TweenParms playerParms = new TweenParms();
         playerParms.Prop("position", newPlayerPos);
         playerParms.Ease(EaseType.Linear);
-        playerParms.OnComplete(OnTweenComplete);
+        playerParms.OnComplete(OnTweenComplete, coordDelta);
         
         HOTween.To(_player.transform, 1, playerParms);
 
@@ -54,9 +56,6 @@ public class WorldScreenChangeState : FSMState {
         cameraParms.Ease(EaseType.Linear);
 
         HOTween.To(_camera.transform, 1, cameraParms);
-
-        // Update current screen coordinate.
-        GameData.CurrentScreenCoord = GameData.CurrentScreenCoord + coordDelta;
     }
     
     public override void ExitState(FSMTransition nextStateTransition) {
@@ -74,10 +73,55 @@ public class WorldScreenChangeState : FSMState {
         base.Dispose();
     }
 
+    // IDEA: To prevent lag here, we could try pushing coordinates onto a 
+    // queue in the order that they'll appear to the player, then check
+    // that queue on each update loop and create one per update. This should
+    // prevent lag while crossing screen boundaries. It will matter much more
+    // when we're creating trees / enemies / etc.
+    private void CreateScreens(XY oldCoord, XY coordDelta) {
+        // north
+        if(coordDelta.Y == 1) {
+            for(int x = oldCoord.X - 1; x <= oldCoord.X + 1; x++)
+                _worldScreenManager.CreateScreen(new XY(x, oldCoord.Y + 3));
+        // east
+        } else if (coordDelta.X == 1) {
+            for(int y = oldCoord.Y - 1; y <= oldCoord.Y + 2; y++)
+                _worldScreenManager.CreateScreen(new XY(oldCoord.X + 2, y));
+        // south
+        } else if(coordDelta.Y == -1) {
+            for(int x = oldCoord.X - 1; x <= oldCoord.X + 1; x++)
+                _worldScreenManager.CreateScreen(new XY(x, oldCoord.Y - 2));
+        // west
+        } else if(coordDelta.X == -1) {
+            for(int y = oldCoord.Y - 1; y <= oldCoord.Y + 2; y++)
+                _worldScreenManager.CreateScreen(new XY(oldCoord.X - 2, y));
+        }  
+    }
+
+    private void DestroyScreens(XY oldCoord, XY coordDelta) {
+        // north
+        if(coordDelta.Y == 1) {
+            for(int x = oldCoord.X - 1; x <= oldCoord.X + 1; x++)
+                _worldScreenManager.DestroyScreen(new XY(x, oldCoord.Y - 1));
+            // east
+        } else if (coordDelta.X == 1) {
+            for(int y = oldCoord.Y - 1; y <= oldCoord.Y + 2; y++)
+                _worldScreenManager.DestroyScreen(new XY(oldCoord.X - 1, y));
+            // south
+        } else if(coordDelta.Y == -1) {
+            for(int x = oldCoord.X - 1; x <= oldCoord.X + 1; x++)
+                _worldScreenManager.DestroyScreen(new XY(x, oldCoord.Y + 2));
+            // west
+        } else if(coordDelta.X == -1) {
+            for(int y = oldCoord.Y - 1; y <= oldCoord.Y + 2; y++)
+                _worldScreenManager.DestroyScreen(new XY(oldCoord.X + 1, y));
+        }  
+    }
+
     // Move player one half chunk's length onto the next screen.
     private Vector3 GetNewPlayerPosition(XY coordDelta) {
         Vector3 playerPos = _player.transform.position;
-        float halfChunkSize = GameData.World.Config.ChunkSize / 2.0f;
+        float halfChunkSize = 0.5f;
 
         return playerPos + new Vector3(coordDelta.X * halfChunkSize,
                                        0,
@@ -113,7 +157,14 @@ public class WorldScreenChangeState : FSMState {
         return new Vector3(newX, camPos.y, newZ);
     }
 
-    private void OnTweenComplete() {
+    private void OnTweenComplete(TweenEvent data) {
+        XY coordDelta = (XY)data.parms[0];
+
+        DestroyScreens(GameData.CurrentScreenCoord, coordDelta);
+
+        // Update current screen coordinate.
+        GameData.CurrentScreenCoord = GameData.CurrentScreenCoord + coordDelta;
+
         ExitState(new FSMTransition(null));
     }
 }

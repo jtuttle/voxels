@@ -7,7 +7,7 @@ public class WorldConfig {
     public int ChunkSize { get; private set; }
 
     public XYZ ScreenChunks { get; private set; }
-    public XYZ ScreenCount { get; private set; }
+    public XY ScreenCount { get; private set; }
     public XYZ ScreenSize { get; private set; }
 
     public XYZ WorldChunks { get; private set; }
@@ -16,16 +16,19 @@ public class WorldConfig {
 
     public int KeyLevels { get; private set; }
 
-    public WorldConfig(int chunkSize, XYZ screenChunks, XYZ screenCount) {
+    public WorldConfig(int chunkSize, XYZ screenChunks, XY screenCount) {
         ChunkSize = chunkSize;
         ScreenChunks = screenChunks;
         ScreenCount = screenCount;
 
-        ScreenSize = ScreenChunks * chunkSize;
+        // Now that 1 chunk = 1 unit, these are the same thing. This will 
+        // allow altering the number of voxels per chunk without changing
+        // the size of everything.
+        ScreenSize = ScreenChunks; // * chunkSize;
 
         WorldChunks = new XYZ(screenChunks.X * screenCount.X,
-                              screenChunks.Y * screenCount.Y,
-                              screenChunks.Z * screenCount.Z);
+                              screenChunks.Y,
+                              screenChunks.Z * screenCount.Y);
 
         // TODO: parameterize these
         MinRoomSize = 16;

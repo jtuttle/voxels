@@ -9,30 +9,34 @@ using UnityEngine;
 // and provides information about screen dimensions and boundaries.
 
 public class WorldScreenManager : MonoBehaviour {
+    // TODO: Pool this.
+    public GameObject DynamicMeshPrototype;
+
     private GameObjectPool _chunkPool;
 
-    private Dictionary<XY, ChunkGroup> _screenChunks;
+    private Dictionary<XY, GameObject> _screenMeshes;
 
     protected void Awake() {
         _chunkPool = GameObject.Find("ChunkPool").
             GetComponent<GameObjectPool>();
 
-        _screenChunks = new Dictionary<XY, ChunkGroup>();
+        _screenMeshes = new Dictionary<XY, GameObject>();
     }
 
 	public void CreateScreen(XY screenCoord) {
-        World world = GameData.World;
+        if(!IsValidScreenCoord(screenCoord)) return;
 
-        WorldScreen screen = world.GetScreen(screenCoord);
-        float[,] screenNoise = world.GetScreenNoise(screen.Coord);
+        GameObject screenMesh = GenerateScreenMesh(screenCoord);
 
-        ChunkGroup screenChunks = CreateScreenChunks(screen.Coord, screenNoise);
-
-        _screenChunks[screen.Coord] = screenChunks;
+        _screenMeshes[screenCoord] = screenMesh;
     }
 
-    public void DestroyScreen(XY coord) {
+    public void DestroyScreen(XY screenCoord) {
+        if(!IsValidScreenCoord(screenCoord)) return;
 
+        Destroy(_screenMeshes[screenCoord]);
+
+        _screenMeshes.Remove(screenCoord);
     }
 
     public Vector2 GetScreenDimensions() {
@@ -67,84 +71,90 @@ public class WorldScreenManager : MonoBehaviour {
     public Rect GetScreenCameraBounds(XY screenCoord) {
         Rect screenBounds = GetScreenBounds(screenCoord);
 
-        // TODO: un-hardcode these?
-        float top = 40;
-        float bottom = 26;
+        // TODO: Need to come up with a better way to handle this. It's way
+        // too arbitrary and probably won't work for all player elevations.
+        float top = 2.5f;
+        float bottom = 2.5f;
         float left, right;
-        left = right = 25;
+        left = right = 2.8f;
 
-        Rect blah = new Rect(screenBounds.xMin + left,
-                        screenBounds.yMin + bottom,
-                        screenBounds.width - left - right,
-                        screenBounds.height - top - bottom);
+        Rect camBounds = new Rect(screenBounds.xMin + left,
+                                  screenBounds.yMin + bottom,
+                                  screenBounds.width - left - right,
+                                  screenBounds.height - top - bottom);
 
-        return blah;
+        return camBounds;
     }
 
-    private ChunkGroup CreateScreenChunks(XY screenCoord, float[,] screenNoise) {
+    private bool IsValidScreenCoord(XY coord) {
+        XY screenCount = GameData.World.Config.ScreenCount;
+        return coord.X > 0 && coord.X < screenCount.X
+            && coord.Y > 0 && coord.Y < screenCount.Y;
+    }
+
+    private GameObject GenerateScreenMesh(XY screenCoord) {
         WorldConfig worldConfig = GameData.World.Config;
-
         int chunkSize = worldConfig.ChunkSize;
-        XYZ screenSize = worldConfig.ScreenSize;
-        int screenHeight = worldConfig.ScreenChunks.Y;
+        XYZ screenChunks = worldConfig.ScreenChunks;
         
-        Chunk[,,] chunks = new Chunk[screenNoise.GetLength(0), 
-                                     screenHeight, 
-                                     screenNoise.GetLength(1)];
-
-        Vector2 screenOffset = new Vector2(screenCoord.X * screenSize.X,
-                                           screenCoord.Y * screenSize.Z);
-
-        for(int x = 0; x < screenNoise.GetLength(0); x++) {
-            for(int z = 0; z < screenNoise.GetLength(1); z++) {
-                int y = (int)screenNoise[x, z];
-
-                Vector3 chunkPos = new Vector3(screenOffset.x + x * chunkSize, 
-                                               y * chunkSize, 
-                                               screenOffset.y + z * chunkSize);
-                    
-                //GameObject newChunkGo = Instantiate(_world.ChunkPrototype, chunkPos,
-                //                                    new Quaternion(0, 0, 0, 0)) as GameObject;
+        TextureAtlas atlas = GameData.TextureAtlas;
+        int texIndex = 12; // TEMP
+        
+        float[,] worldNoise = GameData.World.Noise;
+        
+        CubeMesh mesh = new CubeMesh(chunkSize, atlas, texIndex);
+        CubeMesh cMesh = new CubeMesh(1, null, 0);
+        
+        for(int sx = 0; sx < screenChunks.X; sx++) {
+            for(int sz = 0; sz < screenChunks.Z; sz++) {
+                // Calculate world coords. Since we have to check neighbors
+                // across screen boundaries, screen coords will not suffice.
+                int wx = screenCoord.X * screenChunks.X + sx;
+                int wz = screenCoord.Y * screenChunks.Z + sz;
                 
-                GameObject chunkGo = _chunkPool.GetObject();
-                chunkGo.transform.position = chunkPos;
-                chunkGo.transform.parent = transform;
-                    
-                int textureIndex = 12;
-                    
-                if(y == 0)
-                    textureIndex = 14;
-                else if(y == 1)
-                    textureIndex = 13;
-                else if(y == 5)
-                    textureIndex = 15;
-                else if(y == 6)
-                    textureIndex = 8;
-                    
-                Chunk chunk = chunkGo.GetComponent("Chunk") as Chunk;
-                chunk.Initialize(chunkSize, true, GameData.TextureAtlas, textureIndex);
-
-                chunks[x, y, z] = chunk;
+                float sample = (int)worldNoise[wx, wz];
+                
+                mesh.AddTopFace(sx, sample, sz);
+                cMesh.AddTopFace(sx, sample, sz);
+                
+                // north face 
+                if(wz < worldNoise.GetLength(1) - 1 && worldNoise[wx, wz + 1] < sample) {
+                    mesh.AddNorthFace(sx, sample, sz);
+                    cMesh.AddNorthFace(sx, sample, sz);
+                }
+                
+                // east face 
+                if(wx < worldNoise.GetLength(0) - 1 && worldNoise[wx + 1, wz] < sample) {
+                    mesh.AddEastFace(sx, sample, sz);
+                    cMesh.AddEastFace(sx, sample, sz);
+                }
+                
+                // south face 
+                if(wz > 0 && worldNoise[wx, wz - 1] < sample) {
+                    mesh.AddSouthFace(sx, sample, sz);
+                    cMesh.AddSouthFace(sx, sample, sz);
+                }
+                
+                // west face
+                if(wx > 0 && worldNoise[wx - 1, wz] < sample) {
+                    mesh.AddWestFace(sx, sample, sz);
+                    cMesh.AddWestFace(sx, sample, sz);
+                }
             }
         }
-
-        ChunkGroup chunkGroup = new ChunkGroup(chunks);
         
-        for(int x = 0; x < screenNoise.GetLength(0); x++) {
-            for(int z = 0; z < screenNoise.GetLength(1); z++) {
-                int y = (int)screenNoise[x, z];
-
-                Chunk chunk = chunks[x, y, z];
-
-                // Set the variables necessary for mesh generation optimization
-                // TODO: This can probably be handled more gracefully
-                chunk.chunkGroup = chunkGroup;
-                chunk.chunkOffset = new XYZ(x * chunkSize, y * chunkSize, z * chunkSize);
-
-                chunk.GenerateMesh();
-            }
-        }
-
-        return chunkGroup;
+        Vector3 screenPos = new Vector3(screenCoord.X * screenChunks.X,
+                                        0,
+                                        screenCoord.Y * screenChunks.Z);
+        
+        GameObject dynamicMesh = (GameObject)Instantiate(DynamicMeshPrototype, 
+                                                         screenPos, 
+                                                         Quaternion.identity);
+        dynamicMesh.transform.parent = transform;
+        
+        dynamicMesh.GetComponent<MeshFilter>().mesh = mesh.GetMesh();
+        dynamicMesh.GetComponent<MeshCollider>().sharedMesh = cMesh.GetMesh();
+        
+        return dynamicMesh;
     }
 }
