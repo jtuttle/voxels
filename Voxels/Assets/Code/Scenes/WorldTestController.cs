@@ -8,7 +8,7 @@ public class WorldTestController : MonoBehaviour {
     public GameObject Canvas;
 
     public Vector3 ScreenChunks;
-    public Vector3 ScreenCount;
+    public Vector2 ScreenCount;
 
     private WorldGenerator _worldGenerator;
     //private float[,] _currentNoise;
@@ -90,7 +90,7 @@ public class WorldTestController : MonoBehaviour {
 
     private void RefreshWorld() {
         XYZ screenChunks = new XYZ((int)ScreenChunks.x, (int)ScreenChunks.y, (int)ScreenChunks.z);
-        XYZ screenCount = new XYZ((int)ScreenCount.x, (int)ScreenCount.y, (int)ScreenCount.z);
+        XY screenCount = new XY((int)ScreenCount.x, (int)ScreenCount.y);
         WorldConfig worldConfig = new WorldConfig(8, screenChunks, screenCount);
 
         _worldGenerator = new WorldGenerator();

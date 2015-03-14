@@ -59,7 +59,7 @@ public class PlayerCreateState : FSMState {
         
         int chunkSize = 8;
         XYZ screenChunks = new XYZ(16, 8, 12);
-        XYZ screenCount = new XYZ(16, 1, 16);
+        XY screenCount = new XY(16, 16);
         
         return new WorldConfig(chunkSize, screenChunks, screenCount);
     }
