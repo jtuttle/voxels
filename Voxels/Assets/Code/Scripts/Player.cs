@@ -4,9 +4,9 @@ using System.Collections;
 public class Player : MonoBehaviour {
     public ModifyTerrain ModifyTerrain;
 
-    private CharacterController controller;
+    public float Speed = 5.0f;
 
-    private float speed = 20.0f;
+    private CharacterController controller;
 
     private Vector3 moveDirection = Vector3.zero;
     private Vector3 forward = Vector3.zero;
@@ -36,7 +36,7 @@ public class Player : MonoBehaviour {
 
         movement += new Vector3(0, -0.05f, 0); // gravity
 
-        controller.Move(movement * speed);
+        controller.Move(movement * Speed);
     }
 
     private void Attack() {
