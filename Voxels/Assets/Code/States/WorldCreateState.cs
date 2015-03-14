@@ -59,18 +59,16 @@ public class WorldCreateState : FSMState {
         
         int chunkSize = 8;
         XYZ screenChunks = new XYZ(16, 8, 12);
-        XYZ screenCount = new XYZ(16, 1, 16);
+        XY screenCount = new XY(16, 16);
         
         return new WorldConfig(chunkSize, screenChunks, screenCount);
     }
 
     private void CreateInitialScreens(XY coord) {
-        //_worldScreenManager.CreateScreen(new XY(0, 0));
         //_worldScreenManager.CreateScreen(coord);
 
-
         for(int x = coord.X - 1; x <= coord.X + 1; x++) {
-            for(int y = coord.Y; y <= coord.Y + 1; y++)
+            for(int y = coord.Y - 1; y <= coord.Y + 2; y++)
                 _worldScreenManager.CreateScreen(new XY(x, y));
         }
     }

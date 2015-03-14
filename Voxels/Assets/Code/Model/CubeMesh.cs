@@ -36,8 +36,8 @@ public class CubeMesh {
                 float y = cy;
                 float z = cz + fz * _faceSectionSize;
                 
-                CubeTop(x, y, z, _faceSectionSize);
-                CubeFaceTris();
+                VertsTop(x, y, z, _faceSectionSize);
+                Tris();
 
                 if(_atlas != null)
                     _uvs.AddRange(_atlas.getUVCoords(_texIndex));
@@ -53,8 +53,8 @@ public class CubeMesh {
                 float x = cx + fx * _faceSectionSize;
                 float y = cy - fy * _faceSectionSize;
                 
-                CubeNorth(x, y, z, _faceSectionSize);
-                CubeFaceTris();
+                VertsNorth(x, y, z, _faceSectionSize);
+                Tris();
 
                 if(_atlas != null)
                     _uvs.AddRange(_atlas.getUVCoords(_texIndex));
@@ -70,8 +70,8 @@ public class CubeMesh {
                 float y = cy - fy * _faceSectionSize;
                 float z = cz + fz * _faceSectionSize;
                 
-                CubeEast(x, y, z, _faceSectionSize);
-                CubeFaceTris();
+                VertsEast(x, y, z, _faceSectionSize);
+                Tris();
 
                 if(_atlas != null)
                     _uvs.AddRange(_atlas.getUVCoords(_texIndex));
@@ -86,8 +86,8 @@ public class CubeMesh {
                 float y = cy - fy * _faceSectionSize;
                 float z = cz;
                 
-                CubeSouth(x, y, z, _faceSectionSize);
-                CubeFaceTris();
+                VertsSouth(x, y, z, _faceSectionSize);
+                Tris();
 
                 if(_atlas != null)
                     _uvs.AddRange(_atlas.getUVCoords(_texIndex));
@@ -102,8 +102,8 @@ public class CubeMesh {
                 float y = cy - fy * _faceSectionSize;
                 float z = cz + fz * _faceSectionSize;
                 
-                CubeWest(x, y, z, _faceSectionSize);
-                CubeFaceTris();
+                VertsWest(x, y, z, _faceSectionSize);
+                Tris();
 
                 if(_atlas != null)
                     _uvs.AddRange(_atlas.getUVCoords(_texIndex));
@@ -122,49 +122,49 @@ public class CubeMesh {
         return mesh;
     }
 
-    private void CubeTop(float x, float y, float z, float size) {
+    private void VertsTop(float x, float y, float z, float size) {
         _verts.Add(new Vector3(x, y, z + size));
         _verts.Add(new Vector3(x + size, y, z + size));
         _verts.Add(new Vector3(x + size, y, z));
         _verts.Add(new Vector3(x, y, z));
     }
     
-    private void CubeNorth(float x, float y, float z, float size) {
+    private void VertsNorth(float x, float y, float z, float size) {
         _verts.Add(new Vector3(x + size, y - size, z + size));
         _verts.Add(new Vector3(x + size, y, z + size));
         _verts.Add(new Vector3(x, y, z + size));
         _verts.Add(new Vector3(x, y - size, z + size));
     }
     
-    private void CubeEast(float x, float y, float z, float size) {
+    private void VertsEast(float x, float y, float z, float size) {
         _verts.Add(new Vector3(x + size, y - size, z));
         _verts.Add(new Vector3(x + size, y, z));
         _verts.Add(new Vector3(x + size, y, z + size));
         _verts.Add(new Vector3(x + size, y - size, z + size));
     }
     
-    private void CubeSouth(float x, float y, float z, float size) {
+    private void VertsSouth(float x, float y, float z, float size) {
         _verts.Add(new Vector3(x, y - size, z));
         _verts.Add(new Vector3(x, y, z));
         _verts.Add(new Vector3(x + size, y, z));
         _verts.Add(new Vector3(x + size, y - size, z));
     }
     
-    private void CubeWest(float x, float y, float z, float size) {
+    private void VertsWest(float x, float y, float z, float size) {
         _verts.Add(new Vector3(x, y - size, z + size));
         _verts.Add(new Vector3(x, y, z + size));
         _verts.Add(new Vector3(x, y, z));
         _verts.Add(new Vector3(x, y - size, z));
     }
     
-    private void CubeBot(float x, float y, float z, float size) {
+    private void VertsBottom(float x, float y, float z, float size) {
         _verts.Add(new Vector3(x, y - size, z));
         _verts.Add(new Vector3(x + size, y - size, z));
         _verts.Add(new Vector3(x + size, y - size, z + size));
         _verts.Add(new Vector3(x, y - size, z + size));
     }
     
-    private void CubeFaceTris() {
+    private void Tris() {
         _tris.Add(_offset + 0); //1
         _tris.Add(_offset + 1); //2
         _tris.Add(_offset + 2); //3

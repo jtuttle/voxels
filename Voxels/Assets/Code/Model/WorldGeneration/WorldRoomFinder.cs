@@ -26,11 +26,11 @@ public class WorldRoomFinder {
     // This method divides the world's noise into screens based on the dimensions specified in the
     // world config. It also calls another method to find the rooms in each screen.
     private void FindWorldRooms() {
-        XYZ screenCount = _world.Config.ScreenCount;
+        XY screenCount = _world.Config.ScreenCount;
         XYZ screenChunks = _world.Config.ScreenChunks;
         
         // Loop over world screens.
-        for(int screenZ = 0; screenZ < screenCount.Z; screenZ++) {
+        for(int screenZ = 0; screenZ < screenCount.Y; screenZ++) {
             for(int screenX = 0; screenX < screenCount.X; screenX++) {
                 XY screenCoord = new XY(screenX, screenZ);
                 
