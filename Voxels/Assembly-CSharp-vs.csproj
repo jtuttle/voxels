@@ -82,6 +82,9 @@
      <Compile Include="Assets\Code\Utils\GameObjectPool.cs" />
      <Compile Include="Assets\Code\Utils\MathUtils.cs" />
      <Compile Include="Assets\Code\Utils\Noise.cs" />
+     <Compile Include="Assets\Code\Utils\Quest\BaseQuestAction.cs" />
+     <Compile Include="Assets\Code\Utils\Quest\IQuestAction.cs" />
+     <Compile Include="Assets\Code\Utils\Quest\QuestManager.cs" />
      <Compile Include="Assets\Code\Utils\Search\ISearchable.cs" />
      <Compile Include="Assets\Code\Utils\Search\Search.cs" />
      <Compile Include="Assets\Code\Utils\State\FSMState.cs" />
