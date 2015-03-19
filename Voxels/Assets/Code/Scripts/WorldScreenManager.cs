@@ -29,6 +29,8 @@ public class WorldScreenManager : MonoBehaviour {
         GameObject screenMesh = GenerateScreenMesh(screenCoord);
 
         _screenMeshes[screenCoord] = screenMesh;
+
+        PlaceScreenObjects(screenCoord);
     }
 
     public void DestroyScreen(XY screenCoord) {
@@ -156,5 +158,25 @@ public class WorldScreenManager : MonoBehaviour {
         dynamicMesh.GetComponent<MeshCollider>().sharedMesh = cMesh.GetMesh();
         
         return dynamicMesh;
+    }
+
+    private void PlaceScreenObjects(XY screenCoord) {
+        WorldScreen screen = GameData.World.GetScreen(screenCoord);
+
+        GameObject treePrototype = Resources.Load("Prefabs/Tree") as GameObject;
+
+        Vector2 screenCorner = GetScreenCorner(screenCoord);
+        int chunkSize = 1;
+
+        foreach(Room room in screen.Rooms) {
+            foreach(XY coord in room.Perimeter) {
+                float x = screenCorner.x + coord.X * chunkSize;
+                float y = room.Elevation;
+                float z = screenCorner.y + coord.Y * chunkSize;
+
+                GameObject tree = (GameObject)Instantiate(treePrototype);
+                tree.transform.position = new Vector3(x, y, z);
+            }
+        }
     }
 }

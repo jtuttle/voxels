@@ -2,11 +2,9 @@ using UnityEngine;
 using System.Collections;
 
 public class ModifyTerrain : MonoBehaviour {
-    public WorldComponent world;
     public GameObject cameraGO;
 
     protected void Start() {
-        world = gameObject.GetComponent("World") as WorldComponent;
         cameraGO = GameObject.FindGameObjectWithTag("MainCamera");
     }
 
@@ -99,12 +97,13 @@ public class ModifyTerrain : MonoBehaviour {
     }
 
     public void SetBlockAt(int x, int y, int z, byte block) {
+        /*
         XYZ worldChunks = world.Config.WorldChunks;
 
         if(x < 0 || x >= worldChunks.X || y < 0 || y >= worldChunks.Y || z < 0 || z >= worldChunks.Z)
             return;
+        */
 
-        // TODO - replace this (might have been done?)
 //        world.data[x, y, z] = block;
 
         //UpdateChunkAt(x, y, z);

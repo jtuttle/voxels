@@ -69,8 +69,6 @@
      <Compile Include="Assets\Code\Scripts\ModifyTerrain.cs" />
      <Compile Include="Assets\Code\Scripts\Player.cs" />
      <Compile Include="Assets\Code\Scripts\PlayerCamera.cs" />
-     <Compile Include="Assets\Code\Scripts\WorldComponent.cs" />
-     <Compile Include="Assets\Code\Scripts\WorldScreenComponent.cs" />
      <Compile Include="Assets\Code\Scripts\WorldScreenManager.cs" />
      <Compile Include="Assets\Code\States\PlayerCreateState.cs" />
      <Compile Include="Assets\Code\States\WorldCreateState.cs" />
