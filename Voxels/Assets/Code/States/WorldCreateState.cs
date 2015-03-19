@@ -67,8 +67,16 @@ public class WorldCreateState : FSMState {
     private void CreateInitialScreens(XY coord) {
         //_worldScreenManager.CreateScreen(coord);
 
+        /*
         for(int x = coord.X - 1; x <= coord.X + 1; x++) {
             for(int y = coord.Y - 1; y <= coord.Y + 2; y++)
+                _worldScreenManager.CreateScreen(new XY(x, y));
+        }
+        */
+
+        WorldConfig config = GameData.World.Config;
+        for(int x = 0; x < config.ScreenCount.X; x++) {
+            for(int y = 0; y < config.ScreenCount.Y; y++)
                 _worldScreenManager.CreateScreen(new XY(x, y));
         }
     }
