@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -103,8 +103,9 @@ public class WorldTestController : MonoBehaviour {
             XY screenCoord = screen.Coord;
             XY screenOffset = new XY(screenCoord.X * screenChunks.X, screenCoord.Y * screenChunks.Z);
 
-            foreach(Room room in screen.Rooms)
-                _centroids[room] = screenOffset + XY.Average(room.Perimeter.ToList());
+            foreach(Room room in screen.Rooms) {
+                _centroids[room] = screenOffset + XY.Average(room.Coords.ToList());
+            }
         }
 
         UpdateTexture();

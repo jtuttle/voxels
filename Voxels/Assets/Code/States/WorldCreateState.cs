@@ -33,6 +33,9 @@ public class WorldCreateState : FSMState {
 
         GameData.World = world;
 
+        // TEMP - screen with slope
+        world.InitialRoom = world.GetScreen(new XY(5, 4)).Rooms[0];
+
         WorldScreen initialScreen = world.GetScreen(world.InitialRoom);
 
         CreateInitialScreens(initialScreen.Coord);
@@ -58,7 +61,7 @@ public class WorldCreateState : FSMState {
         // world can be 16 x 16 screens
         
         int chunkSize = 8;
-        XYZ screenChunks = new XYZ(16, 8, 12);
+        XYZ screenChunks = new XYZ(16, 6, 12);
         XY screenCount = new XY(16, 16);
         
         return new WorldConfig(chunkSize, screenChunks, screenCount);
@@ -67,18 +70,19 @@ public class WorldCreateState : FSMState {
     private void CreateInitialScreens(XY coord) {
         //_worldScreenManager.CreateScreen(coord);
 
-        /*
         for(int x = coord.X - 1; x <= coord.X + 1; x++) {
             for(int y = coord.Y - 1; y <= coord.Y + 2; y++)
                 _worldScreenManager.CreateScreen(new XY(x, y));
         }
-        */
 
+        // all screens
+        /*
         WorldConfig config = GameData.World.Config;
         for(int x = 0; x < config.ScreenCount.X; x++) {
             for(int y = 0; y < config.ScreenCount.Y; y++)
                 _worldScreenManager.CreateScreen(new XY(x, y));
         }
+        */
     }
 
     // TODO: This should be on a NoiseCanvas script or something

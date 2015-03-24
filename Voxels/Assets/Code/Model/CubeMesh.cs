@@ -5,7 +5,6 @@ using UnityEngine;
 public class CubeMesh {
     private int _faceSections;
     private TextureAtlas _atlas;
-    private int _texIndex;
 
     private float _faceSectionSize;
 
@@ -15,10 +14,9 @@ public class CubeMesh {
 
     private int _offset;
 
-    public CubeMesh(int faceSections, TextureAtlas atlas, int texIndex) {
+    public CubeMesh(int faceSections, TextureAtlas atlas) {
         _faceSections = faceSections;
         _atlas = atlas;
-        _texIndex = texIndex;
 
         _faceSectionSize = 1.0f / _faceSections;
 
@@ -29,7 +27,7 @@ public class CubeMesh {
         _offset = 0;
     }
 
-    public void AddTopFace(float cx, float cy, float cz) {
+    public void AddTopFace(float cx, float cy, float cz, int texIndex = 0) {
         for(int fx = 0; fx < _faceSections; fx++) {
             for(int fz = 0; fz < _faceSections; fz++) {
                 float x = cx + fx * _faceSectionSize;
@@ -40,12 +38,12 @@ public class CubeMesh {
                 Tris();
 
                 if(_atlas != null)
-                    _uvs.AddRange(_atlas.getUVCoords(_texIndex));
+                    _uvs.AddRange(_atlas.getUVCoords(texIndex));
             }
         }
     }
 
-    public void AddNorthFace(float cx, float cy, float cz) {
+    public void AddNorthFace(float cx, float cy, float cz, int texIndex = 0) {
         float z = cz + _faceSectionSize * (_faceSections - 1);
         
         for(int fx = 0; fx < _faceSections; fx++) {
@@ -57,12 +55,12 @@ public class CubeMesh {
                 Tris();
 
                 if(_atlas != null)
-                    _uvs.AddRange(_atlas.getUVCoords(_texIndex));
+                    _uvs.AddRange(_atlas.getUVCoords(texIndex));
             }
         }
     }
 
-    public void AddEastFace(float cx, float cy, float cz) {
+    public void AddEastFace(float cx, float cy, float cz, int texIndex = 0) {
         float x = cx + _faceSectionSize * (_faceSections - 1);
         
         for(int fz = 0; fz < _faceSections; fz++) {
@@ -74,12 +72,12 @@ public class CubeMesh {
                 Tris();
 
                 if(_atlas != null)
-                    _uvs.AddRange(_atlas.getUVCoords(_texIndex));
+                    _uvs.AddRange(_atlas.getUVCoords(texIndex));
             }
         }
     }
 
-    public void AddSouthFace(float cx, float cy, float cz) {
+    public void AddSouthFace(float cx, float cy, float cz, int texIndex = 0) {
         for(int fx = 0; fx < _faceSections; fx++) {
             for(int fy = 0; fy < _faceSections; fy++) {
                 float x = cx + fx * _faceSectionSize;
@@ -90,12 +88,12 @@ public class CubeMesh {
                 Tris();
 
                 if(_atlas != null)
-                    _uvs.AddRange(_atlas.getUVCoords(_texIndex));
+                    _uvs.AddRange(_atlas.getUVCoords(texIndex));
             }
         }
     }
 
-    public void AddWestFace(float cx, float cy, float cz) {
+    public void AddWestFace(float cx, float cy, float cz, int texIndex = 0) {
         for(int fz = 0; fz < _faceSections; fz++) {
             for(int fy = 0; fy < _faceSections; fy++) {
                 float x = cx;
@@ -106,7 +104,7 @@ public class CubeMesh {
                 Tris();
 
                 if(_atlas != null)
-                    _uvs.AddRange(_atlas.getUVCoords(_texIndex));
+                    _uvs.AddRange(_atlas.getUVCoords(texIndex));
             }
         }
     }
