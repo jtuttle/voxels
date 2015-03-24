@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -118,7 +118,9 @@ public class WorldRoomFinder {
                             XY leftCoord = neighborCoord + new XY(_world.Config.ScreenChunks.X, 0);
                             
                             neighbor = FindNeighbor(room, leftScreen, leftCoord);
-                            if(neighbor != null) neighbors.Add(neighbor);
+
+                            if(neighbor != null && !neighbors.Contains(neighbor)) 
+                                neighbors.Add(neighbor);
                         }
                         
                         // Check for neighbor relationships with the previous vertical screen.
@@ -126,7 +128,9 @@ public class WorldRoomFinder {
                             XY downCoord = neighborCoord + new XY(0, _world.Config.ScreenChunks.Y);
                             
                             neighbor = FindNeighbor(room, downScreen, downCoord);
-                            if(neighbor != null) neighbors.Add(neighbor);
+
+                            if(neighbor != null && !neighbors.Contains(neighbor)) 
+                                neighbors.Add(neighbor);
                         }
                     } else {
                         if(searchTile.Elevation == neighborTile.Elevation && !visited.Contains(neighborTile)) {
@@ -140,7 +144,9 @@ public class WorldRoomFinder {
                             
                             // Check for internal neighbor relationships.
                             neighbor = FindNeighbor(room, currentScreen, neighborCoord);
-                            if(neighbor != null) neighbors.Add(neighbor);
+
+                            if(neighbor != null && !neighbors.Contains(neighbor))
+                                neighbors.Add(neighbor);
                         }
                     }
                 }

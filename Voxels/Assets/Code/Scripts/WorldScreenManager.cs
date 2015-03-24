@@ -30,7 +30,8 @@ public class WorldScreenManager : MonoBehaviour {
 
         _screenMeshes[screenCoord] = screenMesh;
 
-        PlaceScreenObjects(screenCoord);
+        PlaceDoors(screenCoord);
+        //PlaceScreenObjects(screenCoord);    
     }
 
     public void DestroyScreen(XY screenCoord) {
@@ -104,8 +105,18 @@ public class WorldScreenManager : MonoBehaviour {
         
         float[,] worldNoise = GameData.World.Noise;
         
-        CubeMesh mesh = new CubeMesh(chunkSize, atlas, texIndex);
-        CubeMesh cMesh = new CubeMesh(1, null, 0);
+        CubeMesh mesh = new CubeMesh(chunkSize, atlas);
+        CubeMesh cMesh = new CubeMesh(1, null);
+
+        Dictionary<int, int> textures = new Dictionary<int, int>() {
+            { 0, 14 },
+            { 1, 13 },
+            { 2, 12 },
+            { 3, 12 },
+            { 4, 12 },
+            { 5, 15 },
+            { 6, 8 }
+        };
         
         for(int sx = 0; sx < screenChunks.X; sx++) {
             for(int sz = 0; sz < screenChunks.Z; sz++) {
@@ -114,32 +125,35 @@ public class WorldScreenManager : MonoBehaviour {
                 int wx = screenCoord.X * screenChunks.X + sx;
                 int wz = screenCoord.Y * screenChunks.Z + sz;
                 
-                float sample = (int)worldNoise[wx, wz];
-                
-                mesh.AddTopFace(sx, sample, sz);
+                int sample = (int)worldNoise[wx, wz];
+
+                if(sample > 6)
+                    Debug.Log(sample);
+
+                mesh.AddTopFace(sx, sample, sz, textures[sample]);
                 cMesh.AddTopFace(sx, sample, sz);
                 
                 // north face 
                 if(wz < worldNoise.GetLength(1) - 1 && worldNoise[wx, wz + 1] < sample) {
-                    mesh.AddNorthFace(sx, sample, sz);
+                    mesh.AddNorthFace(sx, sample, sz, textures[sample]);
                     cMesh.AddNorthFace(sx, sample, sz);
                 }
                 
                 // east face 
                 if(wx < worldNoise.GetLength(0) - 1 && worldNoise[wx + 1, wz] < sample) {
-                    mesh.AddEastFace(sx, sample, sz);
+                    mesh.AddEastFace(sx, sample, sz, textures[sample]);
                     cMesh.AddEastFace(sx, sample, sz);
                 }
                 
                 // south face 
                 if(wz > 0 && worldNoise[wx, wz - 1] < sample) {
-                    mesh.AddSouthFace(sx, sample, sz);
+                    mesh.AddSouthFace(sx, sample, sz, textures[sample]);
                     cMesh.AddSouthFace(sx, sample, sz);
                 }
                 
                 // west face
                 if(wx > 0 && worldNoise[wx - 1, wz] < sample) {
-                    mesh.AddWestFace(sx, sample, sz);
+                    mesh.AddWestFace(sx, sample, sz, textures[sample]);
                     cMesh.AddWestFace(sx, sample, sz);
                 }
             }
@@ -160,6 +174,15 @@ public class WorldScreenManager : MonoBehaviour {
         return dynamicMesh;
     }
 
+    private void PlaceDoors(XY screenCoord) {
+        WorldScreen screen = GameData.World.GetScreen(screenCoord);
+
+
+        foreach(Room room in screen.Rooms) {
+
+        }
+    }
+
     private void PlaceScreenObjects(XY screenCoord) {
         WorldScreen screen = GameData.World.GetScreen(screenCoord);
 
@@ -167,12 +190,13 @@ public class WorldScreenManager : MonoBehaviour {
 
         Vector2 screenCorner = GetScreenCorner(screenCoord);
         int chunkSize = 1;
+        float halfChunk = chunkSize / 2.0f;
 
         foreach(Room room in screen.Rooms) {
             foreach(XY coord in room.Perimeter) {
-                float x = screenCorner.x + coord.X * chunkSize;
+                float x = screenCorner.x + coord.X * chunkSize + halfChunk;
                 float y = room.Elevation;
-                float z = screenCorner.y + coord.Y * chunkSize;
+                float z = screenCorner.y + coord.Y * chunkSize + halfChunk;
 
                 GameObject tree = (GameObject)Instantiate(treePrototype);
                 tree.transform.position = new Vector3(x, y, z);
