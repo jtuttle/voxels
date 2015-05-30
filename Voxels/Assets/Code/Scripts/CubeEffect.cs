@@ -26,7 +26,7 @@ public class CubeEffect : MonoBehaviour {
                 Vector3.zero + new Vector3(Random.Range(-1, 1), 
                                            Random.Range(-1, 1), 
                                            Random.Range(-1, 1));
-            newCube.renderer.material.color = color;
+            newCube.GetComponent<Renderer>().material.color = color;
 
             _cubes.Add(newCube);
         }

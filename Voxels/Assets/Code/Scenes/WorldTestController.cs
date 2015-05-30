@@ -113,7 +113,7 @@ public class WorldTestController : MonoBehaviour {
 
     private void UpdateTexture() {
         _currentTexture = GenerateTexture(_currentWorld);
-        Canvas.renderer.material.mainTexture = _currentTexture;
+        Canvas.GetComponent<Renderer>().material.mainTexture = _currentTexture;
     }
 
     private Texture2D GenerateTexture(World world) {
