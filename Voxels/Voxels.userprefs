@@ -1,11 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True" selected="True" />
-      </Pad>
-    </Pads>
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../climb/ClimbClientUnity/Assets/Code/PlayerControl.cs">
+    <Files>
+      <File FileName="../../climb/ClimbClientUnity/Assets/Code/Ground.cs" Line="1" Column="1" />
+      <File FileName="../../climb/ClimbClientUnity/Assets/Code/PlayerControl.cs" Line="60" Column="32" />
+    </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

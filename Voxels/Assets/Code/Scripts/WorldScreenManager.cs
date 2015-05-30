@@ -12,14 +12,9 @@ public class WorldScreenManager : MonoBehaviour {
     // TODO: Pool this.
     public GameObject DynamicMeshPrototype;
 
-    private GameObjectPool _chunkPool;
-
     private Dictionary<XY, GameObject> _screenMeshes;
 
     protected void Awake() {
-        _chunkPool = GameObject.Find("ChunkPool").
-            GetComponent<GameObjectPool>();
-
         _screenMeshes = new Dictionary<XY, GameObject>();
     }
 

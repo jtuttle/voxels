@@ -49,25 +49,25 @@ public class NoiseTestController : MonoBehaviour {
     private void OnAverageClick() {
         _currentNoise = _worldNoise.NormalizeAverage(_currentNoise);
         _currentTexture = GenerateTexture(Width, Height, _currentNoise);
-        Canvas.renderer.material.mainTexture = _currentTexture;
+        Canvas.GetComponent<Renderer>().material.mainTexture = _currentTexture;
     }
 
     private void OnWeightClick() {
         _currentNoise = _worldNoise.ApplyCubicWeight(_currentNoise);
         _currentTexture = GenerateTexture(Width, Height, _currentNoise);
-        Canvas.renderer.material.mainTexture = _currentTexture;
+        Canvas.GetComponent<Renderer>().material.mainTexture = _currentTexture;
     }
 
     private void OnBlockifyClick() {
         _currentNoise = _worldNoise.Blockify(_currentNoise);
         _currentTexture = GenerateTexture(Width, Height, _currentNoise);
-        Canvas.renderer.material.mainTexture = _currentTexture;
+        Canvas.GetComponent<Renderer>().material.mainTexture = _currentTexture;
     }
 
     private void OnDiscretizeClick() {
         _currentNoise = _worldNoise.DiscretizeNormalizedNoise(_currentNoise, Elevation);
         _currentTexture = GenerateTexture(Width, Height, _currentNoise);
-        Canvas.renderer.material.mainTexture = _currentTexture;
+        Canvas.GetComponent<Renderer>().material.mainTexture = _currentTexture;
     }
 
     private void OnSaveClick() {
@@ -79,7 +79,7 @@ public class NoiseTestController : MonoBehaviour {
 
         _currentNoise = _worldNoise.GenerateRawNoise(Width, Height);
         _currentTexture = GenerateTexture(Width, Height, _currentNoise);
-        Canvas.renderer.material.mainTexture = _currentTexture;
+        Canvas.GetComponent<Renderer>().material.mainTexture = _currentTexture;
     }
 
     private Texture2D GenerateTexture(int width, int height, float[,] samples) {
