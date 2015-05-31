@@ -2,9 +2,9 @@
 using UnityEngine;
 
 public class ChunkGroup {
-    public Chunk[,,] Chunks;
+    public IChunk[,,] Chunks;
 
-    public ChunkGroup(Chunk[,,] chunks) {
+    public ChunkGroup(IChunk[,,] chunks) {
         Chunks = chunks;
     }
 
@@ -15,7 +15,7 @@ public class ChunkGroup {
                                   (int)Mathf.Floor(y / chunkSize), 
                                   (int)Mathf.Floor(z / chunkSize));
         
-        Chunk chunk = Chunks[chunkCoords.X, chunkCoords.Y, chunkCoords.Z];
+        IChunk chunk = Chunks[chunkCoords.X, chunkCoords.Y, chunkCoords.Z];
 
         if(chunk == null) return 0;
 

@@ -46,9 +46,14 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Code\ChunkTestScene.cs" />
+     <Compile Include="Assets\Code\FixedChunk.cs" />
      <Compile Include="Assets\Code\GameController.cs" />
      <Compile Include="Assets\Code\GameData.cs" />
+     <Compile Include="Assets\Code\Model\ChunkGroupMesh.cs" />
      <Compile Include="Assets\Code\Model\CubeMesh.cs" />
+     <Compile Include="Assets\Code\Model\DynamicMesh.cs" />
+     <Compile Include="Assets\Code\Model\IChunk.cs" />
      <Compile Include="Assets\Code\Model\Room.cs" />
      <Compile Include="Assets\Code\Model\RoomEdge.cs" />
      <Compile Include="Assets\Code\Model\RoomTile.cs" />
@@ -59,6 +64,7 @@
      <Compile Include="Assets\Code\Model\WorldGeneration\WorldNoiseGenerator.cs" />
      <Compile Include="Assets\Code\Model\WorldGeneration\WorldRoomFinder.cs" />
      <Compile Include="Assets\Code\Model\WorldScreen.cs" />
+     <Compile Include="Assets\Code\NewChunkGroup.cs" />
      <Compile Include="Assets\Code\Scenes\NoiseTestController.cs" />
      <Compile Include="Assets\Code\Scenes\WorldTestController.cs" />
      <Compile Include="Assets\Code\Scripts\BoundedTargetCamera.cs" />
