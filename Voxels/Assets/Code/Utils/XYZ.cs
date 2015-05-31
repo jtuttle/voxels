@@ -62,6 +62,10 @@ public class XYZ {
         return new XYZ(a.X * b, a.Y * b, a.Z * b);
     }
 
+    public static XYZ operator *(XYZ a, XYZ b) {
+        return new XYZ(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
+    }
+
     public static XYZ operator /(XYZ a, int b) {
         return new XYZ(a.X / b, a.Y / b, a.Z / b);
     }
